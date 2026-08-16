@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NOC - Ultimate 3D Presentation Experience</title>
+    <title>Omantel NOC - Pro-Max 3D Command Presentation</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,8 +12,8 @@
         }
 
         body {
-            background-color: #020617;
-            color: #f8fafc;
+            background-color: #010409;
+            color: #f0f6fc;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow-x: hidden;
         }
@@ -29,52 +29,64 @@
             pointer-events: none;
         }
 
-        /* Presentation Slide Sections */
+        /* Presentation Sections */
         .section {
             position: relative;
             height: 100vh;
             width: 100vw;
             display: flex;
             align-items: center;
-            padding-left: 10%;
+            padding-left: 8%;
             z-index: 2;
         }
 
+        /* Pro-Max Glassmorphism Card */
         .presentation-card {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 20px;
-            padding: 2.5rem;
-            max-width: 580px;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 163, 224, 0.35);
+            border-radius: 24px;
+            padding: 2.75rem;
+            max-width: 620px;
             opacity: 0;
             transform: translateY(50px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 
-                        0 0 30px rgba(0, 163, 224, 0.15);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 
+                        0 0 40px rgba(0, 163, 224, 0.2);
         }
 
         .category-tag {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(0, 163, 224, 0.2), rgba(56, 189, 248, 0.2));
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(0, 163, 224, 0.25), rgba(56, 189, 248, 0.25));
             color: #38bdf8;
             font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            padding: 0.4rem 0.9rem;
+            padding: 0.45rem 1rem;
             border-radius: 30px;
-            margin-bottom: 1.2rem;
-            border: 1px solid rgba(56, 189, 248, 0.4);
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+        }
+
+        .category-tag::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #38bdf8;
         }
 
         h1 {
-            font-size: 2.6rem;
+            font-size: 2.8rem;
             font-weight: 800;
             letter-spacing: -0.03em;
-            line-height: 1.15;
+            line-height: 1.1;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
+            background: linear-gradient(135deg, #ffffff 20%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -82,7 +94,7 @@
         p {
             font-size: 1.05rem;
             color: #94a3b8;
-            line-height: 1.6;
+            line-height: 1.65;
             margin-bottom: 1.5rem;
         }
 
@@ -94,64 +106,72 @@
         }
 
         .feature-box {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 12px;
+            background: rgba(22, 27, 34, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.1rem;
+            border-radius: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .feature-box:hover {
+            border-color: rgba(56, 189, 248, 0.4);
         }
 
         .feature-box h3 {
             font-size: 0.95rem;
             color: #38bdf8;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.35rem;
         }
 
         .feature-box p {
             font-size: 0.85rem;
-            color: #94a3b8;
+            color: #8b949e;
             margin: 0;
         }
 
         /* Floating Scroll Indicator */
         .scroll-indicator {
             position: fixed;
-            bottom: 2rem;
+            bottom: 2.5rem;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             color: rgba(255, 255, 255, 0.4);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.25em;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+            50% { opacity: 0.9; }
         }
     </style>
 </head>
 <body>
 
-    <div class="scroll-indicator">↓ Scroll to Experience Presentation</div>
+    <div class="scroll-indicator"><span>↓</span> Scroll to Navigate Command Presentation</div>
     <div id="webgl-container"></div>
 
     <!-- Slide 1: Introduction -->
     <section class="section">
         <div class="presentation-card" id="slide-1">
             <span class="category-tag">Omantel Enterprise Overview</span>
-            <h1>Network Operations Center (NOC)</h1>
-            <p>The centralized command nexus of Oman's telecommunications infrastructure. The NOC orchestrates, monitors, and protects national connectivity 24/7/365.</p>
+            <h1>Network Operations Center</h1>
+            <p>The centralized nerve center of the Sultanate's digital infrastructure. Operating 24/7/365 to orchestrate, secure, and future-proof national connectivity.</p>
             <div class="grid-features">
                 <div class="feature-box">
                     <h3>99.999% Uptime</h3>
-                    <p>Core network stability for millions.</p>
+                    <p>Unmatched core stability for enterprise and consumer data.</p>
                 </div>
                 <div class="feature-box">
-                    <h3>Automated AI Ops</h3>
-                    <p>Real-time telemetry and predictive alerts.</p>
+                    <h3>AI Telemetry</h3>
+                    <p>Predictive anomaly detection and automated rerouting.</p>
                 </div>
             </div>
         </div>
@@ -161,16 +181,16 @@
     <section class="section">
         <div class="presentation-card" id="slide-2">
             <span class="category-tag">Operational Hierarchy</span>
-            <h1>Front Office & Back Office</h1>
-            <p>A synchronized two-tier defense system engineered for instant escalation and elite technical resolution.</p>
+            <h1>Front & Back Office Structure</h1>
+            <p>A synchronized two-tier defense model engineered for rapid triage, escalation, and zero-downtime resolution.</p>
             <div class="grid-features">
                 <div class="feature-box">
                     <h3>Front Office (Tier 1)</h3>
-                    <p>First-line watchdogs tracking live alarms, triage, and customer-impacting outages.</p>
+                    <p>Front-line surveillance monitoring real-time alarms, client impacts, and initial dispatch.</p>
                 </div>
                 <div class="feature-box">
                     <h3>Back Office (Tier 2/3)</h3>
-                    <p>Specialized domain engineers executing root-cause analysis and complex patches.</p>
+                    <p>Specialized systems engineers driving root-cause analysis, complex configuration patches, and vendor execution.</p>
                 </div>
             </div>
         </div>
@@ -180,16 +200,16 @@
     <section class="section">
         <div class="presentation-card" id="slide-3">
             <span class="category-tag">Visual Command Center</span>
-            <h1>Video Walls & Screens</h1>
-            <p>Massive enterprise visualization dashboards giving engineers instantaneous situational awareness across nationwide nodes.</p>
+            <h1>Video Walls & Dashboards</h1>
+            <p>High-resolution enterprise monitoring walls providing absolute situational awareness across nationwide fiber backbones and mobile networks.</p>
             <div class="grid-features">
                 <div class="feature-box">
-                    <h3>Core Traffic Flows</h3>
-                    <p>International gateway routing and load monitoring.</p>
+                    <h3>Gateway Traffic</h3>
+                    <p>International submarine cable capacity and peering metrics.</p>
                 </div>
                 <div class="feature-box">
-                    <h3>Fiber & RAN Maps</h3>
-                    <p>Geospatial telemetry on mobile towers and optical cables.</p>
+                    <h3>RAN & Optical Maps</h3>
+                    <p>Geospatial telemetry tracking 5G cell tower load and fiber health.</p>
                 </div>
             </div>
         </div>
@@ -200,21 +220,21 @@
         <div class="presentation-card" id="slide-4">
             <span class="category-tag">Engineering Domains</span>
             <h1>Inside the NOC Verticals</h1>
-            <p>Dedicated technical groups keeping every layer of Omantel's telecommunication fabric operating at elite speeds.</p>
+            <p>Dedicated technical syndicates maintaining absolute operational integrity across every layer of Omantel's infrastructure.</p>
             <div class="grid-features">
                 <div class="feature-box">
                     <h3>IP/MPLS & Core</h3>
-                    <p>Packet routing, 5G core nodes, and data switching.</p>
+                    <p>Core routing architecture, high-speed switching, and packet gateways.</p>
                 </div>
                 <div class="feature-box">
-                    <h3>Power & Facilities</h3>
-                    <p>Datacenter climate control, backup generators, and safety.</p>
+                    <h3>Power & Facility</h3>
+                    <p>Datacenter environmental regulation, UPS backups, and grid stability.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CDN Libraries: Three.js & GSAP with ScrollTrigger -->
+    <!-- CDN Libraries: Three.js, GSAP, & ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -226,58 +246,88 @@
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 7);
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 8);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        // 2. Cinematic Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+        // 2. High-Tech Cyberpunk Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
         scene.add(ambientLight);
 
-        const primaryLight = new THREE.PointLight(0x00a3e0, 6, 12); // Omantel Cyan Blue
-        primaryLight.position.set(4, 4, 4);
-        scene.add(primaryLight);
+        const mainLight = new THREE.PointLight(0x00a3e0, 8, 15); // Omantel Cyan
+        mainLight.position.set(3, 4, 4);
+        scene.add(mainLight);
 
-        const secondaryLight = new THREE.PointLight(0x38bdf8, 4, 12);
-        secondaryLight.position.set(-4, -4, 3);
-        scene.add(secondaryLight);
+        const accentLight = new THREE.PointLight(0x38bdf8, 5, 15);
+        accentLight.position.set(-4, -3, 3);
+        scene.add(accentLight);
 
-        // 3. Create Multi-Part 3D Presentation Master Group (Server + Interactive Screens + Hologram Rings)
+        // 3. Create Multi-Component Advanced 3D Infrastructure Cluster
         const nocGroup = new THREE.Group();
 
-        // Central Server Hub
-        const serverGeo = new THREE.BoxGeometry(1.4, 2.4, 0.8);
-        const serverMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.15 });
-        const serverHub = new THREE.Mesh(serverGeo, serverMat);
-        nocGroup.add(serverHub);
+        // Central Server Hub Array (Multiple interconnected racks)
+        const rackGroup = new THREE.Group();
+        for (let i = -1; i <= 1; i++) {
+            const rackGeo = new THREE.BoxGeometry(0.5, 2.2, 0.5);
+            const rackMat = new THREE.MeshStandardMaterial({ 
+                color: 0x0f172a, 
+                metalness: 0.95, 
+                roughness: 0.1 
+            });
+            const rack = new THREE.Mesh(rackGeo, rackMat);
+            rack.position.x = i * 0.7;
+            rackGroup.add(rack);
+        }
+        nocGroup.add(rackGroup);
 
-        // Interactive Glowing Screen Panels (representing Video Walls / Front & Back office displays)
-        const screenGeo = new THREE.PlaneGeometry(1.1, 0.6);
-        const screenMat1 = new THREE.MeshBasicMaterial({ color: 0x00a3e0, side: THREE.DoubleSide });
-        const screenMat2 = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
-        
-        const screen1 = new THREE.Mesh(screenGeo, screenMat1);
-        screen1.position.set(0, 0.7, 0.43);
-        nocGroup.add(screen1);
+        // Glowing Screen Wall Panels (Simulating Command Center Video Walls)
+        const panelGeo = new THREE.PlaneGeometry(2.4, 1.4);
+        const panelMat = new THREE.MeshBasicMaterial({ 
+            color: 0x00a3e0, 
+            wireframe: false,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.85
+        });
+        const commandScreen = new THREE.Mesh(panelGeo, panelMat);
+        commandScreen.position.set(0, 0, 0.35);
+        nocGroup.add(commandScreen);
 
-        const screen2 = new THREE.Mesh(screenGeo, screenMat2);
-        screen2.position.set(0, 0, 0.43);
-        nocGroup.add(screen2);
+        // Secondary Floating Data Ring / Torus Knot Core
+        const coreGeo = new THREE.TorusKnotGeometry(1.2, 0.08, 128, 32);
+        const coreMat = new THREE.MeshStandardMaterial({ 
+            color: 0x38bdf8, 
+            metalness: 0.8, 
+            roughness: 0.2,
+            emissive: 0x00a3e0,
+            emissiveIntensity: 0.5
+        });
+        const dataCore = new THREE.Mesh(coreGeo, coreMat);
+        dataCore.scale.set(0.7, 0.7, 0.7);
+        nocGroup.add(dataCore);
 
-        const screen3 = new THREE.Mesh(screenGeo, screenMat1);
-        screen3.position.set(0, -0.7, 0.43);
-        nocGroup.add(screen3);
+        // Particle Field (Representing Data Packets & Network Telemetry)
+        const particleCount = 350;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
 
-        // Floating Data Rings (Cyberpunk Aesthetic)
-        const ringGeo = new THREE.TorusGeometry(2.2, 0.02, 16, 100);
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.2, emissive: 0x00a3e0, emissiveIntensity: 0.4 });
-        const dataRing = new THREE.Mesh(ringGeo, ringMat);
-        dataRing.rotation.x = Math.PI / 2;
-        nocGroup.add(dataRing);
+        for(let i = 0; i < particleCount * 3; i++) {
+            particlePositions[i] = (Math.random() - 0.5) * 12;
+        }
+
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMat = new THREE.PointsMaterial({
+            color: 0x38bdf8,
+            size: 0.04,
+            transparent: true,
+            opacity: 0.7
+        });
+        const particleField = new THREE.Points(particleGeo, particleMat);
+        scene.add(particleField);
 
         scene.add(nocGroup);
 
@@ -290,47 +340,59 @@
                 trigger: "body",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1.5 // Smooth momentum tracking with user scrollbar
+                scrub: 1.5
             }
         });
 
-        // Slide 1 -> Slide 2 Transitions (Front & Back Office Focus)
+        // Slide 1 -> Slide 2 (Front/Back Office Focus)
         presentationTimeline
-            .to(nocGroup.rotation, { y: Math.PI * 0.8, x: Math.PI * 0.15, duration: 2 }, 0)
-            .to(nocGroup.position, { x: 1.3, y: 0, duration: 2 }, 0)
+            .to(nocGroup.rotation, { y: Math.PI * 0.75, x: Math.PI * 0.15, duration: 2 }, 0)
+            .to(nocGroup.position, { x: 1.4, y: 0, duration: 2 }, 0)
+            .to(dataCore.rotation, { z: Math.PI, duration: 2 }, 0)
             .to("#slide-1", { opacity: 0, y: -50, duration: 0.5 }, 0)
             .to("#slide-2", { opacity: 1, y: 0, duration: 0.5 }, 0.5)
 
-        // Slide 2 -> Slide 3 Transitions (Command Center Video Wall Focus)
-            .to(nocGroup.rotation, { y: Math.PI * 1.6, x: -Math.PI * 0.1, duration: 2 }, 2)
-            .to(nocGroup.position, { x: -1.3, y: 0.2, duration: 2 }, 2)
-            .to(dataRing.rotation, { z: Math.PI, duration: 2 }, 2)
+        // Slide 2 -> Slide 3 (Video Wall / Screen Focus)
+            .to(nocGroup.rotation, { y: Math.PI * 1.5, x: -Math.PI * 0.1, duration: 2 }, 2)
+            .to(nocGroup.position, { x: -1.4, y: 0.2, duration: 2 }, 2)
+            .to(dataCore.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 2 }, 2)
             .to("#slide-2", { opacity: 0, y: -50, duration: 0.5 }, 2)
             .to("#slide-3", { opacity: 1, y: 0, duration: 0.5 }, 2.5)
 
-        // Slide 3 -> Slide 4 Transitions (Core Domains Focus)
-            .to(nocGroup.rotation, { y: Math.PI * 2.4, x: Math.PI * 0.1, duration: 2 }, 4)
-            .to(nocGroup.position, { x: 0.9, y: -0.1, duration: 2 }, 4)
+        // Slide 3 -> Slide 4 (Core Domains Focus)
+            .to(nocGroup.rotation, { y: Math.PI * 2.25, x: Math.PI * 0.2, duration: 2 }, 4)
+            .to(nocGroup.position, { x: 1.0, y: -0.1, duration: 2 }, 4)
             .to("#slide-3", { opacity: 0, y: -50, duration: 0.5 }, 4)
             .to("#slide-4", { opacity: 1, y: 0, duration: 0.5 }, 4.5);
 
-        // Continuous subtle floating idle motion loop
+        // Continuous Organic Idle Motion Loops
         gsap.to(nocGroup.position, {
-            y: "+=0.18",
-            duration: 2.2,
+            y: "+=0.2",
+            duration: 2.5,
             repeat: -1,
             yoyo: true,
             ease: "sine.inOut"
         });
 
-        // 6. WebGL Render Loop
+        gsap.to(dataCore.rotation, {
+            y: "+=6.28",
+            duration: 12,
+            repeat: -1,
+            ease: "none"
+        });
+
+        // 6. Render Loop
         function animateScene() {
             requestAnimationFrame(animateScene);
+            
+            // Gently rotate particle field for dynamic ambiance
+            particleField.rotation.y += 0.0005;
+
             renderer.render(scene, camera);
         }
         animateScene();
 
-        // 7. Dynamic Window Resizing
+        // 7. Window Resizing Handler
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
