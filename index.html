@@ -3,8 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — Master 3D Command Presentation</title>
+    <title>Omantel NSOC — Cinematic Master Presentation</title>
+    <!-- Google Fonts: Instrument Serif for Editorial Elegance & Jakarta Sans for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --bg-deep: #030712;
+            --bg-surface: rgba(13, 19, 32, 0.75);
+            --border-glass: rgba(56, 189, 248, 0.2);
+            --accent-cyan: #00a3e0;
+            --accent-sky: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -12,583 +27,599 @@
         }
 
         body {
-            background-color: #000208;
-            color: #f1f5f9;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        /* Fixed WebGL Canvas Container */
-        #webgl-container {
+        /* Cinematic Background Video / Canvas Layer */
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 1;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            top: -20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 60vh;
+            background: radial-gradient(circle, rgba(0, 163, 224, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
+            z-index: 0;
             pointer-events: none;
         }
 
-        /* Presentation Chapters */
-        .section {
-            position: relative;
-            min-height: 100vh;
-            width: 100vw;
+        /* Navigation Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 6rem 0 6rem 8%;
-            z-index: 2;
+            padding: 1.5rem 5%;
+            z-index: 100;
+            background: rgba(3, 7, 18, 0.6);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Cinematic Glassmorphism Presentation Card */
-        .presentation-card {
-            background: rgba(8, 12, 20, 0.85);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border: 1px solid rgba(0, 163, 224, 0.35);
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand span {
+            color: var(--accent-sky);
+        }
+
+        .nav-progress {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Main Presentation Container */
+        .presentation-container {
+            position: relative;
+            z-index: 2;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 8rem 2rem 10rem 2rem;
+        }
+
+        /* Chapter Sections */
+        .chapter-section {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            padding: 4rem 0;
+            opacity: 0.2;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .chapter-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Liquid Glassmorphism Card */
+        .glass-card {
+            width: 100%;
+            background: var(--bg-surface);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass);
             border-radius: 28px;
-            padding: 3rem;
-            max-width: 760px;
-            opacity: 0;
-            transform: translateY(50px);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), 
-                        0 0 60px rgba(0, 163, 224, 0.18),
+            padding: 3.5rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
-        .category-tag {
+        .chapter-tag {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: linear-gradient(135deg, rgba(0, 163, 224, 0.25), rgba(56, 189, 248, 0.25));
-            color: #38bdf8;
             font-size: 0.75rem;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.18em;
-            padding: 0.5rem 1.1rem;
+            letter-spacing: 0.2em;
+            color: var(--accent-sky);
+            background: rgba(0, 163, 224, 0.12);
+            border: 1px solid rgba(0, 163, 224, 0.3);
+            padding: 0.4rem 1rem;
             border-radius: 30px;
+            margin-bottom: 1.5rem;
+        }
+
+        h1.chapter-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 4rem;
+            font-weight: 400;
+            line-height: 1.05;
+            letter-spacing: -0.01em;
             margin-bottom: 1.25rem;
-            border: 1px solid rgba(56, 189, 248, 0.5);
-        }
-
-        .category-tag::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            background-color: #38bdf8;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #38bdf8;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.15;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 20%, #38bdf8 100%);
+            background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        h3 {
-            font-size: 1.15rem;
-            color: #38bdf8;
-            margin-top: 1.25rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
+        p.chapter-desc {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 900px;
         }
 
-        p {
-            font-size: 1rem;
-            color: #94a3b8;
-            line-height: 1.65;
-            margin-bottom: 1rem;
-        }
-
-        ul {
-            list-style: none;
-            margin-bottom: 1rem;
-        }
-
-        ul li {
-            position: relative;
-            padding-left: 1.25rem;
-            margin-bottom: 0.45rem;
-            color: #cbd5e1;
-            font-size: 0.92rem;
-        }
-
-        ul li::before {
-            content: "▪";
-            position: absolute;
-            left: 0;
-            color: #00a3e0;
-            font-size: 0.8rem;
-        }
-
-        .grid-features {
+        /* Grid Layouts for Content */
+        .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1.25rem;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
 
-        .feature-box {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            padding: 1.15rem;
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 16px;
-            transition: all 0.3s ease;
+            padding: 1.5rem;
+            transition: border-color 0.3s ease;
         }
 
-        .feature-box:hover {
-            border-color: rgba(56, 189, 248, 0.4);
-            transform: translateY(-2px);
+        .info-box:hover {
+            border-color: rgba(56, 189, 248, 0.3);
         }
 
-        .feature-box h4 {
-            font-size: 0.95rem;
-            color: #38bdf8;
-            margin-bottom: 0.35rem;
+        .info-box h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-sky);
+            margin-bottom: 0.5rem;
         }
 
-        .feature-box p {
-            font-size: 0.85rem;
-            color: #8b949e;
+        .info-box p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
             margin: 0;
         }
 
-        /* Ambient Scroll Guide */
-        .scroll-indicator {
-            position: fixed;
-            bottom: 2.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            pointer-events: none;
+        /* Bullet Point Lists */
+        .feature-list {
+            list-style: none;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            animation: pulse 2s infinite;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.9; }
+        .feature-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        .feature-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-sky);
+            font-weight: bold;
+        }
+
+        /* Flow / Process Steps */
+        .flow-chain {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .flow-node {
+            background: rgba(0, 163, 224, 0.1);
+            border: 1px solid rgba(0, 163, 224, 0.3);
+            color: #ffffff;
+            padding: 0.6rem 1.1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* Sidebar Progress Indicator */
+        .side-nav {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-sky);
+            transform: scale(1.4);
+            box-shadow: 0 0 10px var(--accent-sky);
+        }
+
+        @media(max-width: 900px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            h1.chapter-title { font-size: 3rem; }
+            .glass-card { padding: 2rem; }
+            .side-nav { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="scroll-indicator"><span>↓</span> Scroll to Explore NSOC Master Presentation</div>
-    <div id="webgl-container"></div>
+    <div class="ambient-glow"></div>
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- Chapter 1 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-1">
-            <span class="category-tag">01 — NSOC Overview</span>
-            <h1>Network & Service Operations Center</h1>
-            <p>The centralized nerve center of Omantel's telecommunications infrastructure, orchestrating nationwide digital resilience 24/7/365.</p>
-            <ul>
-                <li>Continuous surveillance of physical network elements and digital services.</li>
-                <li>Holistic operational cycle spanning event detection, incident resolution, and preventive tuning.</li>
-                <li>Unifying national connectivity under a single command umbrella.</li>
-            </ul>
-        </div>
-    </section>
+    <header>
+        <div class="brand">OMANTEL <span>NSOC</span></div>
+        <div class="nav-progress" id="progress-indicator">Chapter 01 / 11</div>
+    </header>
 
-    <!-- Chapter 2 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-2">
-            <span class="category-tag">02 — Hierarchy & Escalation</span>
-            <h1>Front Office & Back Office Structure</h1>
-            <p>A synchronized multi-tier operational model engineered for rapid isolation, expert analysis, and seamless field execution.</p>
-            <div class="grid-features">
-                <div class="feature-box">
-                    <h4>Front Office (Tier 1)</h4>
-                    <p>Live alarm surveillance, initial triage, and customer impact tracking.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>Back Office (Tier 2/3)</h4>
-                    <p>Domain engineers driving root-cause diagnosis and complex remediation.</p>
-                </div>
-            </div>
-            <h3>Escalation Workflow</h3>
-            <p style="font-size: 0.88rem; color: #38bdf8;">Front Office → Back Office → Field Intervention / Vendor Partner</p>
-        </div>
-    </section>
+    <div class="side-nav" id="side-nav"></div>
 
-    <!-- Chapter 3 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-3">
-            <span class="category-tag">03 — Organizational Structure</span>
-            <h1>Core Operational Domains</h1>
-            <p>Specialized technical verticals working in unison to protect every architectural layer of Omantel's network.</p>
-            <ul>
-                <li><strong>Fixed & Service Desk:</strong> Broadband operations and subscriber request management.</li>
-                <li><strong>Transport & Transmission:</strong> Optical fiber, microwave links, and VSAT systems.</li>
-                <li><strong>IP Core & Datacom:</strong> High-capacity routing, switching, and enterprise data pathways.</li>
-                <li><strong>INOC & Enterprise:</strong> Submarine international gateways, MPLS, ILL, and SD-WAN.</li>
-                <li><strong>Service Operations & Cybersecurity:</strong> Availability monitoring, threat detection, and response.</li>
-            </ul>
-        </div>
-    </section>
+    <main class="presentation-container">
 
-    <!-- Chapter 4 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-4">
-            <span class="category-tag">04 — Fixed & Service Desk</span>
-            <h1>Fixed Networks & Subscriber Support</h1>
-            <p>Managing fixed-line integrity and governing end-to-end customer service lifecycles.</p>
-            <div class="grid-features">
-                <div class="feature-box">
-                    <h4>Fixed Operations</h4>
-                    <p>Real-time alarm monitoring, threshold metrics, and automated ticketing.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>Service Desk</h4>
-                    <p>Service request handling, incident logging, and strict SLA/KPI enforcement.</p>
+        <!-- 01 — Overview -->
+        <section class="chapter-section active" data-chapter="1">
+            <div class="glass-card">
+                <span class="chapter-tag">01 — NSOC Overview</span>
+                <h1 class="chapter-title">Network & Service Operations Center</h1>
+                <p class="chapter-desc">The central nervous system of Omantel's telecommunications grid, balancing deep infrastructure surveillance with seamless digital service delivery.</p>
+                <div class="grid-3">
+                    <div class="info-box">
+                        <h3>24/7 Monitoring</h3>
+                        <p>Continuous national surveillance ensuring uncompromised uptime and real-time operational readiness.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Operations Scope</h3>
+                        <p>Simultaneous oversight of underlying network elements and customer-facing digital services.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Operational Cycle</h3>
+                        <p>End-to-end framework encompassing event detection, incident triage, analysis, and preventive maintenance.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Chapter 5 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-5">
-            <span class="category-tag">05 — Transport & Datacom</span>
-            <h1>Transport Links & Datacom Infrastructure</h1>
-            <p>Securing physical backbone connectivity and high-speed data transmission across the nation.</p>
-            <ul>
-                <li><strong>IP Core:</strong> IP network routing, core reachability, and high-performance packet services.</li>
-                <li><strong>Transmission:</strong> Fiber optic lines, microwave relays, VSAT, and optical transport links.</li>
-                <li><strong>Datacom:</strong> Enterprise data connectivity, infrastructure monitoring, and troubleshooting.</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- Chapter 6 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-6">
-            <span class="category-tag">06 — INOC & Enterprise Services</span>
-            <h1>International Gateways & Corporate Solutions</h1>
-            <p>Connecting Oman to global submarine cable systems and managing enterprise-grade network fabrics.</p>
-            <div class="grid-features">
-                <div class="feature-box">
-                    <h4>INOC (International NOC)</h4>
-                    <p>Submarine cables, international internet gateways, and voice transit.</p>
+        <!-- 02 — Front & Back Office -->
+        <section class="chapter-section" data-chapter="2">
+            <div class="glass-card">
+                <span class="chapter-tag">02 — Structure & Escalation</span>
+                <h1 class="chapter-title">Front Office & Back Office Architecture</h1>
+                <p class="chapter-desc">A structured multi-tier operational model engineered for rapid alarm filtration, expert diagnosis, and precise field resolution.</p>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>Front Office</h3>
+                        <p>First-line defense managing incoming alarms, event tracking, and initial triage.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Back Office</h3>
+                        <p>Specialized engineers executing deep root-cause analysis and complex mitigation strategies.</p>
+                    </div>
                 </div>
-                <div class="feature-box">
-                    <h4>Enterprise Operations</h4>
-                    <p>Dedicated management for MPLS, Point-to-Point, ILL, and SD-WAN.</p>
+                <div style="margin-top: 1.5rem;">
+                    <h3 style="font-size: 0.95rem; color: var(--accent-sky); margin-bottom: 0.75rem;">Escalation Pathway</h3>
+                    <div class="flow-chain">
+                        <span class="flow-node">Front Office</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">Back Office</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">Field Intervention</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-node">Vendor Partner</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Chapter 7 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-7">
-            <span class="category-tag">07 — Service Operations & Security</span>
-            <h1>Service Integrity & Cyber Protection</h1>
-            <p>Guaranteeing optimal service performance while defending critical infrastructure against digital threats.</p>
-            <ul>
-                <li><strong>Service Operations:</strong> Tracking service availability, measuring degradation, and assessing customer impact.</li>
-                <li><strong>Cybersecurity:</strong> Continuous security monitoring, threat detection, and coordination with network teams.</li>
-            </ul>
-        </div>
-    </section>
+        <!-- 03 — Organizational Structure -->
+        <section class="chapter-section" data-chapter="3">
+            <div class="glass-card">
+                <span class="chapter-tag">03 — Organizational Matrix</span>
+                <h1 class="chapter-title">Core Technical Departments</h1>
+                <p class="chapter-desc">Specialized technical verticals working collaboratively to secure every layer of the network ecosystem.</p>
+                <ul class="feature-list">
+                    <li><strong>Fixed & Service Desk:</strong> Fixed-line voice/broadband operations and subscriber request management.</li>
+                    <li><strong>Transport & Transmission:</strong> Optical fiber infrastructure, microwave backhaul, and VSAT systems.</li>
+                    <li><strong>IP Core & Datacom:</strong> High-capacity packet routing, switching, and enterprise data pathways.</li>
+                    <li><strong>INOC & Enterprise:</strong> Submarine international gateways, MPLS, ILL, and SD-WAN management.</li>
+                    <li><strong>Service Operations & Cybersecurity:</strong> Availability tracking, degradation control, threat detection, and mitigation.</li>
+                </ul>
+            </div>
+        </section>
 
-    <!-- Chapter 8 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-8">
-            <span class="category-tag">08 — Operations & Alarms</span>
-            <h1>Alarm Management & Monitoring Systems</h1>
-            <p>The technological engine driving automated event correlation and network visibility.</p>
-            <div class="grid-features">
-                <div class="feature-box">
-                    <h4>Alarm Lifecycle</h4>
-                    <p>Generation → Collection → Correlation → Filtering → Escalation → Clearance.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>Operational Systems</h4>
-                    <p>NMS tools, ticketing systems, topology mapping, and documentation repositories.</p>
+        <!-- 04 — Department Connections -->
+        <section class="chapter-section" data-chapter="4">
+            <div class="glass-card">
+                <span class="chapter-tag">04 — Inter-Departmental Flow</span>
+                <h1 class="chapter-title">Department Connections & Workflows</h1>
+                <p class="chapter-desc">Governing cross-departmental communication, incident handoffs, and architectural domain dependencies.</p>
+                <div class="grid-3">
+                    <div class="info-box">
+                        <h3>Communication</h3>
+                        <p>Standardized protocols ensuring zero latency in inter-departmental notifications.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Incident Movement</h3>
+                        <p>Structured workflows governing how tickets migrate across technical boundaries.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Internal Escalation</h3>
+                        <p>Clear thresholds defining when domain experts take ownership of complex tickets.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Chapter 9 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-9">
-            <span class="category-tag">09 — Incident Workflow</span>
-            <h1>Ticket Lifecycle & Department Interaction</h1>
-            <p>Standardized protocols ensuring smooth collaboration from initial detection to final closure.</p>
-            <ul>
-                <li><strong>Lifecycle:</strong> Detection → Analysis → Classification → Assignment → Investigation → Resolution → Closure.</li>
-                <li><strong>Interaction:</strong> Alarm → Front Office → Back Office Domain → Field/Vendor → Network Verification.</li>
-            </ul>
-        </div>
-    </section>
+        <!-- 05 — Fixed Network -->
+        <section class="chapter-section" data-chapter="5">
+            <div class="glass-card">
+                <span class="chapter-tag">05 — Fixed Domain</span>
+                <h1 class="chapter-title">Fixed Network Operations</h1>
+                <p class="chapter-desc">Safeguarding fixed-line subscriber services through proactive monitoring and rigorous alarm management.</p>
+                <ul class="feature-list">
+                    <li>Continuous monitoring of fixed network infrastructure and voice/broadband services.</li>
+                    <li>Automated alarm surveillance using advanced network management applications.</li>
+                    <li>Integrated ticketing, seamless escalation pathways, and dedicated Back Office support.</li>
+                </ul>
+            </div>
+        </section>
 
-    <!-- Chapter 10 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-10">
-            <span class="category-tag">10 — Escalation & KPIs</span>
-            <h1>Escalation Levels & Performance Metrics</h1>
-            <p>Measuring operational excellence through defined escalation tiers and stringent performance indicators.</p>
-            <div class="grid-features">
-                <div class="feature-box">
-                    <h4>Escalation Tiers</h4>
-                    <p>Level 1 (Front Office) to Level 4 (Vendor / Senior Management).</p>
-                </div>
-                <div class="feature-box">
-                    <h4>Key Performance Indicators</h4>
-                    <p>Availability, MTTA, MTTR, alarm volume, and SLA compliance rates.</p>
+        <!-- 06 — Service Desk -->
+        <section class="chapter-section" data-chapter="6">
+            <div class="glass-card">
+                <span class="chapter-tag">06 — Subscriber Care</span>
+                <h1 class="chapter-title">Service Desk & Ticket Management</h1>
+                <p class="chapter-desc">Handling service requests and incident lifecycles while enforcing strict Service Level Agreements (SLAs).</p>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>Incident Lifecycle</h3>
+                        <p>Service request logging, initial ticket categorization, escalation, and closure verification.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>SLA & Compliance</h3>
+                        <p>Rigorous tracking of Key Performance Indicators (KPIs) and customer communication standards.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Chapter 11 -->
-    <section class="section">
-        <div class="presentation-card" id="slide-11">
-            <span class="category-tag">11 — Strategy & Simulation</span>
-            <h1>Proactive Operations & Complete Simulation</h1>
-            <p>Shifting from reactive recovery to predictive prevention across a unified ecosystem.</p>
-            <ul>
-                <li><strong>Reactive vs Proactive:</strong> Moving from alarm firefighting to predictive analysis and preventive action.</li>
-                <li><strong>Complete Simulation:</strong> Transport link failure → Automated alarm → Front Office detection → Back Office investigation → Field/Vendor intervention → Service restoration & closure.</li>
-                <li><strong>One Ecosystem:</strong> Alarms, tickets, services, network domains, and engineers working as a unified entity.</li>
-            </ul>
-        </div>
-    </section>
+        <!-- 07 — Transport & Datacom -->
+        <section class="chapter-section" data-chapter="7">
+            <div class="glass-card">
+                <span class="chapter-tag">07 — Backbone Infrastructure</span>
+                <h1 class="chapter-title">Transport & Datacom Networks</h1>
+                <p class="chapter-desc">Securing physical transmission links and high-speed enterprise data connectivity nationwide.</p>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>IP Core & Transmission</h3>
+                        <p>Core IP routing, fiber optic spans, microwave relays, VSAT, and optical transport monitoring.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Datacom & Integration</h3>
+                        <p>Enterprise data infrastructure, troubleshooting, and end-to-end transport integration.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <!-- CDN Libraries: Three.js, GSAP, & ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+        <!-- 08 — INOC & Enterprise -->
+        <section class="chapter-section" data-chapter="8">
+            <div class="glass-card">
+                <span class="chapter-tag">08 — International & Enterprise</span>
+                <h1 class="chapter-title">INOC & Enterprise Services</h1>
+                <p class="chapter-desc">Managing submarine cable gateways and high-performance enterprise connectivity solutions.</p>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>INOC Operations</h3>
+                        <p>Submarine cable systems, international links, Internet gateways, and voice transit monitoring.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Enterprise Solutions</h3>
+                        <p>Dedicated oversight for MPLS, Point-to-Point (P2P), Leased Lines (ILL), and SD-WAN architectures.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
+        <!-- 09 — Service Operations & Cybersecurity -->
+        <section class="chapter-section" data-chapter="9">
+            <div class="glass-card">
+                <span class="chapter-tag">09 — Integrity & Security</span>
+                <h1 class="chapter-title">Service Operations & Cybersecurity</h1>
+                <p class="chapter-desc">Maintaining optimal service performance while actively defending against cyber threats.</p>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>Service Operations</h3>
+                        <p>Tracking service availability, measuring performance degradation, and assessing customer impact.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Cybersecurity</h3>
+                        <p>Continuous threat detection, security incident investigation, response, and network coordination.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10 — Alarm Management & Systems -->
+        <section class="chapter-section" data-chapter="10">
+            <div class="glass-card">
+                <span class="chapter-tag">10 — Telemetry & Systems</span>
+                <h1 class="chapter-title">Alarm Management & Operational Tools</h1>
+                <p class="chapter-desc">The software and telemetry engine driving automated event correlation and network visibility.</p>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>Alarm Lifecycle</h3>
+                        <p>Generation → Collection → Display → Correlation → Severity Filtering → Acknowledgement → Escalation → Clearance.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>Operational Systems</h3>
+                        <p>Network monitoring apps, NMS platforms, ticketing systems, and knowledge documentation repositories.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11 — Ticket Lifecycle, Simulation & Ecosystem -->
+        <section class="chapter-section" data-chapter="11">
+            <div class="glass-card">
+                <span class="chapter-tag">11 — Execution & Ecosystem</span>
+                <h1 class="chapter-title">Incident Simulation & NOC Ecosystem</h1>
+                <p class="chapter-desc">Synthesizing reactive firefighting with proactive prevention into a unified operational ecosystem.</p>
+                <ul class="feature-list">
+                    <li><strong>Complete Incident Simulation:</strong> Transport link failure → Alarm generation → Front Office detection → Back Office / Field intervention → Service restoration & closure.</li>
+                    <li><strong>Escalation Levels:</strong> Level 1 (Front Office) to Level 4 (Vendor / Management).</li>
+                    <li><strong>NOC KPIs:</strong> Availability, MTTA, MTTR, alarm volume, critical incidents, and SLA compliance.</li>
+                    <li><strong>One Ecosystem:</strong> Unifying alarms, tickets, network domains, and engineers into a single collaborative entity.</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Canvas Particle / Ambient Background Script -->
     <script>
-        gsap.registerPlugin(ScrollTrigger);
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
 
-        // 1. Scene & Camera Setup
-        const container = document.getElementById('webgl-container');
-        const scene = new THREE.Scene();
+        let width, height;
+        let particles = [];
 
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 8.5);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
-
-        // 2. Cinematic Lighting Design
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
-        scene.add(ambientLight);
-
-        const cyanLight = new THREE.PointLight(0x00a3e0, 10, 18); // Omantel Cyan
-        cyanLight.position.set(4, 4, 5);
-        scene.add(cyanLight);
-
-        const blueLight = new THREE.PointLight(0x38bdf8, 6, 18);
-        blueLight.position.set(-4, -4, 4);
-        scene.add(blueLight);
-
-        const rimLight = new THREE.PointLight(0xffffff, 4, 15);
-        rimLight.position.set(0, 6, -3);
-        scene.add(rimLight);
-
-        // 3. Cybernetic Network Core Matrix (Advanced High-End 3D Asset)
-        const coreCluster = new THREE.Group();
-
-        // Central Server Hub Pillars
-        const serverGroup = new THREE.Group();
-        for (let i = 0; i < 4; i++) {
-            const angle = (i / 4) * Math.PI * 2;
-            const rackGeo = new THREE.BoxGeometry(0.4, 2.6, 0.4);
-            const rackMat = new THREE.MeshStandardMaterial({ 
-                color: 0x090d16, 
-                metalness: 0.95, 
-                roughness: 0.12 
-            });
-            const rack = new THREE.Mesh(rackGeo, rackMat);
-            rack.position.set(Math.cos(angle) * 0.9, 0, Math.sin(angle) * 0.9);
-            serverGroup.add(rack);
-        }
-        coreCluster.add(serverGroup);
-
-        // Central Holographic Command Panel / Monolith
-        const monoGeo = new THREE.BoxGeometry(1.2, 2.2, 0.15);
-        const monoMat = new THREE.MeshStandardMaterial({ 
-            color: 0x00a3e0, 
-            emissive: 0x00a3e0, 
-            emissiveIntensity: 0.5,
-            metalness: 0.8,
-            roughness: 0.2
-        });
-        const monolith = new THREE.Mesh(monoGeo, monoMat);
-        coreCluster.add(monolith);
-
-        // Nested Rotating Cyber Rings (Torus & Torus Knot)
-        const ringGeo1 = new THREE.TorusGeometry(1.8, 0.03, 16, 100);
-        const ringMat = new THREE.MeshStandardMaterial({ 
-            color: 0x38bdf8, 
-            metalness: 0.9, 
-            roughness: 0.1,
-            emissive: 0x00a3e0,
-            emissiveIntensity: 0.4
-        });
-        const ring1 = new THREE.Mesh(ringGeo1, ringMat);
-        ring1.rotation.x = Math.PI / 3;
-        coreCluster.add(ring1);
-
-        const ringGeo2 = new THREE.TorusGeometry(2.3, 0.02, 16, 100);
-        const ring2 = new THREE.Mesh(ringGeo2, ringMat);
-        ring2.rotation.y = Math.PI / 4;
-        coreCluster.add(ring2);
-
-        const knotGeo = new THREE.TorusKnotGeometry(1.2, 0.05, 128, 32);
-        const knotMat = new THREE.MeshStandardMaterial({
-            color: 0xffffff,
-            metalness: 0.9,
-            roughness: 0.1,
-            emissive: 0x38bdf8,
-            emissiveIntensity: 0.3
-        });
-        const dataKnot = new THREE.Mesh(knotGeo, knotMat);
-        dataKnot.scale.set(0.6, 0.6, 0.6);
-        coreCluster.add(dataKnot);
-
-        // Immersive Particle Network Field
-        const particleCount = 500;
-        const particleGeo = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(particleCount * 3);
-
-        for(let i = 0; i < particleCount * 3; i++) {
-            particlePositions[i] = (Math.random() - 0.5) * 16;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         }
 
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-        const particleMat = new THREE.PointsMaterial({
-            color: 0x38bdf8,
-            size: 0.035,
-            transparent: true,
-            opacity: 0.75
-        });
-        const particleField = new THREE.Points(particleGeo, particleMat);
-        scene.add(particleField);
+        window.addEventListener('resize', resize);
+        resize();
 
-        scene.add(coreCluster);
-
-        // 4. Initial Animation State (Slide 1)
-        gsap.to("#slide-1", { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
-
-        // 5. Master Scroll-Driven Timeline Configuration (All 11 Chapters)
-        const presentationTimeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: "body",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1.5
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.radius = Math.random() * 1.5;
             }
-        });
-
-        presentationTimeline
-            // Ch 1 -> 2
-            .to(coreCluster.rotation, { y: Math.PI * 0.6, x: Math.PI * 0.15, duration: 2 }, 0)
-            .to(coreCluster.position, { x: 1.4, y: 0, duration: 2 }, 0)
-            .to("#slide-1", { opacity: 0, y: -40, duration: 0.4 }, 0)
-            .to("#slide-2", { opacity: 1, y: 0, duration: 0.4 }, 0.4)
-
-            // Ch 2 -> 3
-            .to(coreCluster.rotation, { y: Math.PI * 1.2, x: -Math.PI * 0.15, duration: 2 }, 2)
-            .to(coreCluster.position, { x: -1.4, y: 0.2, duration: 2 }, 2)
-            .to("#slide-2", { opacity: 0, y: -40, duration: 0.4 }, 2)
-            .to("#slide-3", { opacity: 1, y: 0, duration: 0.4 }, 2.4)
-
-            // Ch 3 -> 4
-            .to(coreCluster.rotation, { y: Math.PI * 1.8, x: Math.PI * 0.2, duration: 2 }, 4)
-            .to(coreCluster.position, { x: 1.4, y: -0.1, duration: 2 }, 4)
-            .to("#slide-3", { opacity: 0, y: -40, duration: 0.4 }, 4)
-            .to("#slide-4", { opacity: 1, y: 0, duration: 0.4 }, 4.4)
-
-            // Ch 4 -> 5
-            .to(coreCluster.rotation, { y: Math.PI * 2.4, x: -Math.PI * 0.1, duration: 2 }, 6)
-            .to(coreCluster.position, { x: -1.4, y: 0.1, duration: 2 }, 6)
-            .to("#slide-4", { opacity: 0, y: -40, duration: 0.4 }, 6)
-            .to("#slide-5", { opacity: 1, y: 0, duration: 0.4 }, 6.4)
-
-            // Ch 5 -> 6
-            .to(coreCluster.rotation, { y: Math.PI * 3.0, x: Math.PI * 0.15, duration: 2 }, 8)
-            .to(coreCluster.position, { x: 1.4, y: 0, duration: 2 }, 8)
-            .to("#slide-5", { opacity: 0, y: -40, duration: 0.4 }, 8)
-            .to("#slide-6", { opacity: 1, y: 0, duration: 0.4 }, 8.4)
-
-            // Ch 6 -> 7
-            .to(coreCluster.rotation, { y: Math.PI * 3.6, x: -Math.PI * 0.2, duration: 2 }, 10)
-            .to(coreCluster.position, { x: -1.4, y: -0.1, duration: 2 }, 10)
-            .to("#slide-6", { opacity: 0, y: -40, duration: 0.4 }, 10)
-            .to("#slide-7", { opacity: 1, y: 0, duration: 0.4 }, 10.4)
-
-            // Ch 7 -> 8
-            .to(coreCluster.rotation, { y: Math.PI * 4.2, x: Math.PI * 0.1, duration: 2 }, 12)
-            .to(coreCluster.position, { x: 1.4, y: 0.1, duration: 2 }, 12)
-            .to("#slide-7", { opacity: 0, y: -40, duration: 0.4 }, 12)
-            .to("#slide-8", { opacity: 1, y: 0, duration: 0.4 }, 12.4)
-
-            // Ch 8 -> 9
-            .to(coreCluster.rotation, { y: Math.PI * 4.8, x: -Math.PI * 0.1, duration: 2 }, 14)
-            .to(coreCluster.position, { x: -1.4, y: 0, duration: 2 }, 14)
-            .to("#slide-8", { opacity: 0, y: -40, duration: 0.4 }, 14)
-            .to("#slide-9", { opacity: 1, y: 0, duration: 0.4 }, 14.4)
-
-            // Ch 9 -> 10
-            .to(coreCluster.rotation, { y: Math.PI * 5.4, x: Math.PI * 0.15, duration: 2 }, 16)
-            .to(coreCluster.position, { x: 1.4, y: -0.1, duration: 2 }, 16)
-            .to("#slide-9", { opacity: 0, y: -40, duration: 0.4 }, 16)
-            .to("#slide-10", { opacity: 1, y: 0, duration: 0.4 }, 16.4)
-
-            // Ch 10 -> 11
-            .to(coreCluster.rotation, { y: Math.PI * 6.0, x: 0, duration: 2 }, 18)
-            .to(coreCluster.position, { x: 0, y: 0, duration: 2 }, 18)
-            .to("#slide-10", { opacity: 0, y: -40, duration: 0.4 }, 18)
-            .to("#slide-11", { opacity: 1, y: 0, duration: 0.4 }, 18.4);
-
-        // Continuous Organic Idle Motion Loops
-        gsap.to(coreCluster.position, {
-            y: "+=0.18",
-            duration: 2.5,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut"
-        });
-
-        gsap.to(ring1.rotation, { z: "+=6.28", duration: 15, repeat: -1, ease: "none" });
-        gsap.to(ring2.rotation, { z: "-=6.28", duration: 20, repeat: -1, ease: "none" });
-        gsap.to(dataKnot.rotation, { y: "+=6.28", duration: 10, repeat: -1, ease: "none" });
-
-        // 6. Render Loop
-        function animateScene() {
-            requestAnimationFrame(animateScene);
-            particleField.rotation.y += 0.0004;
-            renderer.render(scene, camera);
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = width;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = height;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+                ctx.fill();
+            }
         }
-        animateScene();
 
-        // 7. Window Resizing Handler
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        for (let i = 0; i < 70; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Scroll Intersection Observer for Chapter Transitions
+        const sections = document.querySelectorAll('.chapter-section');
+        const sideNav = document.getElementById('side-nav');
+        const progressIndicator = document.getElementById('progress-indicator');
+
+        sections.forEach((sec, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('nav-dot');
+            if (idx === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                sec.scrollIntoView({ behavior: 'smooth' });
+            });
+            sideNav.appendChild(dot);
         });
+
+        const dots = document.querySelectorAll('.nav-dot');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-30% 0px -30% 0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    const chapterNum = entry.target.getAttribute('data-chapter');
+                    progressIndicator.textContent = `Chapter ${chapterNum.padStart(2, '0')} / 11`;
+                    
+                    dots.forEach((dot, idx) => {
+                        dot.classList.toggle('active', idx === parseInt(chapterNum) - 1);
+                    });
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(sec => observer.observe(sec));
     </script>
 </body>
 </html>
