@@ -3,23 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — Cinematic Master Presentation</title>
-    <!-- Google Fonts: Instrument Serif for Editorial Elegance & Jakarta Sans for UI -->
+    <title>Omantel NSOC — Bright Cinematic Presentation</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --bg-deep: #030712;
-            --bg-surface: rgba(13, 19, 32, 0.75);
-            --border-glass: rgba(56, 189, 248, 0.2);
-            --accent-cyan: #00a3e0;
-            --accent-sky: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -27,15 +17,16 @@
         }
 
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
+            /* Extremely bright, cinematic environment */
+            background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+            color: #0f172a;
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        /* Cinematic Background Video / Canvas Layer */
-        #bg-canvas {
+        /* 3D Cinematic Canvas */
+        #webgl-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -43,583 +34,338 @@
             height: 100vh;
             z-index: 0;
             pointer-events: none;
-            opacity: 0.6;
         }
 
-        .ambient-glow {
+        /* Ambient bright lighting overlays */
+        .light-flare {
             position: fixed;
-            top: -20vh;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80vw;
-            height: 60vh;
-            background: radial-gradient(circle, rgba(0, 163, 224, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
-            z-index: 0;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(0, 163, 224, 0.15) 0%, rgba(255,255,255,0) 70%);
+            z-index: 1;
             pointer-events: none;
+            mix-blend-mode: multiply;
         }
 
-        /* Navigation Header */
         header {
             position: fixed;
             top: 0;
-            left: 0;
             width: 100%;
+            padding: 2rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 5%;
             z-index: 100;
-            background: rgba(3, 7, 18, 0.6);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 163, 224, 0.1);
         }
 
         .brand {
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.2rem;
             letter-spacing: 0.1em;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #0f172a;
         }
 
         .brand span {
-            color: var(--accent-sky);
+            color: #00a3e0;
         }
 
-        .nav-progress {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-        }
-
-        /* Main Presentation Container */
+        /* Clean, Bright UI Cards */
         .presentation-container {
             position: relative;
-            z-index: 2;
-            max-width: 1100px;
+            z-index: 10;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 8rem 2rem 10rem 2rem;
+            padding: 10rem 2rem;
         }
 
-        /* Chapter Sections */
-        .chapter-section {
-            min-height: 85vh;
+        .slide {
+            min-height: 80vh;
             display: flex;
             align-items: center;
-            padding: 4rem 0;
-            opacity: 0.2;
-            transform: translateY(30px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 5rem;
+            opacity: 0.1;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .chapter-section.active {
+        .slide.active {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Liquid Glassmorphism Card */
-        .glass-card {
-            width: 100%;
-            background: var(--bg-surface);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--border-glass);
-            border-radius: 28px;
-            padding: 3.5rem;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+            padding: 4rem;
+            box-shadow: 0 25px 50px rgba(0, 163, 224, 0.08), 
+                        inset 0 2px 0 rgba(255, 255, 255, 1);
+            max-width: 700px;
         }
 
-        .chapter-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 700;
+        .tag {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            color: var(--accent-sky);
-            background: rgba(0, 163, 224, 0.12);
-            border: 1px solid rgba(0, 163, 224, 0.3);
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
+            color: #00a3e0;
+            background: rgba(0, 163, 224, 0.1);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
             margin-bottom: 1.5rem;
         }
 
-        h1.chapter-title {
-            font-family: 'Instrument Serif', serif;
-            font-size: 4rem;
-            font-weight: 400;
-            line-height: 1.05;
-            letter-spacing: -0.01em;
-            margin-bottom: 1.25rem;
-            background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
         }
 
-        p.chapter-desc {
-            font-size: 1.05rem;
-            color: var(--text-muted);
+        p {
+            font-size: 1.1rem;
             line-height: 1.7;
-            margin-bottom: 2rem;
-            max-width: 900px;
+            color: #475569;
         }
 
-        /* Grid Layouts for Content */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
-            margin-top: 1.5rem;
-        }
-
-        .info-box {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .info-box:hover {
-            border-color: rgba(56, 189, 248, 0.3);
-        }
-
-        .info-box h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--accent-sky);
-            margin-bottom: 0.5rem;
-        }
-
-        .info-box p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin: 0;
-        }
-
-        /* Bullet Point Lists */
-        .feature-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1.25rem;
-        }
-
-        .feature-list li {
-            position: relative;
-            padding-left: 1.5rem;
-            font-size: 0.95rem;
-            color: #cbd5e1;
-        }
-
-        .feature-list li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--accent-sky);
-            font-weight: bold;
-        }
-
-        /* Flow / Process Steps */
-        .flow-chain {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-        }
-
-        .flow-node {
-            background: rgba(0, 163, 224, 0.1);
-            border: 1px solid rgba(0, 163, 224, 0.3);
-            color: #ffffff;
-            padding: 0.6rem 1.1rem;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .flow-arrow {
-            color: var(--text-muted);
-            font-weight: 300;
-        }
-
-        /* Sidebar Progress Indicator */
-        .side-nav {
+        .visual-cue {
             position: fixed;
-            right: 2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            bottom: 3rem;
+            left: 5%;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            color: #00a3e0;
+            text-transform: uppercase;
             z-index: 100;
         }
 
-        .nav-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .nav-dot.active {
-            background: var(--accent-sky);
-            transform: scale(1.4);
-            box-shadow: 0 0 10px var(--accent-sky);
-        }
-
-        @media(max-width: 900px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
-            h1.chapter-title { font-size: 3rem; }
-            .glass-card { padding: 2rem; }
-            .side-nav { display: none; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
-    <canvas id="bg-canvas"></canvas>
+    <div class="light-flare"></div>
+    
+    <!-- The Live 3D Cinematic Engine -->
+    <canvas id="webgl-canvas"></canvas>
 
     <header>
         <div class="brand">OMANTEL <span>NSOC</span></div>
-        <div class="nav-progress" id="progress-indicator">Chapter 01 / 11</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #64748b; letter-spacing: 0.1em;">TRANSFORMING NETWORK</div>
     </header>
 
-    <div class="side-nav" id="side-nav"></div>
+    <div class="visual-cue" id="shape-indicator">CURRENT SHAPE: GLOBAL SPHERE</div>
 
     <main class="presentation-container">
-
-        <!-- 01 — Overview -->
-        <section class="chapter-section active" data-chapter="1">
-            <div class="glass-card">
-                <span class="chapter-tag">01 — NSOC Overview</span>
-                <h1 class="chapter-title">Network & Service Operations Center</h1>
-                <p class="chapter-desc">The central nervous system of Omantel's telecommunications grid, balancing deep infrastructure surveillance with seamless digital service delivery.</p>
-                <div class="grid-3">
-                    <div class="info-box">
-                        <h3>24/7 Monitoring</h3>
-                        <p>Continuous national surveillance ensuring uncompromised uptime and real-time operational readiness.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Operations Scope</h3>
-                        <p>Simultaneous oversight of underlying network elements and customer-facing digital services.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Operational Cycle</h3>
-                        <p>End-to-end framework encompassing event detection, incident triage, analysis, and preventive maintenance.</p>
-                    </div>
-                </div>
+        
+        <!-- Minimal Content to let the design shine -->
+        <section class="slide active" id="slide-1">
+            <div class="glass-panel">
+                <span class="tag">01 — The Network Ecosystem</span>
+                <h1>A Living, Breathing Infrastructure.</h1>
+                <p>Scroll down. Watch the 3D network in the background physically transform its shape. This represents the dynamic, ever-changing nature of the Omantel Network & Service Operations Center.</p>
             </div>
         </section>
 
-        <!-- 02 — Front & Back Office -->
-        <section class="chapter-section" data-chapter="2">
-            <div class="glass-card">
-                <span class="chapter-tag">02 — Structure & Escalation</span>
-                <h1 class="chapter-title">Front Office & Back Office Architecture</h1>
-                <p class="chapter-desc">A structured multi-tier operational model engineered for rapid alarm filtration, expert diagnosis, and precise field resolution.</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <h3>Front Office</h3>
-                        <p>First-line defense managing incoming alarms, event tracking, and initial triage.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Back Office</h3>
-                        <p>Specialized engineers executing deep root-cause analysis and complex mitigation strategies.</p>
-                    </div>
-                </div>
-                <div style="margin-top: 1.5rem;">
-                    <h3 style="font-size: 0.95rem; color: var(--accent-sky); margin-bottom: 0.75rem;">Escalation Pathway</h3>
-                    <div class="flow-chain">
-                        <span class="flow-node">Front Office</span>
-                        <span class="flow-arrow">→</span>
-                        <span class="flow-node">Back Office</span>
-                        <span class="flow-arrow">→</span>
-                        <span class="flow-node">Field Intervention</span>
-                        <span class="flow-arrow">→</span>
-                        <span class="flow-node">Vendor Partner</span>
-                    </div>
-                </div>
+        <section class="slide" id="slide-2">
+            <div class="glass-panel">
+                <span class="tag">02 — Structural Hierarchy</span>
+                <h1>Front Office to Back Office Flow.</h1>
+                <p>As the network morphology shifts behind this card, our internal escalation pathways adapt seamlessly. From Tier 1 detection directly into the hands of specialized domain experts.</p>
             </div>
         </section>
 
-        <!-- 03 — Organizational Structure -->
-        <section class="chapter-section" data-chapter="3">
-            <div class="glass-card">
-                <span class="chapter-tag">03 — Organizational Matrix</span>
-                <h1 class="chapter-title">Core Technical Departments</h1>
-                <p class="chapter-desc">Specialized technical verticals working collaboratively to secure every layer of the network ecosystem.</p>
-                <ul class="feature-list">
-                    <li><strong>Fixed & Service Desk:</strong> Fixed-line voice/broadband operations and subscriber request management.</li>
-                    <li><strong>Transport & Transmission:</strong> Optical fiber infrastructure, microwave backhaul, and VSAT systems.</li>
-                    <li><strong>IP Core & Datacom:</strong> High-capacity packet routing, switching, and enterprise data pathways.</li>
-                    <li><strong>INOC & Enterprise:</strong> Submarine international gateways, MPLS, ILL, and SD-WAN management.</li>
-                    <li><strong>Service Operations & Cybersecurity:</strong> Availability tracking, degradation control, threat detection, and mitigation.</li>
-                </ul>
+        <section class="slide" id="slide-3">
+            <div class="glass-panel">
+                <span class="tag">03 — Core Connectivity</span>
+                <h1>Transport, IP Core & Datacom.</h1>
+                <p>The visual engine behind you is actively calculating thousands of data points, mirroring how our IP Core and Transmission networks handle massive throughput across the nation in real-time.</p>
             </div>
         </section>
 
-        <!-- 04 — Department Connections -->
-        <section class="chapter-section" data-chapter="4">
-            <div class="glass-card">
-                <span class="chapter-tag">04 — Inter-Departmental Flow</span>
-                <h1 class="chapter-title">Department Connections & Workflows</h1>
-                <p class="chapter-desc">Governing cross-departmental communication, incident handoffs, and architectural domain dependencies.</p>
-                <div class="grid-3">
-                    <div class="info-box">
-                        <h3>Communication</h3>
-                        <p>Standardized protocols ensuring zero latency in inter-departmental notifications.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Incident Movement</h3>
-                        <p>Structured workflows governing how tickets migrate across technical boundaries.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Internal Escalation</h3>
-                        <p>Clear thresholds defining when domain experts take ownership of complex tickets.</p>
-                    </div>
-                </div>
+        <section class="slide" id="slide-4">
+            <div class="glass-panel">
+                <span class="tag">04 — Global Gateways</span>
+                <h1>International & Submarine Links.</h1>
+                <p>Connecting local enterprise structures to global submarine cables. The architecture requires absolute precision, fluidly moving incidents through our defined operational lifecycle.</p>
             </div>
         </section>
-
-        <!-- 05 — Fixed Network -->
-        <section class="chapter-section" data-chapter="5">
-            <div class="glass-card">
-                <span class="chapter-tag">05 — Fixed Domain</span>
-                <h1 class="chapter-title">Fixed Network Operations</h1>
-                <p class="chapter-desc">Safeguarding fixed-line subscriber services through proactive monitoring and rigorous alarm management.</p>
-                <ul class="feature-list">
-                    <li>Continuous monitoring of fixed network infrastructure and voice/broadband services.</li>
-                    <li>Automated alarm surveillance using advanced network management applications.</li>
-                    <li>Integrated ticketing, seamless escalation pathways, and dedicated Back Office support.</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- 06 — Service Desk -->
-        <section class="chapter-section" data-chapter="6">
-            <div class="glass-card">
-                <span class="chapter-tag">06 — Subscriber Care</span>
-                <h1 class="chapter-title">Service Desk & Ticket Management</h1>
-                <p class="chapter-desc">Handling service requests and incident lifecycles while enforcing strict Service Level Agreements (SLAs).</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <h3>Incident Lifecycle</h3>
-                        <p>Service request logging, initial ticket categorization, escalation, and closure verification.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>SLA & Compliance</h3>
-                        <p>Rigorous tracking of Key Performance Indicators (KPIs) and customer communication standards.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 07 — Transport & Datacom -->
-        <section class="chapter-section" data-chapter="7">
-            <div class="glass-card">
-                <span class="chapter-tag">07 — Backbone Infrastructure</span>
-                <h1 class="chapter-title">Transport & Datacom Networks</h1>
-                <p class="chapter-desc">Securing physical transmission links and high-speed enterprise data connectivity nationwide.</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <h3>IP Core & Transmission</h3>
-                        <p>Core IP routing, fiber optic spans, microwave relays, VSAT, and optical transport monitoring.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Datacom & Integration</h3>
-                        <p>Enterprise data infrastructure, troubleshooting, and end-to-end transport integration.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 08 — INOC & Enterprise -->
-        <section class="chapter-section" data-chapter="8">
-            <div class="glass-card">
-                <span class="chapter-tag">08 — International & Enterprise</span>
-                <h1 class="chapter-title">INOC & Enterprise Services</h1>
-                <p class="chapter-desc">Managing submarine cable gateways and high-performance enterprise connectivity solutions.</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <h3>INOC Operations</h3>
-                        <p>Submarine cable systems, international links, Internet gateways, and voice transit monitoring.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Enterprise Solutions</h3>
-                        <p>Dedicated oversight for MPLS, Point-to-Point (P2P), Leased Lines (ILL), and SD-WAN architectures.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 09 — Service Operations & Cybersecurity -->
-        <section class="chapter-section" data-chapter="9">
-            <div class="glass-card">
-                <span class="chapter-tag">09 — Integrity & Security</span>
-                <h1 class="chapter-title">Service Operations & Cybersecurity</h1>
-                <p class="chapter-desc">Maintaining optimal service performance while actively defending against cyber threats.</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <h3>Service Operations</h3>
-                        <p>Tracking service availability, measuring performance degradation, and assessing customer impact.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Cybersecurity</h3>
-                        <p>Continuous threat detection, security incident investigation, response, and network coordination.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 10 — Alarm Management & Systems -->
-        <section class="chapter-section" data-chapter="10">
-            <div class="glass-card">
-                <span class="chapter-tag">10 — Telemetry & Systems</span>
-                <h1 class="chapter-title">Alarm Management & Operational Tools</h1>
-                <p class="chapter-desc">The software and telemetry engine driving automated event correlation and network visibility.</p>
-                <div class="grid-2">
-                    <div class="info-box">
-                        <h3>Alarm Lifecycle</h3>
-                        <p>Generation → Collection → Display → Correlation → Severity Filtering → Acknowledgement → Escalation → Clearance.</p>
-                    </div>
-                    <div class="info-box">
-                        <h3>Operational Systems</h3>
-                        <p>Network monitoring apps, NMS platforms, ticketing systems, and knowledge documentation repositories.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 11 — Ticket Lifecycle, Simulation & Ecosystem -->
-        <section class="chapter-section" data-chapter="11">
-            <div class="glass-card">
-                <span class="chapter-tag">11 — Execution & Ecosystem</span>
-                <h1 class="chapter-title">Incident Simulation & NOC Ecosystem</h1>
-                <p class="chapter-desc">Synthesizing reactive firefighting with proactive prevention into a unified operational ecosystem.</p>
-                <ul class="feature-list">
-                    <li><strong>Complete Incident Simulation:</strong> Transport link failure → Alarm generation → Front Office detection → Back Office / Field intervention → Service restoration & closure.</li>
-                    <li><strong>Escalation Levels:</strong> Level 1 (Front Office) to Level 4 (Vendor / Management).</li>
-                    <li><strong>NOC KPIs:</strong> Availability, MTTA, MTTR, alarm volume, critical incidents, and SLA compliance.</li>
-                    <li><strong>One Ecosystem:</strong> Unifying alarms, tickets, network domains, and engineers into a single collaborative entity.</li>
-                </ul>
+        
+        <section class="slide" id="slide-5">
+            <div class="glass-panel">
+                <span class="tag">05 — Next Steps</span>
+                <h1>The 21-Point Integration.</h1>
+                <p>Once the cinematic, bright visual foundation is perfected, we will map out the complete 21-point architecture seamlessly into these glass interfaces.</p>
             </div>
         </section>
 
     </main>
 
-    <!-- Canvas Particle / Ambient Background Script -->
+    <!-- Core Libraries: Three.js for 3D and GSAP for cinematic animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
     <script>
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
+        // --- 1. Scene Setup for Maximum Brightness ---
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        // Bright white/blue fog to blend the 3D into the bright background
+        scene.fog = new THREE.FogExp2(0xffffff, 0.04); 
 
-        let width, height;
-        let particles = [];
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 18);
 
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // --- 2. Advanced Particle Morphing System ---
+        const particleCount = 12000;
+        const geometry = new THREE.BufferGeometry();
+
+        // Arrays to hold the different 3D shapes the network will transform into
+        const positions = new Float32Array(particleCount * 3);
+        const shapeSphere = new Float32Array(particleCount * 3);
+        const shapeRing = new Float32Array(particleCount * 3);
+        const shapeWave = new Float32Array(particleCount * 3);
+
+        // Generate coordinates for Shape 1: Global Sphere
+        for (let i = 0; i < particleCount; i++) {
+            const phi = Math.acos(-1 + (2 * i) / particleCount);
+            const theta = Math.sqrt(particleCount * Math.PI) * phi;
+            const r = 8 + Math.random() * 0.5; // Radius
+            shapeSphere[i * 3] = r * Math.cos(theta) * Math.sin(phi);
+            shapeSphere[i * 3 + 1] = r * Math.sin(theta) * Math.sin(phi);
+            shapeSphere[i * 3 + 2] = r * Math.cos(phi);
         }
 
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.3;
-                this.vy = (Math.random() - 0.5) * 0.3;
-                this.radius = Math.random() * 1.5;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = width;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = height;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
-                ctx.fill();
-            }
+        // Generate coordinates for Shape 2: Data Cylinder / Ring
+        for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 6 + Math.random() * 4;
+            const height = (Math.random() - 0.5) * 20;
+            shapeRing[i * 3] = Math.cos(angle) * radius;
+            shapeRing[i * 3 + 1] = height;
+            shapeRing[i * 3 + 2] = Math.sin(angle) * radius;
         }
 
-        for (let i = 0; i < 70; i++) {
-            particles.push(new Particle());
+        // Generate coordinates for Shape 3: Network Data Wave
+        for (let i = 0; i < particleCount; i++) {
+            const x = (Math.random() - 0.5) * 30;
+            const z = (Math.random() - 0.5) * 30;
+            const y = Math.sin(x * 0.5) * 3 + Math.cos(z * 0.5) * 3;
+            shapeWave[i * 3] = x;
+            shapeWave[i * 3 + 1] = y;
+            shapeWave[i * 3 + 2] = z;
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+        // Initialize with Sphere
+        for(let i = 0; i < particleCount * 3; i++) {
+            positions[i] = shapeSphere[i];
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        // Bright, energetic particle material
+        const material = new THREE.PointsMaterial({
+            size: 0.08,
+            color: 0x00a3e0, // Omantel Cyan
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particleSystem = new THREE.Points(geometry, material);
+        // Position slightly to the right so it balances the left-aligned text cards
+        particleSystem.position.x = 4; 
+        scene.add(particleSystem);
+
+        // --- 3. Cinematic Morphing Logic ---
+        const shapes = [shapeSphere, shapeRing, shapeWave];
+        const shapeNames = ["GLOBAL SPHERE", "DATA CYLINDER", "NETWORK WAVE"];
+        let currentShapeIndex = 0;
+        let isMorphing = false;
+
+        function morphToShape(targetShapeIndex) {
+            if (isMorphing || currentShapeIndex === targetShapeIndex) return;
+            isMorphing = true;
+            
+            const targetArray = shapes[targetShapeIndex];
+            const startArray = new Float32Array(geometry.attributes.position.array);
+            
+            // Update UI text
+            document.getElementById('shape-indicator').innerText = `CURRENT SHAPE: ${shapeNames[targetShapeIndex]}`;
+
+            let proxy = { t: 0 };
+            gsap.to(proxy, {
+                t: 1,
+                duration: 2.5,
+                ease: "power3.inOut",
+                onUpdate: () => {
+                    const positions = geometry.attributes.position.array;
+                    for (let i = 0; i < positions.length; i++) {
+                        positions[i] = startArray[i] + (targetArray[i] - startArray[i]) * proxy.t;
+                    }
+                    geometry.attributes.position.needsUpdate = true;
+                },
+                onComplete: () => {
+                    currentShapeIndex = targetShapeIndex;
+                    isMorphing = false;
+                }
             });
+        }
+
+        // --- 4. Render & Continuous Rotation Loop ---
+        const clock = new THREE.Clock();
+        function animate() {
             requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            
+            // Continuous cinematic rotation
+            particleSystem.rotation.y = time * 0.15;
+            particleSystem.rotation.x = Math.sin(time * 0.1) * 0.2;
+            
+            renderer.render(scene, camera);
         }
         animate();
 
-        // Scroll Intersection Observer for Chapter Transitions
-        const sections = document.querySelectorAll('.chapter-section');
-        const sideNav = document.getElementById('side-nav');
-        const progressIndicator = document.getElementById('progress-indicator');
-
-        sections.forEach((sec, idx) => {
-            const dot = document.createElement('div');
-            dot.classList.add('nav-dot');
-            if (idx === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => {
-                sec.scrollIntoView({ behavior: 'smooth' });
-            });
-            sideNav.appendChild(dot);
-        });
-
-        const dots = document.querySelectorAll('.nav-dot');
-
-        const observerOptions = {
-            root: null,
-            rootMargin: '-30% 0px -30% 0px',
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    const chapterNum = entry.target.getAttribute('data-chapter');
-                    progressIndicator.textContent = `Chapter ${chapterNum.padStart(2, '0')} / 11`;
+        // --- 5. Scroll-Triggered Transitions ---
+        const slides = document.querySelectorAll('.slide');
+        window.addEventListener('scroll', () => {
+            let scrollY = window.scrollY;
+            let windowHeight = window.innerHeight;
+            
+            slides.forEach((slide, index) => {
+                const rect = slide.getBoundingClientRect();
+                if (rect.top < windowHeight * 0.6 && rect.bottom > 0) {
+                    slide.classList.add('active');
                     
-                    dots.forEach((dot, idx) => {
-                        dot.classList.toggle('active', idx === parseInt(chapterNum) - 1);
-                    });
-                } else {
-                    entry.target.classList.remove('active');
+                    // Trigger 3D morphs based on which slide is active
+                    if(index === 0) morphToShape(0);      // Slide 1 = Sphere
+                    else if(index === 2) morphToShape(1); // Slide 3 = Ring
+                    else if(index === 4) morphToShape(2); // Slide 5 = Wave
                 }
             });
-        }, observerOptions);
+        });
 
-        sections.forEach(sec => observer.observe(sec));
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
     </script>
 </body>
 </html>
