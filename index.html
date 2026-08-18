@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — Infrastructure Engine</title>
+    <title>Omantel NSOC — Tactical Command Interface</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,7 @@
         }
 
         body {
-            /* Sleek, deep telecom dark mode */
-            background: radial-gradient(circle at center, #0b1121 0%, #030712 100%);
+            background: #020617;
             color: #f8fafc;
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
@@ -35,15 +34,12 @@
             pointer-events: none;
         }
 
-        /* Ambient glow for the 3D elements */
-        .ambient-flare {
+        .cyber-grid-overlay {
             position: fixed;
-            top: 40%;
-            left: 60%;
-            transform: translate(-50%, -50%);
-            width: 70vw;
-            height: 70vh;
-            background: radial-gradient(circle, rgba(0, 163, 224, 0.12) 0%, rgba(249, 115, 22, 0.05) 40%, rgba(0,0,0,0) 70%);
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             z-index: 1;
             pointer-events: none;
         }
@@ -57,18 +53,31 @@
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            background: linear-gradient(to bottom, rgba(3, 7, 18, 0.9), rgba(3, 7, 18, 0));
+            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0));
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
         }
 
         .brand {
             font-weight: 800;
             font-size: 1.2rem;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             color: #ffffff;
         }
 
         .brand span {
-            color: #00a3e0;
+            color: #38bdf8;
+        }
+
+        .status-pill {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
         }
 
         .presentation-container {
@@ -85,7 +94,7 @@
             align-items: center;
             margin-bottom: 8rem;
             opacity: 0.1;
-            transform: translateY(40px);
+            transform: translateY(30px);
             transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -94,26 +103,15 @@
             transform: translateY(0);
         }
 
-        /* Premium UI Cards */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-left: 4px solid #00a3e0;
-            border-radius: 12px;
-            padding: 4rem;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-            max-width: 550px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-panel::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, #00a3e0, transparent);
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 3.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            max-width: 520px;
         }
 
         .tag {
@@ -122,420 +120,280 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.25em;
-            color: #f97316; /* Highlight orange from the isometric ref */
-            background: rgba(249, 115, 22, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
+            color: #38bdf8;
+            margin-bottom: 1rem;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 2.8rem;
             font-weight: 800;
             line-height: 1.1;
             letter-spacing: -0.02em;
             color: #ffffff;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
 
         p {
-            font-size: 1.1rem;
-            line-height: 1.8;
+            font-size: 1.05rem;
+            line-height: 1.7;
             color: #94a3b8;
         }
-
     </style>
 </head>
 <body>
 
-    <div class="ambient-flare"></div>
-    
+    <div class="cyber-grid-overlay"></div>
     <canvas id="webgl-canvas"></canvas>
 
     <header>
         <div class="brand">OMANTEL <span>NSOC</span></div>
+        <div class="status-pill" id="system-status">TACTICAL CORE ACTIVE</div>
     </header>
 
     <main class="presentation-container">
-        
         <section class="slide active" id="slide-1">
             <div class="glass-panel">
-                <span class="tag">Phase 01</span>
-                <h1>The Global Core.</h1>
-                <p>A unified, heavily structured representation of our central network intelligence. Solid, unyielding, and operating in perfect synchronization.</p>
+                <span class="tag">Module 01 // Global Core</span>
+                <h1>Tactical Network Matrix.</h1>
+                <p>Real-time telemetry mapping across regional distribution nodes, establishing baseline synchronization for all infrastructure assets.</p>
             </div>
         </section>
 
         <section class="slide" id="slide-2">
             <div class="glass-panel">
-                <span class="tag">Phase 02</span>
-                <h1>Isometric Processing.</h1>
-                <p>Data decouples into physical backend architecture. We monitor every server, database, and transaction block flowing seamlessly through structured isometric pipelines.</p>
+                <span class="tag">Module 02 // Cellular Topology</span>
+                <h1>Mast Frequency Arrays.</h1>
+                <p>Deploying multi-tier radio masts with real-time signal propagation rings and high-gain microwave backhaul alignment.</p>
             </div>
         </section>
 
         <section class="slide" id="slide-3">
             <div class="glass-panel">
-                <span class="tag">Phase 03</span>
-                <h1>Optical Transport.</h1>
-                <p>The architecture stretches into pure velocity. This is our high-speed fiber optic backbone, carrying massive payload volumes across vast distances.</p>
+                <span class="tag">Module 03 // Holographic Command</span>
+                <h1>Workspace Analytics.</h1>
+                <p>Immersive holographic telemetry windows streaming live throughput, error rates, and predictive AI anomaly tracking.</p>
             </div>
         </section>
 
         <section class="slide" id="slide-4">
             <div class="glass-panel">
-                <span class="tag">Phase 04</span>
-                <h1>Radio Propagation.</h1>
-                <p>The signal breaches the physical layer. The network reconstructs into high-gain cellular masts, radiating continuous electromagnetic coverage across the terrain.</p>
+                <span class="tag">Module 04 // Optical Backbone</span>
+                <h1>High-Speed Data Streams.</h1>
+                <p>Continuous light-path routing across core fiber routes, securing low-latency communication lines nationwide.</p>
             </div>
         </section>
-
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
-        // --- 1. Scene & Lighting Setup ---
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x030712, 0.015);
+        scene.fog = new THREE.FogExp2(0x020617, 0.015);
 
         const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 45);
+        camera.position.set(0, 5, 35);
 
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        
-        // High-end cinematic lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-        
-        const blueLight = new THREE.PointLight(0x00a3e0, 2, 100);
-        blueLight.position.set(-10, 10, 10);
-        scene.add(blueLight);
 
-        const orangeLight = new THREE.PointLight(0xf97316, 1.5, 100);
-        orangeLight.position.set(10, -10, 5);
-        scene.add(orangeLight);
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const pointLight = new THREE.PointLight(0x38bdf8, 3, 100);
+        pointLight.position.set(0, 15, 10);
+        scene.add(pointLight);
 
         const masterGroup = new THREE.Group();
-        masterGroup.position.x = 12; // Shift right for UI
+        masterGroup.position.x = 8; // Shift right to make space for text
         scene.add(masterGroup);
 
-        // --- 2. The Physical Blocks (The building units) ---
-        const blockCount = 150;
-        const blocks = [];
-        
-        // Solid, sleek tech material
-        const blockMaterial = new THREE.MeshStandardMaterial({
-            color: 0x1e293b,
-            metalness: 0.8,
-            roughness: 0.2,
-            emissive: 0x00a3e0,
-            emissiveIntensity: 0.2
+        // --- COMPONENT BUILDERS ---
+
+        // 1. Tactial Map Nodes (Ref: image_8492d3)
+        const nodeCount = 25;
+        const nodes = [];
+        const nodeGeo = new THREE.SphereGeometry(0.3, 16, 16);
+        const nodeMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.8 });
+
+        const nodeGroup = new THREE.Group();
+        for(let i=0; i<nodeCount; i++) {
+            const mesh = new THREE.Mesh(nodeGeo, nodeMat);
+            const x = (Math.random() - 0.5) * 20;
+            const z = (Math.random() - 0.5) * 15;
+            mesh.position.set(x, -2 + Math.random() * 2, z);
+            nodeGroup.add(mesh);
+            nodes.push(mesh);
+        }
+        masterGroup.add(nodeGroup);
+
+        // 2. Cellular Masts (Ref: image_84934c)
+        const mastGroup = new THREE.Group();
+        const mastCount = 4;
+        const masts = [];
+
+        for(let i=0; i<mastCount; i++) {
+            const singleMast = new THREE.Group();
+            
+            // Tower skeletal structure
+            const towerGeo = new THREE.ConeGeometry(1, 12, 4);
+            const towerMat = new THREE.MeshStandardMaterial({ 
+                color: 0x0f172a, 
+                wireframe: true, 
+                emissive: 0x38bdf8, 
+                emissiveIntensity: 0.3 
+            });
+            const tower = new THREE.Mesh(towerGeo, towerMat);
+            tower.position.y = 4;
+            singleMast.add(tower);
+
+            // Beacon light at top
+            const beaconGeo = new THREE.SphereGeometry(0.2, 8, 8);
+            const beaconMat = new THREE.MeshBasicMaterial({ color: 0xff3b30 });
+            const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+            beacon.position.y = 10;
+            singleMast.add(beacon);
+
+            // Position masts across a tactical line
+            const xPos = (i - 1.5) * 7;
+            singleMast.position.set(xPos, -4, 0);
+            
+            mastGroup.add(singleMast);
+            masts.push(singleMast);
+        }
+        masterGroup.add(mastGroup);
+        mastGroup.scale.set(0,0,0); // Hidden initially
+
+        // 3. Holographic Command Dashboards (Ref: image_84e584)
+        const dashGroup = new THREE.Group();
+        const dashCount = 8;
+        const dashboards = [];
+
+        const glassMat = new THREE.MeshPhysicalMaterial({
+            color: 0x0f172a,
+            metalness: 0.1,
+            roughness: 0.1,
+            transmission: 0.85,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
         });
+        const dashGeo = new THREE.BoxGeometry(4, 2.5, 0.05);
+        const dashBorderMat = new THREE.LineBasicMaterial({ color: 0x38bdf8 });
 
-        // Glowing edge material for highlights
-        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x00a3e0, transparent: true, opacity: 0.5 });
-
-        // Base geometry
-        const baseGeo = new THREE.BoxGeometry(1, 1, 1);
-        const edgesGeo = new THREE.EdgesGeometry(baseGeo);
-
-        for (let i = 0; i < blockCount; i++) {
-            const mesh = new THREE.Mesh(baseGeo, blockMaterial);
-            const edges = new THREE.LineSegments(edgesGeo, edgeMaterial);
+        for(let i=0; i<dashCount; i++) {
+            const mesh = new THREE.Mesh(dashGeo, glassMat);
+            const edges = new THREE.LineSegments(new THREE.EdgesGeometry(dashGeo), dashBorderMat);
             mesh.add(edges);
-            
-            blocks.push(mesh);
-            masterGroup.add(mesh);
+
+            // Arrange in a semi-circle command layout
+            const angle = (i / dashCount) * Math.PI * 1.2 - Math.PI * 0.6;
+            const radius = 9;
+            mesh.position.set(Math.cos(angle) * radius, (i % 2) * 2 - 1, Math.sin(angle) * radius);
+            mesh.lookAt(0, mesh.position.y, 0);
+
+            dashGroup.add(mesh);
+            dashboards.push(mesh);
+        }
+        masterGroup.add(dashGroup);
+        dashGroup.scale.set(0,0,0); // Hidden initially
+
+        // 4. Optical Fiber Tubes (Ref: background data streams)
+        const fiberGroup = new THREE.Group();
+        const curveCount = 6;
+        const curves = [];
+
+        for(let i=0; i<curveCount; i++) {
+            const path = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-15, -5 + i*1.5, -10),
+                new THREE.Vector3(-5, 2 + i*0.5, 0),
+                new THREE.Vector3(5, -2 + i*0.5, 5),
+                new THREE.Vector3(15, 3 + i*1, 10)
+            ]);
+            const tubeGeo = new THREE.TubeGeometry(path, 64, 0.1, 8, false);
+            const tubeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.7 });
+            const tube = new THREE.Mesh(tubeGeo, tubeMat);
+            fiberGroup.add(tube);
+            curves.push(tube);
+        }
+        masterGroup.add(fiberGroup);
+        fiberGroup.scale.set(0,0,0); // Hidden initially
+
+
+        // --- STATE TRANSITIONS ---
+        const statuses = ["TACTICAL CORE ACTIVE", "CELLULAR FREQUENCY ARRAYS", "HOLOGRAPHIC COMMAND SUITE", "OPTICAL BACKBONE ROUTING"];
+        let currentPhase = -1;
+        let isTransitioning = false;
+
+        function setPhase(index) {
+            if (currentPhase === index || isTransitioning) return;
+            isTransitioning = true;
+            currentPhase = index;
+
+            document.getElementById('system-status').innerText = statuses[index];
+
+            // Animate groups based on active phase
+            gsap.to(nodeGroup.scale, { x: index === 0 ? 1 : 0, y: index === 0 ? 1 : 0, z: index === 0 ? 1 : 0, duration: 1.5, ease: "power3.inOut" });
+            gsap.to(mastGroup.scale, { x: index === 1 ? 1 : 0, y: index === 1 ? 1 : 0, z: index === 1 ? 1 : 0, duration: 1.5, ease: "power3.inOut" });
+            gsap.to(dashGroup.scale, { x: index === 2 ? 1 : 0, y: index === 2 ? 1 : 0, z: index === 2 ? 1 : 0, duration: 1.5, ease: "power3.inOut" });
+            gsap.to(fiberGroup.scale, { x: index === 3 ? 1 : 0, y: index === 3 ? 1 : 0, z: index === 3 ? 1 : 0, duration: 1.5, ease: "power3.inOut" });
+
+            // Camera rotations per phase
+            let rotX = 0, rotY = 0;
+            if (index === 1) { rotX = 0.1; rotY = -0.2; }
+            if (index === 2) { rotX = 0; rotY = Math.PI * 0.25; }
+            if (index === 3) { rotX = 0.2; rotY = -0.1; }
+
+            gsap.to(masterGroup.rotation, { x: rotX, y: rotY, duration: 2, ease: "power3.inOut" });
+
+            setTimeout(() => { isTransitioning = false; }, 2000);
         }
 
-        // --- 3. Radio Waves (For Phase 4) ---
-        // Rings that will pulse outward from the towers
-        const ringCount = 6;
-        const rings = [];
-        const ringGeo = new THREE.RingGeometry(0.5, 0.6, 64);
-        const ringMat = new THREE.MeshBasicMaterial({ 
-            color: 0x38bdf8, 
-            side: THREE.DoubleSide, 
-            transparent: true, 
-            opacity: 0 
-        });
-
-        for(let i=0; i<ringCount; i++) {
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.visible = false;
-            masterGroup.add(ring);
-            rings.push(ring);
-        }
-
-        // --- 4. Architectural Formations (The Math) ---
-
-        // PHASE 1: The Core Sphere
-        function getSphereLayout(i) {
-            const phi = Math.acos(-1 + (2 * i) / blockCount);
-            const theta = Math.sqrt(blockCount * Math.PI) * phi;
-            const radius = 8;
-            
-            const pos = new THREE.Vector3(
-                radius * Math.cos(theta) * Math.sin(phi),
-                radius * Math.sin(theta) * Math.sin(phi),
-                radius * Math.cos(phi)
-            );
-            
-            // Blocks face outward
-            const dummy = new THREE.Object3D();
-            dummy.position.copy(pos);
-            dummy.lookAt(0,0,0);
-
-            // Shape them into cubes
-            return { pos: pos, rot: dummy.rotation, scale: new THREE.Vector3(1.5, 1.5, 1.5) };
-        }
-
-        // PHASE 2: Isometric Data Layout (Ref: image_848128)
-        function getIsometricLayout(i) {
-            const gridSize = Math.ceil(Math.sqrt(blockCount));
-            const spacing = 3;
-            
-            const col = i % gridSize;
-            const row = Math.floor(i / gridSize);
-            
-            // Create a staggered grid height like server racks / UI blocks
-            const height = 1 + Math.random() * 4;
-            
-            const pos = new THREE.Vector3(
-                (col - gridSize/2) * spacing,
-                (height / 2) - 5, // Center vertically
-                (row - gridSize/2) * spacing
-            );
-            
-            return { 
-                pos: pos, 
-                rot: new THREE.Euler(0, 0, 0), 
-                scale: new THREE.Vector3(2, height, 2) 
-            };
-        }
-
-        // PHASE 3: Fiber Optic Cables (Ref: image_8484c4 foreground)
-        function getFiberLayout(i) {
-            // Group blocks into long sweeping lines
-            const lines = 10;
-            const blocksPerLine = Math.floor(blockCount / lines);
-            const lineIndex = Math.floor(i / blocksPerLine);
-            const posInLine = i % blocksPerLine;
-            
-            // Flowing sine wave logic
-            const zLength = 40;
-            const zPos = (posInLine / blocksPerLine) * zLength - (zLength/2);
-            
-            const xOffset = (lineIndex - lines/2) * 2;
-            const yOffset = Math.sin(zPos * 0.2 + lineIndex) * 3;
-            
-            const pos = new THREE.Vector3(xOffset, yOffset, zPos);
-            
-            // Stretch the blocks massively along the Z axis to look like cables
-            return { 
-                pos: pos, 
-                rot: new THREE.Euler(0, 0, 0), 
-                scale: new THREE.Vector3(0.2, 0.2, 8) 
-            };
-        }
-
-        // PHASE 4: Holographic Cell Towers (Ref: image_8484c4 & image_848807)
-        function getTowerLayout(i) {
-            // Build 3 distinct masts
-            const towerCount = 3;
-            const blocksPerTower = Math.floor(blockCount / towerCount);
-            const towerIndex = Math.floor(i / blocksPerTower);
-            const localIndex = i % blocksPerTower;
-            
-            const xPositions = [-12, 0, 12]; // Left, Center, Right towers
-            const towerX = xPositions[towerIndex];
-            const towerZ = (towerIndex === 1) ? 5 : -5; // Center tower pushed forward
-            
-            let pos, scale;
-            
-            // Build the architecture of the mast
-            if (localIndex < blocksPerTower * 0.7) {
-                // Main vertical trunk (stacked blocks getting thinner)
-                const heightIndex = localIndex / (blocksPerTower * 0.7);
-                const yPos = heightIndex * 20 - 10;
-                const thickness = 2 - (heightIndex * 1.5); // Tapers at the top
-                pos = new THREE.Vector3(towerX, yPos, towerZ);
-                scale = new THREE.Vector3(thickness, 1.5, thickness);
-            } else {
-                // Antennas / Microwave drums attached to the sides
-                const sideIndex = localIndex % 4;
-                const heightOffset = Math.random() * 10;
-                const angle = (sideIndex / 4) * Math.PI * 2;
-                
-                pos = new THREE.Vector3(
-                    towerX + Math.cos(angle) * 1.5,
-                    heightOffset,
-                    towerZ + Math.sin(angle) * 1.5
-                );
-                // Wide flat blocks mimicking drum antennas
-                scale = new THREE.Vector3(1.5, 2, 0.5); 
-            }
-            
-            // Aim the side antennas
-            const dummy = new THREE.Object3D();
-            dummy.position.copy(pos);
-            dummy.lookAt(towerX, pos.y, towerZ);
-
-            return { pos: pos, rot: dummy.rotation, scale: scale };
-        }
-
-        const layouts = [getSphereLayout, getIsometricLayout, getFiberLayout, getTowerLayout];
-        let currentLayoutIndex = -1;
-        let isAnimating = false;
-
-        function transitionToLayout(layoutIndex) {
-            if (currentLayoutIndex === layoutIndex || isAnimating) return;
-            isAnimating = true;
-            currentLayoutIndex = layoutIndex;
-
-            const layoutFunc = layouts[layoutIndex];
-
-            // Master Group Rotation to enhance the view of the specific structure
-            let targetGroupRotX = 0;
-            let targetGroupRotY = 0;
-            
-            if (layoutIndex === 1) { // Isometric View
-                targetGroupRotX = Math.PI / 6;
-                targetGroupRotY = -Math.PI / 4;
-            } else if (layoutIndex === 2) { // Fiber flow
-                targetGroupRotX = Math.PI / 8;
-                targetGroupRotY = -Math.PI / 8;
-            } else if (layoutIndex === 3) { // Towers (Looking slightly up)
-                targetGroupRotX = -0.1;
-                targetGroupRotY = 0;
-            }
-
-            gsap.to(masterGroup.rotation, {
-                x: targetGroupRotX, y: targetGroupRotY,
-                duration: 2.5, ease: "power3.inOut"
-            });
-
-            // Morph every individual block
-            blocks.forEach((block, i) => {
-                const target = layoutFunc(i);
-                
-                gsap.to(block.position, {
-                    x: target.pos.x, y: target.pos.y, z: target.pos.z,
-                    duration: 2 + Math.random() * 1.5,
-                    ease: "expo.inOut"
-                });
-
-                const targetQuaternion = new THREE.Quaternion().setFromEuler(target.rot);
-                gsap.to(block.quaternion, {
-                    x: targetQuaternion.x, y: targetQuaternion.y, z: targetQuaternion.z, w: targetQuaternion.w,
-                    duration: 2 + Math.random() * 1.5,
-                    ease: "expo.inOut"
-                });
-
-                gsap.to(block.scale, {
-                    x: target.scale.x, y: target.scale.y, z: target.scale.z,
-                    duration: 2 + Math.random() * 1.5,
-                    ease: "expo.inOut"
-                });
-                
-                // Color shifts: Make fiber optic (Phase 3) glow bright cyan
-                const targetEmissive = layoutIndex === 2 ? new THREE.Color(0x38bdf8) : new THREE.Color(0x00a3e0);
-                gsap.to(block.material.emissive, {
-                    r: targetEmissive.r, g: targetEmissive.g, b: targetEmissive.b,
-                    duration: 2
-                });
-            });
-
-            // Manage Radio Wave Rings for Phase 4
-            if (layoutIndex === 3) {
-                rings.forEach(ring => ring.visible = true);
-            } else {
-                rings.forEach(ring => {
-                    gsap.to(ring.material, {opacity: 0, duration: 1, onComplete: () => ring.visible = false});
-                });
-            }
-
-            setTimeout(() => { isAnimating = false; }, 3500);
-        }
-
-        // --- 5. Continuous Animation Loop ---
+        // --- ANIMATION LOOP ---
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            if (!isAnimating) {
-                if (currentLayoutIndex === 0) {
-                    // Sphere rotates
-                    masterGroup.rotation.y = time * 0.2;
-                    masterGroup.rotation.z = Math.sin(time * 0.5) * 0.1;
-                } else if (currentLayoutIndex === 1) {
-                    // Isometric breathes
-                    masterGroup.position.y = Math.sin(time * 2) * 0.5;
-                } else if (currentLayoutIndex === 2) {
-                    // Fiber optic flow effect (move texture/glow along the lines)
-                    blocks.forEach((block, i) => {
-                        block.position.y += Math.sin(time * 3 + i) * 0.02;
-                    });
-                } else if (currentLayoutIndex === 3) {
-                    // Radiating waves from towers
-                    const xPositions = [-12, 0, 12];
-                    const zPositions = [-5, 5, -5];
-                    
-                    rings.forEach((ring, i) => {
-                        const towerIdx = i % 3;
-                        const delay = (i > 2) ? 1.5 : 0; // Second set of rings offset in time
-                        
-                        // Loop math for rings
-                        const progress = ((time + delay) % 3) / 3; 
-                        
-                        ring.position.set(xPositions[towerIdx], 10, zPositions[towerIdx]); // Top of towers
-                        ring.lookAt(xPositions[towerIdx], 20, zPositions[towerIdx]); // Face up
-                        
-                        const scale = progress * 25; // Expand massively
-                        ring.scale.set(scale, scale, scale);
-                        
-                        // Fade out as they get larger
-                        ring.material.opacity = (1 - progress) * 0.8;
-                    });
-                }
+            if (currentPhase === 0) {
+                nodeGroup.rotation.y = time * 0.1;
+            } else if (currentPhase === 1) {
+                mastGroup.rotation.y = Math.sin(time * 0.5) * 0.1;
+            } else if (currentPhase === 2) {
+                dashGroup.rotation.y = time * 0.15;
+            } else if (currentPhase === 3) {
+                fiberGroup.rotation.z = Math.sin(time * 0.5) * 0.05;
             }
 
             renderer.render(scene, camera);
         }
         animate();
 
-        // --- 6. Scroll Logic ---
+        // --- SCROLL INTERACTION ---
         const slides = document.querySelectorAll('.slide');
         window.addEventListener('scroll', () => {
-            let windowHeight = window.innerHeight;
-            
-            slides.forEach((slide, index) => {
+            const h = window.innerHeight;
+            slides.forEach((slide, idx) => {
                 const rect = slide.getBoundingClientRect();
-                if (rect.top < windowHeight * 0.6 && rect.bottom > 0) {
+                if (rect.top < h * 0.6 && rect.bottom > 0) {
                     if (!slide.classList.contains('active')) {
-                        document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+                        slides.forEach(s => s.classList.remove('active'));
                         slide.classList.add('active');
-                        transitionToLayout(index);
+                        setPhase(idx);
                     }
                 }
             });
         });
 
-        // Start Phase 1
-        transitionToLayout(0);
+        // Initialize First Phase
+        setPhase(0);
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
     </script>
 </body>
 </html>
