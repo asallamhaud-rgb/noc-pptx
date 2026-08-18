@@ -11,12 +11,12 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --phosphor: #33ff33; --phosphor-dim: rgba(51,255,51,0.4); --phosphor-faint: rgba(51,255,51,0.12);
-            --amber: #ffb000; --amber-dim: rgba(255,176,0,0.5);
-            --cyan: #00ffff; --cyan-dim: rgba(0,255,255,0.4);
-            --red: #ff3333;
-            --bg: #050805; --bg-panel: rgba(5,8,5,0.92);
-            --border: rgba(51,255,51,0.25);
+            --phosphor: #ff69b4; --phosphor-dim: rgba(255,105,180,0.4); --phosphor-faint: rgba(255,105,180,0.12);
+            --amber: #ffb6c1; --amber-dim: rgba(255,182,193,0.5);
+            --cyan: #ff1493; --cyan-dim: rgba(255,20,147,0.4);
+            --red: #ff4500;
+            --bg: #0d0508; --bg-panel: rgba(13,5,8,0.92);
+            --border: rgba(255,105,180,0.25);
         }
         html { scroll-behavior: auto; }
         body {
@@ -41,13 +41,13 @@
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 101; pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,10,0,0.4) 80%, rgba(0,10,0,0.85) 100%);
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(10,0,5,0.4) 80%, rgba(15,0,8,0.85) 100%);
         }
         .crt-flicker {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 102; pointer-events: none;
-            background: rgba(51,255,51,0.02);
+            background: rgba(255,105,180,0.02);
             animation: crtFlicker 0.15s infinite;
             opacity: 0.3;
         }
@@ -58,13 +58,13 @@
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 103; pointer-events: none;
-            box-shadow: inset 0 0 100px rgba(51,255,51,0.05);
+            box-shadow: inset 0 0 100px rgba(255,105,180,0.05);
         }
         .crt-chromatic {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 99; pointer-events: none;
-            background: linear-gradient(90deg, rgba(255,0,0,0.03) 0%, transparent 3%, transparent 97%, rgba(0,255,255,0.03) 100%);
+            background: linear-gradient(90deg, rgba(255,0,128,0.03) 0%, transparent 3%, transparent 97%, rgba(255,105,180,0.03) 100%);
         }
         #scroll-track {
             position: relative; z-index: 2;
@@ -85,7 +85,7 @@
         .terminal-window {
             background: var(--bg-panel); border: 1px solid var(--border);
             position: relative; backdrop-filter: blur(4px);
-            box-shadow: 0 0 20px rgba(51,255,51,0.05), inset 0 0 40px rgba(51,255,51,0.02);
+            box-shadow: 0 0 20px rgba(255,105,180,0.05), inset 0 0 40px rgba(255,105,180,0.02);
         }
         .terminal-window::before {
             content: ''; position: absolute;
@@ -96,7 +96,7 @@
         .terminal-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 8px 16px; border-bottom: 1px solid var(--border);
-            background: rgba(51,255,51,0.04);
+            background: rgba(255,105,180,0.04);
             font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
         }
         .terminal-header .win-title { color: var(--phosphor); font-weight: 500; }
@@ -121,7 +121,7 @@
             color: var(--phosphor); text-transform: uppercase;
             letter-spacing: -0.02em; line-height: 1.1;
             margin-bottom: 16px;
-            text-shadow: 0 0 20px rgba(51,255,51,0.3);
+            text-shadow: 0 0 20px rgba(255,105,180,0.3);
         }
         .sys-header .dim { color: var(--phosphor-dim); font-weight: 300; }
         .sys-desc {
@@ -134,8 +134,8 @@
             font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
             color: var(--amber); margin-bottom: 20px;
         }
-        .sys-tag.critical { color: var(--red); border-color: rgba(255,51,51,0.3); }
-        .sys-tag.anomaly { color: var(--cyan); border-color: rgba(0,255,255,0.3); }
+        .sys-tag.critical { color: var(--red); border-color: rgba(255,69,0,0.3); }
+        .sys-tag.anomaly { color: var(--cyan); border-color: rgba(255,20,147,0.3); }
         .spec-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -174,7 +174,7 @@
         .status-value.cyan { color: var(--cyan); }
         .progress-track {
             width: 200px; height: 4px;
-            background: rgba(51,255,51,0.08);
+            background: rgba(255,105,180,0.08);
             position: relative; overflow: hidden;
         }
         .progress-fill {
@@ -416,8 +416,8 @@
             cameraZStart: 25,
             cameraZEnd: -300,
             fogDensity: 0.022,
-            fogColor: 0x050805,
-            ambientIntensity: 0.2,
+            fogColor: 0x0d0508,
+            ambientIntensity: 0.25,
             pointLightIntensity: 2.2,
             pointLightDistance: 50,
             objectCount: 200,
@@ -461,21 +461,21 @@
         renderer.toneMappingExposure = 1.0;
         container.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0x0a1a0a, CONFIG.ambientIntensity);
+        const ambientLight = new THREE.AmbientLight(0x2a0d1a, CONFIG.ambientIntensity);
         scene.add(ambientLight);
 
-        const camLight = new THREE.PointLight(0x33ff33, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
+        const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
         camLight.position.set(0, 2, -6);
         camLight.castShadow = true;
         camLight.shadow.mapSize.width = 1024;
         camLight.shadow.mapSize.height = 1024;
         camera.add(camLight);
 
-        const camLight2 = new THREE.PointLight(0xffb000, 0.5, 35);
+        const camLight2 = new THREE.PointLight(0xffb6c1, 0.6, 35);
         camLight2.position.set(3, -1, -4);
         camera.add(camLight2);
 
-        const camLight3 = new THREE.PointLight(0x00ffff, 0.3, 30);
+        const camLight3 = new THREE.PointLight(0xff1493, 0.4, 30);
         camLight3.position.set(-3, 1, -3);
         camera.add(camLight3);
 
@@ -484,8 +484,8 @@
         const corridorLights = [];
         for (let i = 0; i < 20; i++) {
             const z = -15 - i * 16;
-            const isGreen = Math.random() > 0.4;
-            const color = isGreen ? 0x33ff33 : (Math.random() > 0.5 ? 0xffb000 : 0x00ffff);
+            const isPink = Math.random() > 0.3;
+            const color = isPink ? 0xff69b4 : (Math.random() > 0.5 ? 0xffb6c1 : 0xff1493);
             const light = new THREE.PointLight(color, 0.5, 20);
             light.position.set(
                 (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
@@ -497,14 +497,14 @@
         }
 
         const materials = {
-            serverGreen: new THREE.MeshStandardMaterial({ color: 0x1a3a1a, metalness: 0.9, roughness: 0.2, emissive: 0x0a2a0a, emissiveIntensity: 0.3 }),
-            serverAmber: new THREE.MeshStandardMaterial({ color: 0x3a2a0a, metalness: 0.85, roughness: 0.25, emissive: 0x2a1a00, emissiveIntensity: 0.25 }),
-            serverCyan: new THREE.MeshStandardMaterial({ color: 0x0a2a2a, metalness: 0.9, roughness: 0.15, emissive: 0x001a1a, emissiveIntensity: 0.3 }),
-            darkMetal: new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.95, roughness: 0.3 }),
-            wireframe: new THREE.MeshBasicMaterial({ color: 0x33ff33, wireframe: true, transparent: true, opacity: 0.15 }),
-            wireframeAmber: new THREE.MeshBasicMaterial({ color: 0xffb000, wireframe: true, transparent: true, opacity: 0.12 }),
-            floor: new THREE.MeshStandardMaterial({ color: 0x080a08, metalness: 0.7, roughness: 0.5 }),
-            grid: new THREE.MeshBasicMaterial({ color: 0x0a1a0a, transparent: true, opacity: 0.2, wireframe: true }),
+            serverGreen: new THREE.MeshStandardMaterial({ color: 0x3a1a2b, metalness: 0.9, roughness: 0.2, emissive: 0x2a0a1a, emissiveIntensity: 0.3 }),
+            serverAmber: new THREE.MeshStandardMaterial({ color: 0x3a202a, metalness: 0.85, roughness: 0.25, emissive: 0x2a1018, emissiveIntensity: 0.25 }),
+            serverCyan: new THREE.MeshStandardMaterial({ color: 0x2a0a20, metalness: 0.9, roughness: 0.15, emissive: 0x1a0012, emissiveIntensity: 0.3 }),
+            darkMetal: new THREE.MeshStandardMaterial({ color: 0x15090d, metalness: 0.95, roughness: 0.3 }),
+            wireframe: new THREE.MeshBasicMaterial({ color: 0xff69b4, wireframe: true, transparent: true, opacity: 0.15 }),
+            wireframeAmber: new THREE.MeshBasicMaterial({ color: 0xffb6c1, wireframe: true, transparent: true, opacity: 0.12 }),
+            floor: new THREE.MeshStandardMaterial({ color: 0x0a0407, metalness: 0.7, roughness: 0.5 }),
+            grid: new THREE.MeshBasicMaterial({ color: 0x250a15, transparent: true, opacity: 0.25, wireframe: true }),
         };
 
         const objects = [];
@@ -521,7 +521,7 @@
             objectGroup.add(mesh);
 
             const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
-            const ledMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0x33ff33 : 0xffb000, transparent: true, opacity: 0.6 });
+            const ledMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0xff69b4 : 0xffb6c1, transparent: true, opacity: 0.6 });
             const led = new THREE.Mesh(ledGeo, ledMat);
             led.position.set(x, y + scale * 0.8, z + scale * 0.31);
             objectGroup.add(led);
@@ -585,7 +585,7 @@
                 objectGroup.add(mesh);
 
                 const wireGeo = new THREE.EdgesGeometry(geo);
-                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.2 }));
+                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xff69b4, transparent: true, opacity: 0.2 }));
                 wireLine.position.copy(mesh.position);
                 wireLine.rotation.copy(mesh.rotation);
                 objectGroup.add(wireLine);
