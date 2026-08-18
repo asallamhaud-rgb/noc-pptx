@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MEGACORP // MAINFRAME DESCENT v2.8.0</title>
@@ -235,10 +233,7 @@
             .progress-track { width: 100px; }
             .terminal-body { padding: 16px 18px; }
         }
-    </style>
-<base target="_blank">
-</head>
-<body>
+    </style><base target="_blank"></head><body>
     <div id="canvas-container"></div>
     <div class="crt-scanlines"></div>
     <div class="crt-vignette"></div>
@@ -415,12 +410,6 @@
     <div id="scroll-track"></div>
 
     <script>
-        // ═══════════════════════════════════════════════════════════════
-        //  MEGACORP MAINFRAME DESCENT
-        //  Three.js + GSAP ScrollTrigger — CRT Terminal Aesthetic
-        //  Inspired by Service Desk Simulator
-        // ═══════════════════════════════════════════════════════════════
-
         gsap.registerPlugin(ScrollTrigger);
 
         const CONFIG = {
@@ -437,10 +426,8 @@
             scrubValue: 1.5
         };
 
-        // Generate Random Analyst ID
         document.getElementById('analyst-id').textContent = Math.floor(1000 + Math.random() * 8999).toString();
 
-        // Boot Sequence
         const bootLines = document.querySelectorAll('#boot-overlay .boot-line');
         bootLines.forEach((line, i) => {
             gsap.to(line, {
@@ -457,7 +444,6 @@
             });
         });
 
-        // Scene Setup
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(CONFIG.fogColor);
@@ -475,7 +461,6 @@
         renderer.toneMappingExposure = 1.0;
         container.appendChild(renderer.domElement);
 
-        // Lighting — CRT Phosphor Style
         const ambientLight = new THREE.AmbientLight(0x0a1a0a, CONFIG.ambientIntensity);
         scene.add(ambientLight);
 
@@ -496,7 +481,6 @@
 
         scene.add(camera);
 
-        // Distant corridor lights
         const corridorLights = [];
         for (let i = 0; i < 20; i++) {
             const z = -15 - i * 16;
@@ -512,7 +496,6 @@
             corridorLights.push({ light, baseIntensity: 0.5, flickerSpeed: 5 + Math.random() * 10 });
         }
 
-        // Materials
         const materials = {
             serverGreen: new THREE.MeshStandardMaterial({ color: 0x1a3a1a, metalness: 0.9, roughness: 0.2, emissive: 0x0a2a0a, emissiveIntensity: 0.3 }),
             serverAmber: new THREE.MeshStandardMaterial({ color: 0x3a2a0a, metalness: 0.85, roughness: 0.25, emissive: 0x2a1a00, emissiveIntensity: 0.25 }),
@@ -524,7 +507,6 @@
             grid: new THREE.MeshBasicMaterial({ color: 0x0a1a0a, transparent: true, opacity: 0.2, wireframe: true }),
         };
 
-        // Object arrays
         const objects = [];
         const objectGroup = new THREE.Group();
         scene.add(objectGroup);
@@ -557,355 +539,249 @@
             });
         }
 
-        function createDataCube(z, x, y, scale) {
-            const geo = new THREE.BoxGeometry(scale, scale, scale);
-            const mat = Math.random() > 0.6 ? materials.serverCyan : materials.serverGreen;
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, y, z);
-            mesh.rotation.set(Math.random() * 0.5, Math.random() * Math.PI, Math.random() * 0.5);
-            mesh.castShadow = true;
-            objectGroup.add(mesh);
+        const floorGeo = new THREE.PlaneGeometry(100, Math.abs(CONFIG.cameraZEnd) + 100);
+        const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
+        floorMesh.rotation.x = -Math.PI / 2;
+        floorMesh.position.y = -12;
+        floorMesh.position.z = CONFIG.cameraZEnd / 2;
+        floorMesh.receiveShadow = true;
+        scene.add(floorMesh);
 
-            const innerGeo = new THREE.BoxGeometry(scale * 0.5, scale * 0.5, scale * 0.5);
-            const innerMat = new THREE.MeshBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.15 });
-            const inner = new THREE.Mesh(innerGeo, innerMat);
-            inner.position.copy(mesh.position);
-            objectGroup.add(inner);
+        const gridMesh = new THREE.Mesh(floorGeo, materials.grid);
+        gridMesh.rotation.x = -Math.PI / 2;
+        gridMesh.position.y = -11.9;
+        gridMesh.position.z = CONFIG.cameraZEnd / 2;
+        scene.add(gridMesh);
 
-            objects.push({
-                mesh: mesh, inner: inner,
-                rotSpeed: { x: (Math.random() - 0.5) * 0.008, y: (Math.random() - 0.5) * 0.012, z: (Math.random() - 0.5) * 0.006 },
-                floatSpeed: Math.random() * 0.003 + 0.001,
-                floatOffset: Math.random() * Math.PI * 2, baseY: y
-            });
-        }
-
-        function createTerminalSphere(z, x, y, scale) {
-            const geo = new THREE.IcosahedronGeometry(scale, 2);
-            const mesh = new THREE.Mesh(geo, materials.wireframe);
-            mesh.position.set(x, y, z);
-            objectGroup.add(mesh);
-
-            const coreGeo = new THREE.IcosahedronGeometry(scale * 0.25, 0);
-            const coreMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0x33ff33 : 0xffb000, transparent: true, opacity: 0.5 });
-            const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-            coreMesh.position.copy(mesh.position);
-            objectGroup.add(coreMesh);
-
-            objects.push({
-                mesh: mesh, coreMesh: coreMesh, coreMat: coreMat,
-                rotSpeed: { x: (Math.random() - 0.5) * 0.006, y: (Math.random() - 0.5) * 0.01, z: (Math.random() - 0.5) * 0.004 },
-                floatSpeed: 0, floatOffset: 0, baseY: y
-            });
-        }
-
-        function createDataPlane(z, x, y, scale) {
-            const geo = new THREE.PlaneGeometry(scale * 3, scale * 2);
-            const mesh = new THREE.Mesh(geo, materials.wireframeAmber);
-            mesh.position.set(x, y, z);
-            mesh.rotation.set(Math.random() * 0.3, Math.random() * Math.PI * 2, Math.random() * 0.3);
-            objectGroup.add(mesh);
-
-            objects.push({
-                mesh: mesh,
-                rotSpeed: { x: (Math.random() - 0.5) * 0.003, y: (Math.random() - 0.5) * 0.004, z: (Math.random() - 0.5) * 0.002 },
-                floatSpeed: Math.random() * 0.002 + 0.0005,
-                floatOffset: Math.random() * Math.PI * 2, baseY: y
-            });
-        }
-
-        function createTorusNode(z, x, y, scale) {
-            const geo = new THREE.TorusGeometry(scale, scale * 0.15, 12, 48);
-            const mat = Math.random() > 0.5 ? materials.serverGreen : materials.serverCyan;
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, y, z);
-            mesh.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.5;
-            mesh.castShadow = true;
-            objectGroup.add(mesh);
-
-            const wireGeo = new THREE.TorusGeometry(scale * 1.1, scale * 0.18, 8, 48);
-            const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
-            wireMesh.position.copy(mesh.position);
-            wireMesh.rotation.copy(mesh.rotation);
-            objectGroup.add(wireMesh);
-
-            objects.push({
-                mesh: mesh, wireMesh: wireMesh,
-                rotSpeed: { x: (Math.random() - 0.5) * 0.005, y: (Math.random() - 0.5) * 0.008, z: 0 },
-                floatSpeed: Math.random() * 0.002 + 0.001,
-                floatOffset: Math.random() * Math.PI * 2, baseY: y
-            });
-        }
-
-        // Build Corridor
-        const floorGeo = new THREE.PlaneGeometry(CONFIG.corridorWidth * 2.5, 450);
-        const floor = new THREE.Mesh(floorGeo, materials.floor);
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -CONFIG.corridorHeight / 2;
-        floor.position.z = -200;
-        floor.receiveShadow = true;
-        scene.add(floor);
-
-        const ceiling = new THREE.Mesh(floorGeo, materials.floor);
-        ceiling.rotation.x = Math.PI / 2;
-        ceiling.position.y = CONFIG.corridorHeight / 2;
-        ceiling.position.z = -200;
-        scene.add(ceiling);
-
-        const wallGeo = new THREE.PlaneGeometry(450, CONFIG.corridorHeight);
-        const leftWall = new THREE.Mesh(wallGeo, materials.grid);
-        leftWall.rotation.y = Math.PI / 2;
-        leftWall.position.set(-CONFIG.corridorWidth / 2, 0, -200);
-        scene.add(leftWall);
-
-        const rightWall = new THREE.Mesh(wallGeo, materials.grid);
-        rightWall.rotation.y = -Math.PI / 2;
-        rightWall.position.set(CONFIG.corridorWidth / 2, 0, -200);
-        scene.add(rightWall);
-
-        const gridHelper = new THREE.GridHelper(450, 90, 0x0a2a0a, 0x050a05);
-        gridHelper.position.y = -CONFIG.corridorHeight / 2 + 0.05;
-        gridHelper.position.z = -200;
-        scene.add(gridHelper);
-
-        // Populate Objects
-        const objectTypes = ['server', 'cube', 'sphere', 'plane', 'torus'];
         for (let i = 0; i < CONFIG.objectCount; i++) {
-            const z = -18 - (i / CONFIG.objectCount) * 280;
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 2.5 + Math.random() * (CONFIG.corridorWidth / 2 - 3.5);
-            const x = Math.cos(angle) * radius;
-            const y = (Math.random() - 0.5) * (CONFIG.corridorHeight - 5);
-            const scale = 0.5 + Math.random() * 1.0;
-            const type = objectTypes[Math.floor(Math.random() * objectTypes.length)];
+            const z = CONFIG.cameraZStart - 10 - (Math.random() * (Math.abs(CONFIG.cameraZEnd) + 40));
+            const margin = 2;
+            const hw = CONFIG.corridorWidth / 2 - margin;
+            const hh = CONFIG.corridorHeight / 2 - margin;
 
-            switch(type) {
-                case 'server': createServerRack(z, x, y, scale * 0.7); break;
-                case 'cube': createDataCube(z, x, y, scale); break;
-                case 'sphere': createTerminalSphere(z, x, y, scale * 0.7); break;
-                case 'plane': createDataPlane(z, x, y, scale * 0.6); break;
-                case 'torus': createTorusNode(z, x, y, scale * 0.8); break;
+            let x, y;
+            if (Math.random() > 0.4) {
+                x = Math.random() > 0.5 ? hw : -hw;
+                x += (Math.random() - 0.5) * 4;
+                y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.8;
+            } else {
+                x = (Math.random() - 0.5) * CONFIG.corridorWidth * 0.7;
+                y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.7;
+            }
+
+            const scale = 1 + Math.random() * 2.5;
+            const type = Math.random();
+
+            if (type < 0.4) {
+                createServerRack(z, x, y, scale);
+            } else if (type < 0.7) {
+                const geo = new THREE.BoxGeometry(scale, scale, scale);
+                const mat = Math.random() > 0.7 ? materials.serverCyan : materials.darkMetal;
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(x, y, z);
+                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                objectGroup.add(mesh);
+
+                const wireGeo = new THREE.EdgesGeometry(geo);
+                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.2 }));
+                wireLine.position.copy(mesh.position);
+                wireLine.rotation.copy(mesh.rotation);
+                objectGroup.add(wireLine);
+
+                objects.push({
+                    mesh: mesh, wireLine: wireLine,
+                    rotSpeed: { x: (Math.random() - 0.5) * 0.02, y: (Math.random() - 0.5) * 0.02, z: (Math.random() - 0.5) * 0.02 },
+                    floatSpeed: (Math.random() - 0.5) * 0.01, floatOffset: Math.random() * Math.PI * 2, baseY: y
+                });
+            } else {
+                const geo = new THREE.TorusKnotGeometry(scale * 0.5, scale * 0.15, 64, 8);
+                const mat = Math.random() > 0.5 ? materials.serverAmber : materials.darkMetal;
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(x, y, z);
+                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                objectGroup.add(mesh);
+
+                objects.push({
+                    mesh: mesh,
+                    rotSpeed: { x: (Math.random() - 0.5) * 0.01, y: (Math.random() - 0.5) * 0.03, z: (Math.random() - 0.5) * 0.01 },
+                    floatSpeed: (Math.random() - 0.5) * 0.005, floatOffset: Math.random() * Math.PI * 2, baseY: y
+                });
             }
         }
 
-        // Central Synergy-AI Core
-        const coreGroup = new THREE.Group();
-        coreGroup.position.set(0, 0, -150);
-        scene.add(coreGroup);
-
-        for (let i = 0; i < 10; i++) {
-            const ringGeo = new THREE.TorusGeometry(2.5 + i * 1.2, 0.06, 8, 64);
-            const ringMat = new THREE.MeshBasicMaterial({
-                color: i % 2 === 0 ? 0x33ff33 : 0xffb000,
-                transparent: true, opacity: 0.12 - i * 0.008
-            });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
-            ring.rotation.y = (Math.random() - 0.5) * 0.4;
-            coreGroup.add(ring);
-            objects.push({
-                mesh: ring,
-                rotSpeed: { x: 0, y: 0.0015 * (i % 2 === 0 ? 1 : -1), z: 0 },
-                floatSpeed: 0, floatOffset: 0, baseY: 0, isCore: true
-            });
+        const sections = document.querySelectorAll('.ui-section');
+        const numSections = sections.length;
+        
+        let pathPoints = [];
+        for (let i = 0; i < numSections; i++) {
+            const progress = i / (numSections - 1);
+            const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
+            const x = Math.sin(progress * Math.PI * 4) * (CONFIG.corridorWidth * 0.15);
+            const y = Math.cos(progress * Math.PI * 3) * (CONFIG.corridorHeight * 0.15);
+            pathPoints.push(new THREE.Vector3(x, y, z));
         }
+        
+        const curve = new THREE.CatmullRomCurve3(pathPoints);
 
-        const aiGeo = new THREE.OctahedronGeometry(2, 0);
-        const aiMat = new THREE.MeshBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.6, wireframe: true });
-        const aiMesh = new THREE.Mesh(aiGeo, aiMat);
-        coreGroup.add(aiMesh);
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: '#scroll-track',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: CONFIG.scrubValue,
+                onUpdate: (self) => {
+                    document.getElementById('progress-fill').style.width = `${self.progress * 100}%`;
+                    const depth = Math.abs(camera.position.z - CONFIG.cameraZStart).toFixed(2);
+                    document.getElementById('depth-readout').textContent = `${depth}m`;
 
-        const aiCoreGeo = new THREE.OctahedronGeometry(1, 0);
-        const aiCoreMat = new THREE.MeshBasicMaterial({ color: 0xffb000, transparent: true, opacity: 0.8 });
-        const aiCoreMesh = new THREE.Mesh(aiCoreGeo, aiCoreMat);
-        coreGroup.add(aiCoreMesh);
+                    const integrity = (99.982 - (self.progress * 15) + (Math.random() * 0.1)).toFixed(3);
+                    const integrityEl = document.getElementById('integrity-readout');
+                    integrityEl.textContent = `${integrity}%`;
+                    
+                    if (self.progress > 0.7) {
+                        integrityEl.className = 'status-value red';
+                        document.getElementById('status-readout').textContent = 'ANOMALY DETECTED';
+                        document.getElementById('status-readout').style.color = 'var(--red)';
+                    } else if (self.progress > 0.4) {
+                        integrityEl.className = 'status-value amber';
+                        document.getElementById('status-readout').textContent = 'DEGRADING';
+                        document.getElementById('status-readout').style.color = 'var(--amber)';
+                    } else {
+                        integrityEl.className = 'status-value amber';
+                        document.getElementById('status-readout').textContent = 'ONLINE';
+                        document.getElementById('status-readout').style.color = 'var(--phosphor)';
+                    }
 
-        const coreLight = new THREE.PointLight(0x33ff33, 3, 40);
-        coreLight.position.set(0, 0, -150);
-        scene.add(coreLight);
-
-        // Particle Field
-        const particleCount = 1000;
-        const particleGeo = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(particleCount * 3);
-        for (let i = 0; i < particleCount; i++) {
-            particlePositions[i * 3] = (Math.random() - 0.5) * CONFIG.corridorWidth * 1.8;
-            particlePositions[i * 3 + 1] = (Math.random() - 0.5) * CONFIG.corridorHeight * 1.8;
-            particlePositions[i * 3 + 2] = -Math.random() * 320;
-        }
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-        const particleMat = new THREE.PointsMaterial({ color: 0x33ff33, size: 0.06, transparent: true, opacity: 0.35, sizeAttenuation: true });
-        const particles = new THREE.Points(particleGeo, particleMat);
-        scene.add(particles);
-
-        // GSAP ScrollTrigger Camera Flight
-        const scrollTriggerConfig = {
-            trigger: '#scroll-track',
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: CONFIG.scrubValue,
-            onUpdate: (self) => {
-                const progress = self.progress;
-                const depth = progress * 300;
-                document.getElementById('progress-fill').style.width = (progress * 100) + '%';
-                document.getElementById('depth-readout').textContent = depth.toFixed(2) + 'm';
-                const integrity = (99.982 - progress * 15).toFixed(3);
-                document.getElementById('integrity-readout').textContent = integrity + '%';
-                const statusEl = document.getElementById('status-readout');
-                if (progress < 0.2) statusEl.textContent = 'ONLINE';
-                else if (progress < 0.4) statusEl.textContent = 'DEGRADED';
-                else if (progress < 0.6) statusEl.textContent = 'ANOMALOUS';
-                else if (progress < 0.8) statusEl.textContent = 'CRITICAL';
-                else statusEl.textContent = 'TERMINAL';
-                if (progress > 0.02) document.getElementById('scroll-hint').classList.add('hidden');
+                    if (self.progress > 0.05) {
+                        document.getElementById('scroll-hint').classList.add('hidden');
+                    }
+                }
             }
-        };
-
-        gsap.to(camera.position, { z: CONFIG.cameraZEnd, scrollTrigger: scrollTriggerConfig });
-
-        gsap.to(camera.rotation, {
-            z: -0.07,
-            scrollTrigger: { trigger: '#scroll-track', start: 'top top', end: '20% top', scrub: CONFIG.scrubValue }
-        });
-        gsap.to(camera.rotation, {
-            z: 0.05,
-            scrollTrigger: { trigger: '#scroll-track', start: '20% top', end: '40% top', scrub: CONFIG.scrubValue }
-        });
-        gsap.to(camera.rotation, {
-            z: -0.06,
-            scrollTrigger: { trigger: '#scroll-track', start: '40% top', end: '60% top', scrub: CONFIG.scrubValue }
-        });
-        gsap.to(camera.rotation, {
-            z: 0.06,
-            scrollTrigger: { trigger: '#scroll-track', start: '60% top', end: '80% top', scrub: CONFIG.scrubValue }
-        });
-        gsap.to(camera.rotation, {
-            z: 0,
-            scrollTrigger: { trigger: '#scroll-track', start: '80% top', end: 'bottom bottom', scrub: CONFIG.scrubValue }
         });
 
-        gsap.to(camera.position, {
-            y: 1.2,
-            scrollTrigger: { trigger: '#scroll-track', start: 'top top', end: '50% top', scrub: CONFIG.scrubValue }
-        });
-        gsap.to(camera.position, {
-            y: -0.8,
-            scrollTrigger: { trigger: '#scroll-track', start: '50% top', end: 'bottom bottom', scrub: CONFIG.scrubValue }
-        });
+        tl.to(camera.position, {
+            ease: "none",
+            duration: 1,
+            onUpdate: function() {
+                const time = this.progress();
+                const point = curve.getPointAt(time);
+                camera.position.copy(point);
 
-        // UI Section Animations
-        const sections = [
-            { id: '#section-1', start: '5%', end: '20%' },
-            { id: '#section-2', start: '22%', end: '38%' },
-            { id: '#section-3', start: '40%', end: '55%' },
-            { id: '#section-4', start: '57%', end: '73%' },
-            { id: '#section-5', start: '75%', end: '92%' }
-        ];
+                const lookAheadTime = Math.min(1, time + 0.05);
+                const lookAheadPoint = curve.getPointAt(lookAheadTime);
+                const dx = lookAheadPoint.x - point.x;
+                camera.rotation.z = gsap.utils.interpolate(camera.rotation.z, dx * -0.1, 0.1);
+                
+                const targetPoint = curve.getPointAt(Math.min(1, time + 0.1));
+                camera.rotation.x = gsap.utils.interpolate(camera.rotation.x, (targetPoint.y - point.y) * 0.02, 0.1);
+                camera.rotation.y = gsap.utils.interpolate(camera.rotation.y, (targetPoint.x - point.x) * 0.05, 0.1);
+            }
+        }, 0);
 
-        sections.forEach((sec) => {
-            const el = document.querySelector(sec.id);
-            gsap.to(el, {
-                opacity: 1, y: 0, duration: 1, ease: 'power2.out',
+        sections.forEach((section, index) => {
+            const startProgress = Math.max(0, (index / (numSections - 1)) - 0.15);
+            const endProgress = Math.min(1, (index / (numSections - 1)) + 0.15);
+            const startRatio = startProgress * 100;
+            const endRatio = endProgress * 100;
+
+            gsap.to(section, {
                 scrollTrigger: {
                     trigger: '#scroll-track',
-                    start: sec.start + ' top',
-                    end: sec.end + ' top',
-                    scrub: CONFIG.scrubValue,
-                    onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8 }),
-                    onLeave: () => gsap.to(el, { opacity: 0, y: -30, duration: 0.6 }),
-                    onEnterBack: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8 }),
-                    onLeaveBack: () => gsap.to(el, { opacity: 0, y: 40, duration: 0.6 })
-                }
+                    start: `${startRatio}% top`,
+                    end: `${endRatio}% top`,
+                    scrub: 0.5,
+                },
+                opacity: 1,
+                y: 0,
+                ease: "power2.out",
+            });
+            
+            gsap.to(section, {
+                scrollTrigger: {
+                    trigger: '#scroll-track',
+                    start: `${(index / (numSections - 1)) * 100 + 10}% top`,
+                    end: `${Math.min(100, (index / (numSections - 1)) * 100 + 25)}% top`,
+                    scrub: 0.5,
+                },
+                opacity: 0,
+                y: -40,
+                ease: "power2.in",
             });
         });
 
-        // Animation Loop
-        const clock = new THREE.Clock();
-        let mouseX = 0, mouseY = 0;
-        let targetMouseX = 0, targetMouseY = 0;
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
 
-        document.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-            targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX) * 0.001;
+            mouseY = (event.clientY - windowHalfY) * 0.001;
         });
+
+        const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            mouseX += (targetMouseX - mouseX) * 0.04;
-            mouseY += (targetMouseY - mouseY) * 0.04;
+            targetX = mouseX * 0.5;
+            targetY = mouseY * 0.5;
+            
+            camera.rotation.y += (targetX - (camera.rotation.y - (camera.userData.baseRotY || 0))) * 0.05;
+            camera.rotation.x += (targetY - (camera.rotation.x - (camera.userData.baseRotX || 0))) * 0.05;
 
-            camera.position.x = mouseX * 1.0;
-            camera.rotation.y = -mouseX * 0.022;
-            camera.rotation.x = -mouseY * 0.016;
-
-            // Animate objects
-            objects.forEach((obj) => {
-                if (obj.isCore) {
-                    obj.mesh.rotation.z += obj.rotSpeed.y;
-                    return;
+            objects.forEach(obj => {
+                if (obj.mesh) {
+                    obj.mesh.rotation.x += obj.rotSpeed.x;
+                    obj.mesh.rotation.y += obj.rotSpeed.y;
+                    obj.mesh.rotation.z += obj.rotSpeed.z;
                 }
-                obj.mesh.rotation.x += obj.rotSpeed.x;
-                obj.mesh.rotation.y += obj.rotSpeed.y;
-                if (obj.rotSpeed.z) obj.mesh.rotation.z += obj.rotSpeed.z;
-
-                if (obj.floatSpeed > 0) {
-                    obj.mesh.position.y = obj.baseY + Math.sin(time * obj.floatSpeed * 100 + obj.floatOffset) * 0.8;
-                }
-
                 if (obj.wireMesh) {
                     obj.wireMesh.rotation.copy(obj.mesh.rotation);
-                    obj.wireMesh.position.y = obj.mesh.position.y;
                 }
-                if (obj.inner) {
-                    obj.inner.rotation.copy(obj.mesh.rotation);
-                    obj.inner.position.y = obj.mesh.position.y;
+                if (obj.wireLine) {
+                    obj.wireLine.rotation.copy(obj.mesh.rotation);
                 }
-                if (obj.coreMesh) {
-                    obj.coreMesh.rotation.copy(obj.mesh.rotation);
-                }
+
+                const yOffset = Math.sin(time * 2 + obj.floatOffset) * obj.floatSpeed * 50;
+                if(obj.mesh) obj.mesh.position.y = obj.baseY + yOffset;
+                if(obj.wireMesh) obj.wireMesh.position.y = obj.baseY + yOffset;
+                if(obj.wireLine) obj.wireLine.position.y = obj.baseY + yOffset;
+                if(obj.led) obj.led.position.y = obj.baseY + yOffset + (obj.mesh.geometry.parameters.height/2 || 0);
+
                 if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.4 + Math.sin(time * 3 + obj.ledPulse) * 0.25;
+                    obj.ledMat.opacity = 0.2 + Math.sin(time * 5 + obj.ledPulse) * 0.8;
                 }
             });
 
-            // Core animation
-            coreGroup.rotation.y = time * 0.12;
-            coreGroup.rotation.x = Math.sin(time * 0.08) * 0.08;
-
-            const pulse = 1 + Math.sin(time * 1.8) * 0.12;
-            aiMesh.scale.set(pulse, pulse, pulse);
-            aiCoreMesh.scale.set(pulse * 0.8, pulse * 0.8, pulse * 0.8);
-            coreLight.intensity = 3 + Math.sin(time * 2.5) * 0.4;
-
-            // Particle drift
-            const positions = particles.geometry.attributes.position.array;
-            for (let i = 0; i < particleCount; i++) {
-                positions[i * 3 + 1] += Math.sin(time * 0.3 + i * 0.1) * 0.0015;
-            }
-            particles.geometry.attributes.position.needsUpdate = true;
-
-            // Corridor light flicker
-            corridorLights.forEach((cl) => {
-                cl.light.intensity = cl.baseIntensity + Math.sin(time * cl.flickerSpeed) * 0.15;
+            corridorLights.forEach(item => {
+                item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.2;
             });
 
-            // Camera light flicker
-            camLight.intensity = CONFIG.pointLightIntensity + Math.sin(time * 6) * 0.08;
+            const flickerEl = document.querySelector('.crt-flicker');
+            if(flickerEl && Math.random() > 0.9) {
+                flickerEl.style.opacity = 0.1 + Math.random() * 0.2;
+            } else if (flickerEl) {
+                flickerEl.style.opacity = 0.3;
+            }
 
             renderer.render(scene, camera);
         }
 
-        animate();
-
-        // Resize Handler
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         });
+
+        animate();
     </script>
 </body>
 </html>
