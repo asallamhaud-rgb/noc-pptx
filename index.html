@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — Panoramic Holographic Command Center</title>
+    <title>Omantel NSOC — Holographic Network Architecture & World Telemetry</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -199,14 +199,14 @@
 <body>
 
     <div class="ambient-glow"></div>
-    <div class="interaction-hud">🖱️ CLICK &amp; DRAG TO PAN PANORAMIC COMMAND WALL • SCROLL TO MORPH DOMAINS</div>
+    <div class="interaction-hud">🖱️ CLICK &amp; DRAG TO ORBIT GLOBAL TELEMETRY • SCROLL TO MORPH ARCHITECTURE</div>
     <canvas id="webgl-canvas"></canvas>
 
     <header>
         <div class="brand">OMANTEL <span>NSOC</span></div>
         <div class="status-badge">
             <div class="dot"></div>
-            <span id="hud-status">HOLOGRAPHIC PANORAMA: ACTIVE</span>
+            <span id="hud-status">GLOBAL TELEMETRY: ACTIVE</span>
         </div>
     </header>
 
@@ -298,10 +298,10 @@
     <script>
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000206, 0.006);
+        scene.fog = new THREE.FogExp2(0x000206, 0.005);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 42);
+        camera.position.set(0, 0, 44);
 
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -318,10 +318,10 @@
         scene.add(neonLight);
 
         const masterGroup = new THREE.Group();
-        masterGroup.position.x = 10; // Offset right so text card sits cleanly on left
+        masterGroup.position.x = 9; // Offset right to clear content cards on left
         scene.add(masterGroup);
 
-        // Interactive Drag Rotation for Panoramic feel
+        // Interactive Drag Rotation
         let isDragging = false;
         let prevMouse = { x: 0, y: 0 };
         const userRot = { x: 0, y: 0 };
@@ -344,170 +344,187 @@
             userRot.x += (e.touches[0].clientY - prevMouse.y) * 0.005;
             prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         });
-        window.addEventListener('touchend', () => { isDragging = false; });
+        window.removeEventListener = ('touchend', () => { isDragging = false; });
 
-        // --- CREATING THE CURVED PANORAMIC HOLOGRAPHIC SCREENS & NEURAL NET ---
-        const totalScreens = 6;
-        const screenPanels = [];
-        const panelGroup = new THREE.Group();
-        masterGroup.add(panelGroup);
+        // --- BUILDING THE CENTRAL SERVER RACK & GLOWING FIBER CABLES (BASED ON REFERENCE IMAGE) ---
+        const centralRackGroup = new THREE.Group();
+        masterGroup.add(centralRackGroup);
 
-        // Helper function to generate dynamic HUD telemetry texture on canvas
-        function createDashboardTexture(typeIdx) {
-            const c = document.createElement('canvas');
-            c.width = 512;
-            c.height = 320;
-            const ctx = c.getContext('2d');
+        // Server Rack Chassis
+        const rackGeo = new THREE.BoxGeometry(3.5, 5.5, 3.5);
+        const rackMat = new THREE.MeshStandardMaterial({ color: 0x020617, metalness: 0.9, roughness: 0.2 });
+        const rackMesh = new THREE.Mesh(rackGeo, rackMat);
+        centralRackGroup.add(rackMesh);
 
-            ctx.fillStyle = 'rgba(2, 6, 23, 0.9)';
-            ctx.fillRect(0, 0, 512, 320);
+        // Server Rack Edge Glow & Panels
+        const rackEdgeGeo = new THREE.EdgesGeometry(rackGeo);
+        const rackEdgeMat = new THREE.LineBasicMaterial({ color: 0x00a3e0, linewidth: 2 });
+        const rackEdges = new THREE.LineSegments(rackEdgeGeo, rackEdgeMat);
+        centralRackGroup.add(rackEdges);
 
-            // Border frame
-            ctx.strokeStyle = typeIdx % 2 === 0 ? '#00a3e0' : '#00ffcc';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(10, 10, 492, 300);
-
-            // Header bar
-            ctx.fillStyle = typeIdx % 2 === 0 ? 'rgba(0, 163, 224, 0.2)' : 'rgba(0, 255, 204, 0.2)';
-            ctx.fillRect(10, 10, 492, 45);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 16px "JetBrains Mono", monospace';
-            ctx.fillText(`NSOC TELEMETRY // SECTOR ${typeIdx + 1}`, 25, 38);
-
-            // Simulated AI & graphs
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(30, 220);
-            for(let i=0; i<15; i++) {
-                ctx.lineTo(30 + i * 30, 160 + Math.sin(i + typeIdx * 2) * 45);
-            }
-            ctx.stroke();
-
-            // Bar charts
-            for(let i=0; i<6; i++) {
-                ctx.fillStyle = i % 2 === 0 ? '#00a3e0' : '#00ffcc';
-                const h = 30 + ((i * 17 + typeIdx * 25) % 80);
-                ctx.fillRect(320 + i * 28, 250 - h, 20, h);
-            }
-
-            const tex = new THREE.CanvasTexture(c);
-            return tex;
+        // Internal server lights texture simulation
+        const panelCanvas = document.createElement('canvas');
+        panelCanvas.width = 256; panelCanvas.height = 256;
+        const pCtx = panelCanvas.getContext('2d');
+        pCtx.fillStyle = '#020617'; pCtx.fillRect(0,0,256,256);
+        for(let i=0; i<12; i++) {
+            pCtx.fillStyle = i % 2 === 0 ? '#00a3e0' : '#00ffcc';
+            pCtx.fillRect(20, 20 + i*18, 120 + (i*7)%80, 8);
+            pCtx.fillStyle = '#f97316';
+            pCtx.fillRect(160, 20 + i*18, 30, 8);
         }
+        const rackTexture = new THREE.CanvasTexture(panelCanvas);
+        const frontPanelGeo = new THREE.PlaneGeometry(3.2, 5.2);
+        const frontPanelMat = new THREE.MeshBasicMaterial({ map: rackTexture, side: THREE.DoubleSide });
+        const frontPanel = new THREE.Mesh(frontPanelGeo, frontPanelMat);
+        frontPanel.position.z = 1.76;
+        centralRackGroup.add(frontPanel);
 
-        // Build curved panoramic wall of holographic screens
-        const screenGeo = new THREE.PlaneGeometry(6.5, 4.2, 16, 16);
-        
-        for (let i = 0; i < totalScreens; i++) {
-            const mat = new THREE.MeshBasicMaterial({
-                map: createDashboardTexture(i),
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.95
+        // --- HUNDREDS OF GLOWING FIBER OPTIC CABLES FLOWING OUTWARD ---
+        const totalCables = 54;
+        const cableCurves = [];
+        const cableMeshes = [];
+
+        for(let i=0; i<totalCables; i++) {
+            const angle = (i / totalCables) * Math.PI * 2;
+            const side = i < totalCables / 2 ? -1 : 1;
+            
+            // Start from bottom of server rack
+            const startX = side * 1.5;
+            const startY = -2.7;
+            const startZ = (Math.random() - 0.5) * 2;
+
+            // End spilled out onto the floor / foreground
+            const endX = side * (6 + Math.random() * 8);
+            const endY = -5.5 - Math.random() * 1.5;
+            const endZ = 3 + Math.random() * 6;
+
+            const controlPoint = new THREE.Vector3(
+                startX + (endX - startX) * 0.4,
+                startY - 3 - Math.random() * 2,
+                startZ + (endZ - startZ) * 0.5
+            );
+
+            const curve = new THREE.QuadraticBezierCurve3(
+                new THREE.Vector3(startX, startY, startZ),
+                controlPoint,
+                new THREE.Vector3(endX, endY, endZ)
+            );
+
+            cableCurves.push(curve);
+
+            const tubeGeo = new THREE.TubeGeometry(curve, 35, 0.08, 6, false);
+            const tubeMat = new THREE.MeshBasicMaterial({ 
+                color: i % 3 === 0 ? 0x00ffcc : (i % 3 === 1 ? 0x00a3e0 : 0x38bdf8)
             });
-            const mesh = new THREE.Mesh(screenGeo, mat);
-
-            // Neon glowing border outline around each holographic screen
-            const edgeGeo = new THREE.EdgesGeometry(screenGeo);
-            const edgeMat = new THREE.LineBasicMaterial({ color: i % 2 === 0 ? 0x00a3e0 : 0x00ffcc, linewidth: 2 });
-            const borderLines = new THREE.LineSegments(edgeGeo, edgeMat);
-            mesh.add(borderLines);
-
-            screenPanels.push(mesh);
-            panelGroup.add(mesh);
+            const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+            masterGroup.add(tubeMesh);
+            cableMeshes.push(tubeMesh);
         }
 
-        // --- GLOWING NEURAL NODE WEB CONNECTING EVERYTHING ---
-        const nodeCount = 80;
-        const nodeGeo = new THREE.SphereGeometry(0.12, 8, 8);
-        const nodeMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
-        const nodes = [];
-        const nodeGroup = new THREE.Group();
-        masterGroup.add(nodeGroup);
+        // --- BACKGROUND GLOBAL NETWORK & RED TELEMETRY NODES (FROM REFERENCE IMAGE) ---
+        const worldGroup = new THREE.Group();
+        worldGroup.position.set(0, 7, -12);
+        masterGroup.add(worldGroup);
+
+        // World Map Particle Grid / Plane
+        const mapCanvas = document.createElement('canvas');
+        mapCanvas.width = 1024; mapCanvas.height = 512;
+        const mCtx = mapCanvas.getContext('2d');
+        mCtx.fillStyle = '#000206'; mCtx.fillRect(0,0,1024,512);
+        // Draw grid lines representing world map wireframe
+        mCtx.strokeStyle = '#00a3e0'; mCtx.lineWidth = 1.5;
+        for(let x=0; x<1024; x+=64) { mCtx.beginPath(); mCtx.moveTo(x,0); mCtx.lineTo(x,512); mCtx.stroke(); }
+        for(let y=0; y<512; y+=64) { mCtx.beginPath(); mCtx.moveTo(0,y); mCtx.lineTo(1024,y); mCtx.stroke(); }
+        
+        const mapTexture = new THREE.CanvasTexture(mapCanvas);
+        const mapGeo = new THREE.PlaneGeometry(26, 13);
+        const mapMat = new THREE.MeshBasicMaterial({ map: mapTexture, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+        const mapMesh = new THREE.Mesh(mapGeo, mapMat);
+        worldGroup.add(mapMesh);
+
+        // Red telemetry warning/node triangles across the world map
+        const nodeCount = 35;
+        const redNodeGeo = new THREE.ConeGeometry(0.2, 0.4, 3);
+        const redNodeMat = new THREE.MeshBasicMaterial({ color: 0xff3344 });
+        const redNodes = [];
 
         for(let i=0; i<nodeCount; i++) {
-            const m = new THREE.Mesh(nodeGeo, nodeMat);
-            nodes.push(m);
-            nodeGroup.add(m);
+            const node = new THREE.Mesh(redNodeGeo, redNodeMat);
+            node.position.set(
+                (Math.random() - 0.5) * 22,
+                (Math.random() - 0.5) * 10,
+                0.2
+            );
+            worldGroup.add(node);
+            redNodes.push(node);
         }
 
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x00a3e0, transparent: true, opacity: 0.4 });
-        const lineGeo = new THREE.BufferGeometry();
-        const linePositions = new Float32Array(nodeCount * 3);
-        lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-        const connectionLines = new THREE.Line(lineGeo, lineMat);
-        nodeGroup.add(connectionLines);
-
-        // --- 6 DISTINCT PANORAMIC / ARCHITECTURAL MORPH LAYOUTS ---
+        // --- 6 DISTINCT MORPHING STATES (INCLUDING SERVER CABLES & GLOBAL MAP) ---
 
         function getLayout0(i) {
-            // Panoramic curved wall arc
-            const angle = ((i - 2.5) / totalScreens) * 1.1;
-            const r = 12;
-            const x = Math.sin(angle) * r;
-            const z = Math.cos(angle) * r - r;
-            const y = Math.sin(i) * 0.8;
+            // State 0: Full Server Rack + Spilling Fiber Cables + World Map
             return {
-                pos: new THREE.Vector3(x, y, z),
-                rot: new THREE.Euler(0, angle, 0),
-                scale: new THREE.Vector3(1, 1, 1)
+                rackScale: 1,
+                rackOpacity: 1,
+                cableOpacity: 1,
+                worldOpacity: 1,
+                worldScale: 1
             };
         }
 
         function getLayout1(i) {
-            // Dual-tier floating command ring
-            const tier = i % 2;
-            const idxInTier = Math.floor(i / 2);
-            const angle = (idxInTier / 3) * Math.PI * 2;
-            const r = 9;
+            // State 1: IP Core Routing Focus (Rack expands, world contracts)
             return {
-                pos: new THREE.Vector3(Math.cos(angle) * r, (tier - 0.5) * 4.5, Math.sin(angle) * r),
-                rot: new THREE.Euler(0, -angle + Math.PI/2, 0),
-                scale: new THREE.Vector3(0.9, 0.9, 0.9)
+                rackScale: 1.3,
+                rackOpacity: 1,
+                cableOpacity: 0.8,
+                worldOpacity: 0.4,
+                worldScale: 0.8
             };
         }
 
         function getLayout2(i) {
-            // Forward optical cascade tunnel
+            // State 2: Transmission Photonics (Cables pulse and stretch)
             return {
-                pos: new THREE.Vector3((i - 2.5) * 2.8, Math.sin(i) * 2, -i * 2.2 + 4),
-                rot: new THREE.Euler(0, (i - 2.5) * 0.15, 0),
-                scale: new THREE.Vector3(0.85, 0.85, 0.85)
+                rackScale: 0.9,
+                rackOpacity: 0.8,
+                cableOpacity: 1,
+                worldOpacity: 0.7,
+                worldScale: 1.1
             };
         }
 
         function getLayout3(i) {
-            // Pyramidal cluster matrix
-            const row = Math.floor(i / 3);
-            const col = i % 3;
+            // State 3: Fixed Access Network
             return {
-                pos: new THREE.Vector3((col - 1) * 5.2, (1 - row) * 3.8, -row * 2),
-                rot: new THREE.Euler(0, (col - 1) * -0.2, 0),
-                scale: new THREE.Vector3(0.95, 0.95, 0.95)
+                rackScale: 1.1,
+                rackOpacity: 1,
+                cableOpacity: 0.6,
+                worldOpacity: 0.9,
+                worldScale: 1.2
             };
         }
 
         function getLayout4(i) {
-            // Spherical command dome distribution
-            const phi = Math.acos(-1 + (2 * i) / totalScreens);
-            const theta = Math.sqrt(totalScreens * Math.PI) * phi;
-            const r = 10;
+            // State 4: Mobile RAN Global Telemetry
             return {
-                pos: new THREE.Vector3(r * Math.cos(theta) * Math.sin(phi), r * Math.sin(theta) * Math.sin(phi), r * Math.cos(phi) - 5),
-                rot: new THREE.Euler(phi * 0.2, theta * 0.2, 0),
-                scale: new THREE.Vector3(0.9, 0.9, 0.9)
+                rackScale: 0.7,
+                rackOpacity: 0.5,
+                cableOpacity: 0.5,
+                worldOpacity: 1,
+                worldScale: 1.4
             };
         }
 
         function getLayout5(i) {
-            // Symmetrical battle-station wing layout
-            const side = i < 3 ? -1 : 1;
-            const idx = i % 3;
+            // State 5: Datacom & MPLS Enterprise Command
             return {
-                pos: new THREE.Vector3(side * (6 + idx * 3.8), (idx - 1) * 3.2, -idx * 1.5),
-                rot: new THREE.Euler(0, side * -0.35, 0),
-                scale: new THREE.Vector3(0.9, 0.9, 0.9)
+                rackScale: 1.2,
+                rackOpacity: 1,
+                cableOpacity: 0.9,
+                worldOpacity: 0.8,
+                worldScale: 1.0
             };
         }
 
@@ -516,12 +533,12 @@
         let isTransitioning = false;
 
         const statuses = [
-            "STATUS: MASTER PANORAMIC COMMAND NEXUS",
-            "STATUS: IP CORE HOLOGRAPHIC ROUTING",
-            "STATUS: DWDM OPTICAL PIPELINE MATRIX",
-            "STATUS: FIXED ACCESS FTTH GRID",
-            "STATUS: MOBILE RAN 5G COMMAND DOME",
-            "STATUS: DATACOM MPLS BATTLE-STATION"
+            "STATUS: MASTER RACK & GLOBAL TELEMETRY ACTIVE",
+            "STATUS: IP CORE ROUTING & PACKET SWITCHING",
+            "STATUS: DWDM OPTICAL PHOTONICS PIPELINES",
+            "STATUS: FIXED ACCESS FTTH INFRASTRUCTURE",
+            "STATUS: MOBILE RAN 5G WORLD SURVEILLANCE",
+            "STATUS: DATACOM MPLS ENTERPRISE CORE"
         ];
 
         function morphTo(idx) {
@@ -530,46 +547,40 @@
             currentIdx = idx;
 
             document.getElementById('hud-status').innerText = statuses[idx];
-            const layoutFunc = layouts[idx];
+            const cfg = layouts[idx](0);
 
-            screenPanels.forEach((panel, i) => {
-                const target = layoutFunc(i);
-                gsap.to(panel.position, { x: target.pos.x, y: target.pos.y, z: target.pos.z, duration: 2.2, ease: "expo.inOut" });
-                gsap.to(panel.rotation, { x: target.rot.x, y: target.rot.y, z: target.rot.z, duration: 2.2, ease: "expo.inOut" });
-                gsap.to(panel.scale, { x: target.scale.x, y: target.scale.y, z: target.scale.z, duration: 2.2, ease: "expo.inOut" });
+            gsap.to(centralRackGroup.scale, { x: cfg.rackScale, y: cfg.rackScale, z: cfg.rackScale, duration: 2.2, ease: "expo.inOut" });
+            
+            cableMeshes.forEach(cable => {
+                gsap.to(cable.material, { opacity: cfg.cableOpacity, transparent: true, duration: 2.2 });
             });
 
-            setTimeout(() => { isTransitioning = false; }, 2800);
+            gsap.to(mapMesh.material, { opacity: cfg.worldOpacity * 0.6, duration: 2.2 });
+            gsap.to(worldGroup.scale, { x: cfg.worldScale, y: cfg.worldScale, z: cfg.worldScale, duration: 2.2, ease: "expo.inOut" });
+
+            setTimeout(() => { isTransitioning = false; }, 2600);
         }
 
-        // Animate Neural Network nodes
+        // Animation Loop
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            masterGroup.rotation.y = THREE.MathUtils.lerp(masterGroup.rotation.y, userRot.y + Math.sin(time * 0.1) * 0.05, 0.05);
+            masterGroup.rotation.y = THREE.MathUtils.lerp(masterGroup.rotation.y, userRot.y + Math.sin(time * 0.1) * 0.04, 0.05);
             masterGroup.rotation.x = THREE.MathUtils.lerp(masterGroup.rotation.x, userRot.x + Math.cos(time * 0.1) * 0.03, 0.05);
 
-            // Update neural nodes floating around the command center
-            nodes.forEach((node, i) => {
-                const angle = time * 0.4 + (i * 0.2);
-                const r = 11 + Math.sin(i + time * 0.5) * 3;
-                node.position.set(
-                    Math.cos(angle) * r,
-                    Math.sin(time * 0.3 + i) * 6,
-                    Math.sin(angle) * r - 4
-                );
-                linePositions[i * 3] = node.position.x;
-                linePositions[i * 3 + 1] = node.position.y;
-                linePositions[i * 3 + 2] = node.position.z;
+            // Pulse red world telemetry nodes
+            redNodes.forEach((node, i) => {
+                const s = 1 + Math.sin(time * 3 + i) * 0.3;
+                node.scale.set(s, s, s);
             });
-            connectionLines.geometry.attributes.position.needsUpdate = true;
 
             renderer.render(scene, camera);
         }
         animate();
 
+        // Scroll Intersection Observer for Slides
         const slides = document.querySelectorAll('.slide');
         window.addEventListener('scroll', () => {
             const h = window.innerHeight;
