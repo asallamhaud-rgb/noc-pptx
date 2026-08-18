@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — Interactive Telemetry Engine</title>
+    <title>Omantel NSOC — Quantum Telemetry Engine</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -17,7 +17,7 @@
         }
 
         body {
-            background: #020617;
+            background: #010309;
             color: #f8fafc;
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
@@ -34,17 +34,28 @@
             pointer-events: none;
         }
 
-        /* Ambient glowing atmosphere */
-        .ambient-glow {
+        /* Dynamic background matrix grids */
+        .grid-overlay {
             position: fixed;
-            top: 30%;
-            left: 65%;
-            transform: translate(-50%, -50%);
-            width: 60vw;
-            height: 60vh;
-            background: radial-gradient(circle, rgba(0, 163, 224, 0.1) 0%, rgba(56, 189, 248, 0.03) 50%, transparent 70%);
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: linear-gradient(rgba(0, 163, 224, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 163, 224, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: 1;
             pointer-events: none;
+        }
+
+        .ambient-flare {
+            position: fixed;
+            top: 35%;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            width: 70vw;
+            height: 70vh;
+            background: radial-gradient(circle, rgba(0, 163, 224, 0.15) 0%, rgba(249, 115, 22, 0.04) 40%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+            filter: blur(60px);
         }
 
         header {
@@ -56,14 +67,14 @@
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0));
-            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            background: linear-gradient(to bottom, rgba(1, 3, 9, 0.95), rgba(1, 3, 9, 0));
+            border-bottom: 1px solid rgba(0, 163, 224, 0.1);
         }
 
         .brand {
             font-weight: 800;
-            font-size: 1.1rem;
-            letter-spacing: 0.15em;
+            font-size: 1.15rem;
+            letter-spacing: 0.2em;
             color: #ffffff;
         }
 
@@ -71,16 +82,34 @@
             color: #00a3e0;
         }
 
-        .telemetry-badge {
+        .telemetry-hud {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
             font-weight: 700;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.15em;
             color: #38bdf8;
-            background: rgba(56, 189, 248, 0.08);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            text-transform: uppercase;
+            background: rgba(0, 163, 224, 0.05);
+            border: 1px solid rgba(0, 163, 224, 0.2);
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px #10b981; }
+            100% { transform: scale(0.95); opacity: 0.8; }
         }
 
         .presentation-container {
@@ -96,36 +125,49 @@
             display: flex;
             align-items: center;
             margin-bottom: 8rem;
-            opacity: 0.15;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0.1;
+            transform: translateY(40px) scale(0.98);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .slide.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            border-left: 3px solid #00a3e0;
-            border-radius: 12px;
+            background: rgba(3, 7, 18, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(0, 163, 224, 0.2);
+            border-left: 4px solid #f97316;
+            border-radius: 8px;
             padding: 3.5rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-            max-width: 520px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            max-width: 540px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, #f97316, transparent);
         }
 
         .tag {
             display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.25em;
-            color: #38bdf8;
-            margin-bottom: 1rem;
+            letter-spacing: 0.2em;
+            color: #f97316;
+            background: rgba(249, 115, 22, 0.1);
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            margin-bottom: 1.2rem;
         }
 
         h1 {
@@ -139,63 +181,103 @@
 
         p {
             font-size: 1.05rem;
-            line-height: 1.7;
+            line-height: 1.75;
             color: #94a3b8;
+        }
+
+        .data-metrics {
+            margin-top: 1.5rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #38bdf8;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
+    <div class="grid-overlay"></div>
+    <div class="ambient-flare"></div>
     <canvas id="webgl-canvas"></canvas>
 
     <header>
         <div class="brand">OMANTEL <span>NSOC</span></div>
-        <div class="telemetry-badge" id="hud-status">SYSTEM INITIALIZED</div>
+        <div class="telemetry-hud">
+            <div class="live-dot"></div>
+            <span id="hud-status">NODE_SYNC: SECURE</span>
+        </div>
     </header>
 
     <main class="presentation-container">
+        
         <section class="slide active" id="slide-1">
             <div class="glass-panel">
-                <span class="tag">Stage 01 // Core Infrastructure</span>
-                <h1>Global Neural Core.</h1>
-                <p>Centralized monitoring matrix tracking multi-regional switching nodes and secure backbone connectivity in real time.</p>
+                <span class="tag">PHASE 01 // ORBITAL CORE</span>
+                <h1>Global Neural Matrix.</h1>
+                <p>Real-time telemetry aggregation mapping multi-tier transit hubs, international subsea landings, and core national gateways.</p>
+                <div class="data-metrics">
+                    <div>LATENCY: <span class="metric-value">4.2ms</span></div>
+                    <div>PACKET LOSS: <span class="metric-value">0.00%</span></div>
+                </div>
             </div>
         </section>
 
         <section class="slide" id="slide-2">
             <div class="glass-panel">
-                <span class="tag">Stage 02 // Enterprise Architecture</span>
-                <h1>Server Rack Grid.</h1>
-                <p>High-density data center architecture handling massive payload distribution, load balancing, and automated server clusters.</p>
+                <span class="tag">PHASE 02 // BLADE CLUSTERS</span>
+                <h1>Autonomous Data Racks.</h1>
+                <p>High-density switching matrices processing millions of simultaneous transactions, intelligent load balancing, and edge caching.</p>
+                <div class="data-metrics">
+                    <div>THROUGHPUT: <span class="metric-value">4.8 Tbps</span></div>
+                    <div>CLUSTER LOAD: <span class="metric-value">68.4%</span></div>
+                </div>
             </div>
         </section>
 
         <section class="slide" id="slide-3">
             <div class="glass-panel">
-                <span class="tag">Stage 03 // Transmission Layer</span>
-                <h1>Optical Fiber Transport.</h1>
-                <p>Ultra-low latency optical channels transmitting high-volume data streams across national trunk lines seamlessly.</p>
+                <span class="tag">PHASE 03 // PHOTONIC PIPELINES</span>
+                <h1>Sub-Surface Fiber Grid.</h1>
+                <p>Laser-driven optical channels carrying ultra-high capacity wavelengths across the entire country with absolute zero degradation.</p>
+                <div class="data-metrics">
+                    <div>WAVELENGTHS: <span class="metric-value">96 CH / Fiber</span></div>
+                    <div>VELOCITY: <span class="metric-value">2.99e8 m/s</span></div>
+                </div>
             </div>
         </section>
 
         <section class="slide" id="slide-4">
             <div class="glass-panel">
-                <span class="tag">Stage 04 // Wireless Topology</span>
-                <h1>RF Mast Propagation.</h1>
-                <p>Cellular base station deployment and microwave link arrays projecting synchronized frequency coverage layers.</p>
+                <span class="tag">PHASE 04 // ELECTROMAGNETIC FIELD</span>
+                <h1>Advanced Cellular Masts.</h1>
+                <p>High-gain antenna arrays executing beamforming protocols, projecting continuous 5G radio coverage across terrain sectors.</p>
+                <div class="data-metrics">
+                    <div>BEAM MATRIX: <span class="metric-value">64T64R MIMO</span></div>
+                    <div>COVERAGE: <span class="metric-value">99.8% Geo</span></div>
+                </div>
             </div>
         </section>
+
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
-        // --- 1. Scene Setup ---
+        // --- 1. Scene, Camera & Renderer ---
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020617, 0.012);
+        scene.fog = new THREE.FogExp2(0x010309, 0.014);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 0, 42);
@@ -204,53 +286,78 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // High-end cinematic lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        const blueLight = new THREE.PointLight(0x00a3e0, 3, 100);
-        blueLight.position.set(-10, 15, 15);
-        scene.add(blueLight);
+        // --- 2. Lighting & Master Engineering Group ---
+        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        
+        const primaryLight = new THREE.PointLight(0x00a3e0, 3.5, 120);
+        primaryLight.position.set(-15, 15, 15);
+        scene.add(primaryLight);
 
-        const cyanLight = new THREE.PointLight(0x38bdf8, 2, 100);
-        cyanLight.position.set(15, -15, 10);
-        scene.add(cyanLight);
+        const secondaryLight = new THREE.PointLight(0xf97316, 2.5, 120);
+        secondaryLight.position.set(15, -15, 15);
+        scene.add(secondaryLight);
 
         const masterGroup = new THREE.Group();
-        masterGroup.position.x = 10; // Shift right to frame UI panels cleanly
+        masterGroup.position.x = 11; // Frame perfectly next to glass panels
         scene.add(masterGroup);
 
-        // --- 2. Build Interactive NOC Elements ---
-        const itemCount = 144;
-        const objects = [];
+        // --- 3. Advanced Instanced / Modular Hardware Units ---
+        const elementCount = 180;
+        const elements = [];
 
-        // Custom Tech Material (Sleek dark metallic with glowing cyan emission)
+        // High-end cyber-tech material with metallic sheen and emissive core
         const techMaterial = new THREE.MeshStandardMaterial({
-            color: 0x0f172a,
-            metalness: 0.85,
-            roughness: 0.2,
+            color: 0x090d16,
+            metalness: 0.9,
+            roughness: 0.15,
             emissive: 0x00a3e0,
-            emissiveIntensity: 0.3
+            emissiveIntensity: 0.4
         });
 
         const boxGeo = new THREE.BoxGeometry(1, 1, 1);
         const edgeGeo = new THREE.EdgesGeometry(boxGeo);
-        const edgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 });
-
-        for (let i = 0; i < itemCount; i++) {
+        
+        // Multi-color glowing edges for hyper-realistic telemetry look
+        for (let i = 0; i < elementCount; i++) {
+            const edgeMat = new THREE.LineBasicMaterial({ 
+                color: (i % 3 === 0) ? 0xf97316 : 0x38bdf8, 
+                transparent: true, 
+                opacity: 0.7 
+            });
+            
             const mesh = new THREE.Mesh(boxGeo, techMaterial);
             const edges = new THREE.LineSegments(edgeGeo, edgeMat);
             mesh.add(edges);
             
-            objects.push(mesh);
+            elements.push(mesh);
             masterGroup.add(mesh);
         }
 
-        // --- 3. Enchanting Morph Layout Calculations ---
+        // --- 4. Special Telemetry Rings (Phase 4 Masts) ---
+        const ringCount = 9;
+        const telemetryRings = [];
+        const ringGeo = new THREE.RingGeometry(0.4, 0.5, 64);
+        const ringMat = new THREE.MeshBasicMaterial({ 
+            color: 0x38bdf8, 
+            side: THREE.DoubleSide, 
+            transparent: true, 
+            opacity: 0 
+        });
 
-        // PHASE 1: The Neural Globe
-        function getGlobeLayout(i) {
-            const phi = Math.acos(-1 + (2 * i) / itemCount);
-            const theta = Math.sqrt(itemCount * Math.PI) * phi;
-            const radius = 7.5;
+        for (let i = 0; i < ringCount; i++) {
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.visible = false;
+            masterGroup.add(ring);
+            telemetryRings.push(ring);
+        }
+
+        // --- 5. Phase Morph Algorithms ---
+
+        // PHASE 1: The Quantum Global Core (Fibonacci Sphere Matrix)
+        function getPhase1Layout(i) {
+            const phi = Math.acos(-1 + (2 * i) / elementCount);
+            const theta = Math.sqrt(elementCount * Math.PI) * phi;
+            const radius = 7.8;
             
             const pos = new THREE.Vector3(
                 radius * Math.cos(theta) * Math.sin(phi),
@@ -262,73 +369,73 @@
             dummy.position.copy(pos);
             dummy.lookAt(0, 0, 0);
 
-            return { pos: pos, rot: dummy.rotation, scale: new THREE.Vector3(1.2, 1.2, 1.2) };
+            return { pos: pos, rot: dummy.rotation, scale: new THREE.Vector3(1.3, 1.3, 1.3) };
         }
 
-        // PHASE 2: Server Rack Array (IT Data Center Grid)
-        function getRackLayout(i) {
+        // PHASE 2: Enterprise Server Blade Matrix
+        function getPhase2Layout(i) {
             const racks = 6;
-            const itemsPerRack = Math.ceil(itemCount / racks);
-            const rackIndex = Math.floor(i / itemsPerRack);
-            const slotIndex = i % itemsPerRack;
+            const itemsPerRack = Math.ceil(elementCount / racks);
+            const rackIdx = Math.floor(i / itemsPerRack);
+            const slotIdx = i % itemsPerRack;
 
-            const rackX = (rackIndex - (racks - 1) / 2) * 2.8;
-            const slotY = (slotIndex - (itemsPerRack - 1) / 2) * 0.55;
+            const rackX = (rackIdx - (racks - 1) / 2) * 2.6;
+            const slotY = (slotIdx - (itemsPerRack - 1) / 2) * 0.45;
             
-            const pos = new THREE.Vector3(rackX, slotY, (slotIndex % 2) * 0.4);
+            const pos = new THREE.Vector3(rackX, slotY, (slotIdx % 2) * 0.5);
             return { 
                 pos: pos, 
                 rot: new THREE.Euler(0, 0, 0), 
-                scale: new THREE.Vector3(2.2, 0.4, 1.2) // Shaped like servers/blades
+                scale: new THREE.Vector3(2.2, 0.35, 1.4) 
             };
         }
 
-        // PHASE 3: Optical Fiber Transport Streams
-        function getFiberLayout(i) {
-            const lines = 8;
-            const itemsPerLine = Math.ceil(itemCount / lines);
-            const lineIdx = Math.floor(i / itemsPerLine);
-            const progress = (i % itemsPerLine) / itemsPerLine;
+        // PHASE 3: Photonic Fiber Channels (Sweeping Light Beams)
+        function getPhase3Layout(i) {
+            const streams = 10;
+            const perStream = Math.ceil(elementCount / streams);
+            const streamIdx = Math.floor(i / perStream);
+            const progress = (i % perStream) / perStream;
 
-            const zPos = (progress - 0.5) * 35;
-            const xPos = (lineIdx - (lines - 1) / 2) * 1.8;
-            const yPos = Math.sin(progress * Math.PI * 2 + lineIdx) * 3;
+            const zPos = (progress - 0.5) * 40;
+            const xPos = (streamIdx - (streams - 1) / 2) * 1.5;
+            const yPos = Math.sin(progress * Math.PI * 3 + streamIdx) * 3.5;
 
             const pos = new THREE.Vector3(xPos, yPos, zPos);
             return {
                 pos: pos,
                 rot: new THREE.Euler(0, 0, 0),
-                scale: new THREE.Vector3(0.4, 0.4, 4.5) // Long stretching fiber packets
+                scale: new THREE.Vector3(0.3, 0.3, 6.0) // Elongated light pulses
             };
         }
 
-        // PHASE 4: Telecommunication Masts & Microwave Arrays
-        function getMastLayout(i) {
+        // PHASE 4: Telecommunication Masts & High-Gain RF Arrays
+        function getPhase4Layout(i) {
             const mastCount = 3;
-            const itemsPerMast = Math.ceil(itemCount / mastCount);
-            const mastIdx = Math.floor(i / itemsPerMast);
-            const localIdx = i % itemsPerMast;
+            const perMast = Math.ceil(elementCount / mastCount);
+            const mastIdx = Math.floor(i / perMast);
+            const localIdx = i % perMast;
 
-            const mastX = (mastIdx - 1) * 10;
+            const mastX = (mastIdx - 1) * 11;
             
             let pos, scale;
-            if (localIdx < itemsPerMast * 0.75) {
-                // Tower spine
-                const heightProg = localIdx / (itemsPerMast * 0.75);
-                pos = new THREE.Vector3(mastX, heightProg * 18 - 9, 0);
-                scale = new THREE.Vector3(1.5 - heightProg * 0.8, 1.2, 1.5 - heightProg * 0.8);
+            if (localIdx < perMast * 0.7) {
+                // Tower structural trunk
+                const heightProg = localIdx / (perMast * 0.7);
+                pos = new THREE.Vector3(mastX, heightProg * 20 - 10, 0);
+                scale = new THREE.Vector3(1.4 - heightProg * 0.7, 1.2, 1.4 - heightProg * 0.7);
             } else {
-                // Parabolic antennas mounted on sides
+                // Directional parabolic reflector dishes
                 const sideIdx = localIdx % 4;
                 const angle = (sideIdx / 4) * Math.PI * 2;
                 const heightOffset = Math.random() * 14 - 5;
                 
                 pos = new THREE.Vector3(
-                    mastX + Math.cos(angle) * 1.6,
+                    mastX + Math.cos(angle) * 1.8,
                     heightOffset,
-                    Math.sin(angle) * 1.6
+                    Math.sin(angle) * 1.8
                 );
-                scale = new THREE.Vector3(1.8, 1.8, 0.4); // Flat circular dish shapes
+                scale = new THREE.Vector3(2.0, 2.0, 0.4); 
             }
 
             const dummy = new THREE.Object3D();
@@ -338,89 +445,111 @@
             return { pos: pos, rot: dummy.rotation, scale: scale };
         }
 
-        const layouts = [getGlobeLayout, getRackLayout, getFiberLayout, getMastLayout];
-        let currentLayout = -1;
+        const layouts = [getPhase1Layout, getPhase2Layout, getPhase3Layout, getPhase4Layout];
+        let currentLayoutIdx = -1;
         let isTransitioning = false;
 
-        const statusTexts = [
-            "ACTIVE: GLOBAL CORE MATRIX",
-            "ACTIVE: ENTERPRISE SERVER CLUSTERS",
-            "ACTIVE: OPTICAL FIBER BACKBONE",
-            "ACTIVE: TELECOM MAST TOPOLOGY"
+        const hudStatusMessages = [
+            "STATUS: GLOBAL MATRIX SYNCHRONIZED",
+            "STATUS: DATA-CENTER BLADE ARRAYS ONLINE",
+            "STATUS: PHOTONIC BACKBONE ACTIVE [0ms LAG]",
+            "STATUS: 5G RF PROPAGATION FIELD STABLE"
         ];
 
-        function transitionTo(index) {
-            if (currentLayout === index || isTransitioning) return;
+        function transitionToPhase(index) {
+            if (currentLayoutIdx === index || isTransitioning) return;
             isTransitioning = true;
-            currentLayout = index;
+            currentLayoutIdx = index;
 
-            document.getElementById('hud-status').innerText = statusTexts[index];
+            document.getElementById('hud-status').innerText = hudStatusMessages[index];
 
             const layoutFunc = layouts[index];
 
-            // Cinematic Group Rotations for each view
-            let targetRotX = 0, targetRotY = 0;
-            if (index === 1) { targetRotX = 0.15; targetRotY = -0.3; }
-            if (index === 2) { targetRotX = 0.2; targetRotY = -0.1; }
-            if (index === 3) { targetRotX = -0.1; targetRotY = 0.2; }
+            // Cinematic Group Angles
+            let rotX = 0, rotY = 0;
+            if (index === 1) { rotX = 0.2; rotY = -0.35; }
+            if (index === 2) { rotX = 0.25; rotY = -0.15; }
+            if (index === 3) { rotX = -0.1; rotY = 0.25; }
 
             gsap.to(masterGroup.rotation, {
-                x: targetRotX, y: targetRotY,
-                duration: 2.2, ease: "power3.inOut"
+                x: rotX, y: rotY,
+                duration: 2.5, ease: "power3.inOut"
             });
 
-            // Smoothly morph every single mesh into its new placement
-            objects.forEach((obj, i) => {
+            // Enchanting staggered morph for each element
+            elements.forEach((el, i) => {
                 const target = layoutFunc(i);
 
-                gsap.to(obj.position, {
+                gsap.to(el.position, {
                     x: target.pos.x, y: target.pos.y, z: target.pos.z,
-                    duration: 2 + (i % 5) * 0.08,
+                    duration: 2.2 + (i % 6) * 0.05,
                     ease: "expo.inOut"
                 });
 
                 const targetQuat = new THREE.Quaternion().setFromEuler(target.rot);
-                gsap.to(obj.quaternion, {
+                gsap.to(el.quaternion, {
                     x: targetQuat.x, y: targetQuat.y, z: targetQuat.z, w: targetQuat.w,
-                    duration: 2 + (i % 5) * 0.08,
+                    duration: 2.2 + (i % 6) * 0.05,
                     ease: "expo.inOut"
                 });
 
-                gsap.to(obj.scale, {
+                gsap.to(el.scale, {
                     x: target.scale.x, y: target.scale.y, z: target.scale.z,
-                    duration: 2 + (i % 5) * 0.08,
+                    duration: 2.2 + (i % 6) * 0.05,
                     ease: "expo.inOut"
                 });
 
-                // Dynamic color shifting for fiber optic phase
-                const glowColor = index === 2 ? new THREE.Color(0x38bdf8) : new THREE.Color(0x00a3e0);
-                gsap.to(obj.material.emissive, {
-                    r: glowColor.r, g: glowColor.g, b: glowColor.b,
-                    duration: 1.5
+                // Dynamic emissive shifting
+                const targetEmissive = index === 2 ? new THREE.Color(0x38bdf8) : (index === 3 ? new THREE.Color(0xf97316) : new THREE.Color(0x00a3e0));
+                gsap.to(el.material.emissive, {
+                    r: targetEmissive.r, g: targetEmissive.g, b: targetEmissive.b,
+                    duration: 1.8
                 });
             });
 
-            setTimeout(() => { isTransitioning = false; }, 3200);
+            // Toggle Radar / Telemetry Rings for Phase 4
+            if (index === 3) {
+                telemetryRings.forEach(r => r.visible = true);
+            } else {
+                telemetryRings.forEach(r => {
+                    gsap.to(r.material, { opacity: 0, duration: 1, onComplete: () => r.visible = false });
+                });
+            }
+
+            setTimeout(() => { isTransitioning = false; }, 3400);
         }
 
-        // --- 4. Continuous Ambient Motion Loop ---
+        // --- 6. Continuous Real-time Animation Engine ---
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
             if (!isTransitioning) {
-                if (currentLayout === 0) {
-                    masterGroup.rotation.y = time * 0.15;
-                } else if (currentLayout === 1) {
-                    masterGroup.position.y = Math.sin(time * 1.5) * 0.3;
-                } else if (currentLayout === 2) {
-                    // Gentle wave pulse along fiber streams
-                    objects.forEach((obj, i) => {
-                        obj.position.y += Math.sin(time * 3 + i) * 0.005;
+                if (currentLayoutIdx === 0) {
+                    masterGroup.rotation.y = time * 0.12;
+                } else if (currentLayoutIdx === 1) {
+                    masterGroup.position.y = Math.sin(time * 1.5) * 0.35;
+                } else if (currentLayoutIdx === 2) {
+                    // Fluid undulating waveform along fiber streams
+                    elements.forEach((el, i) => {
+                        el.position.y += Math.sin(time * 3.5 + i) * 0.006;
                     });
-                } else if (currentLayout === 3) {
-                    masterGroup.rotation.y = Math.sin(time * 0.5) * 0.1;
+                } else if (currentLayoutIdx === 3) {
+                    // Radiating signal pulse rings
+                    const mastX = [-11, 0, 11];
+                    telemetryRings.forEach((ring, i) => {
+                        const mIdx = i % 3;
+                        const delay = (i >= 3) ? 1.2 : 0;
+                        const progress = ((time + delay) % 2.5) / 2.5;
+
+                        ring.position.set(mastX[mIdx], 10, 0);
+                        ring.lookAt(mastX[mIdx], 20, 0);
+
+                        const scale = progress * 22;
+                        ring.scale.set(scale, scale, scale);
+                        ring.material.opacity = (1 - progress) * 0.85;
+                    });
                 }
             }
 
@@ -428,24 +557,24 @@
         }
         animate();
 
-        // --- 5. Scroll Intersection Observer ---
+        // --- 7. Scroll Listener & Intersection Trigger ---
         const slides = document.querySelectorAll('.slide');
         window.addEventListener('scroll', () => {
             const h = window.innerHeight;
             slides.forEach((slide, idx) => {
                 const rect = slide.getBoundingClientRect();
-                if (rect.top < h * 0.6 && rect.bottom > 0) {
+                if (rect.top < h * 0.65 && rect.bottom > 0) {
                     if (!slide.classList.contains('active')) {
                         slides.forEach(s => s.classList.remove('active'));
                         slide.classList.add('active');
-                        transitionTo(idx);
+                        transitionToPhase(idx);
                     }
                 }
             });
         });
 
-        // Initialize Phase 1 on load
-        transitionTo(0);
+        // Initialize Phase 1 immediately
+        transitionToPhase(0);
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
