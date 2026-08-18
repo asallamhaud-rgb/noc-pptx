@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — Holographic Architecture</title>
+    <title>Omantel NSOC — Infrastructure Engine</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,8 @@
         }
 
         body {
-            /* Deep, premium dark mode inspired by spacecraft.iq */
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            /* Sleek, deep telecom dark mode */
+            background: radial-gradient(circle at center, #0b1121 0%, #030712 100%);
             color: #f8fafc;
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
@@ -35,15 +35,15 @@
             pointer-events: none;
         }
 
-        /* Subtle central spotlight effect */
-        .spotlight {
+        /* Ambient glow for the 3D elements */
+        .ambient-flare {
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 40%;
+            left: 60%;
             transform: translate(-50%, -50%);
-            width: 80vw;
-            height: 80vh;
-            background: radial-gradient(ellipse, rgba(0, 163, 224, 0.08) 0%, rgba(0,0,0,0) 60%);
+            width: 70vw;
+            height: 70vh;
+            background: radial-gradient(circle, rgba(0, 163, 224, 0.12) 0%, rgba(249, 115, 22, 0.05) 40%, rgba(0,0,0,0) 70%);
             z-index: 1;
             pointer-events: none;
         }
@@ -57,7 +57,7 @@
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0));
+            background: linear-gradient(to bottom, rgba(3, 7, 18, 0.9), rgba(3, 7, 18, 0));
         }
 
         .brand {
@@ -68,19 +68,7 @@
         }
 
         .brand span {
-            color: #38bdf8;
-        }
-
-        .status-badge {
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: #020617;
-            background: #38bdf8;
-            padding: 0.5rem 1.2rem;
-            border-radius: 4px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            color: #00a3e0;
         }
 
         .presentation-container {
@@ -106,28 +94,37 @@
             transform: translateY(0);
         }
 
-        /* Glassmorphism UI for text panels */
+        /* Premium UI Cards */
         .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #00a3e0;
+            border-radius: 12px;
             padding: 4rem;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
             max-width: 550px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, #00a3e0, transparent);
         }
 
         .tag {
             display: inline-block;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            padding: 0.4rem 1rem;
+            letter-spacing: 0.25em;
+            color: #f97316; /* Highlight orange from the isometric ref */
+            background: rgba(249, 115, 22, 0.1);
+            padding: 0.5rem 1rem;
             border-radius: 4px;
             margin-bottom: 1.5rem;
         }
@@ -151,47 +148,45 @@
 </head>
 <body>
 
-    <div class="spotlight"></div>
+    <div class="ambient-flare"></div>
     
-    <!-- The Solid Geometry 3D Engine -->
     <canvas id="webgl-canvas"></canvas>
 
     <header>
         <div class="brand">OMANTEL <span>NSOC</span></div>
-        <div class="status-badge" id="shape-status">SYSTEM IDLE</div>
     </header>
 
     <main class="presentation-container">
         
         <section class="slide active" id="slide-1">
             <div class="glass-panel">
-                <span class="tag">System 01</span>
+                <span class="tag">Phase 01</span>
                 <h1>The Global Core.</h1>
-                <p>A centralized, pulsating sphere representing our unified network intelligence. All data flows outward from this single source of truth.</p>
+                <p>A unified, heavily structured representation of our central network intelligence. Solid, unyielding, and operating in perfect synchronization.</p>
             </div>
         </section>
 
         <section class="slide" id="slide-2">
             <div class="glass-panel">
-                <span class="tag">System 02</span>
-                <h1>Command Cylinder.</h1>
-                <p>The core unpacks into a massive 360-degree array of holographic screens. A fully immersive environment designed to monitor millions of events simultaneously.</p>
+                <span class="tag">Phase 02</span>
+                <h1>Isometric Processing.</h1>
+                <p>Data decouples into physical backend architecture. We monitor every server, database, and transaction block flowing seamlessly through structured isometric pipelines.</p>
             </div>
         </section>
 
         <section class="slide" id="slide-3">
             <div class="glass-panel">
-                <span class="tag">System 03</span>
-                <h1>Cloud Node Orbit.</h1>
-                <p>The strict grid shatters into an organic solar system of data. Individual metric dashboards orbit the central cloud processing hub, adapting to real-time loads.</p>
+                <span class="tag">Phase 03</span>
+                <h1>Optical Transport.</h1>
+                <p>The architecture stretches into pure velocity. This is our high-speed fiber optic backbone, carrying massive payload volumes across vast distances.</p>
             </div>
         </section>
 
         <section class="slide" id="slide-4">
             <div class="glass-panel">
-                <span class="tag">System 04</span>
-                <h1>Physical NOC Layout.</h1>
-                <p>Abstract data grounds itself into reality. The floating UI panels snap into an exact architectural replica of our physical Front Office workspace.</p>
+                <span class="tag">Phase 04</span>
+                <h1>Radio Propagation.</h1>
+                <p>The signal breaches the physical layer. The network reconstructs into high-gain cellular masts, radiating continuous electromagnetic coverage across the terrain.</p>
             </div>
         </section>
 
@@ -201,164 +196,200 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
-        // --- 1. Scene Setup ---
+        // --- 1. Scene & Lighting Setup ---
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
-        // Dark, moody fog to match the reference backgrounds
-        scene.fog = new THREE.FogExp2(0x020617, 0.02);
+        scene.fog = new THREE.FogExp2(0x030712, 0.015);
 
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 30);
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 45);
 
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         
-        // Lighting is crucial for solid geometry
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        // High-end cinematic lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
         
-        const pointLight = new THREE.PointLight(0x38bdf8, 2, 100);
-        pointLight.position.set(0, 0, 0);
-        scene.add(pointLight);
+        const blueLight = new THREE.PointLight(0x00a3e0, 2, 100);
+        blueLight.position.set(-10, 10, 10);
+        scene.add(blueLight);
 
-        // A master group to rotate the whole scene easily
-        const sceneGroup = new THREE.Group();
-        // Shift it to the right so the text isn't blocking it
-        sceneGroup.position.x = 8;
-        scene.add(sceneGroup);
+        const orangeLight = new THREE.PointLight(0xf97316, 1.5, 100);
+        orangeLight.position.set(10, -10, 5);
+        scene.add(orangeLight);
 
-        // --- 2. Build the Central Core Sphere ---
-        const coreGeometry = new THREE.IcosahedronGeometry(4, 2);
-        const coreMaterial = new THREE.MeshStandardMaterial({
-            color: 0x0f172a,
-            wireframe: true,
-            emissive: 0x0ea5e9,
-            emissiveIntensity: 0.5,
-            transparent: true,
-            opacity: 0.8
-        });
-        const centralCore = new THREE.Mesh(coreGeometry, coreMaterial);
-        sceneGroup.add(centralCore);
+        const masterGroup = new THREE.Group();
+        masterGroup.position.x = 12; // Shift right for UI
+        scene.add(masterGroup);
 
-        // --- 3. Build the UI Panels (Solid screens, not dots) ---
-        const panelCount = 45; // Enough screens to look dense but maintain performance
-        const panels = [];
+        // --- 2. The Physical Blocks (The building units) ---
+        const blockCount = 150;
+        const blocks = [];
         
-        // Glass UI Material
-        const glassMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0x0f172a,
-            metalness: 0.1,
+        // Solid, sleek tech material
+        const blockMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1e293b,
+            metalness: 0.8,
             roughness: 0.2,
-            transmission: 0.9, // Glass effect
-            transparent: true,
-            opacity: 0.9,
-            side: THREE.DoubleSide
+            emissive: 0x00a3e0,
+            emissiveIntensity: 0.2
         });
 
-        const panelGeo = new THREE.BoxGeometry(4.5, 2.8, 0.05); // Thin box = screen
-        const edgesGeo = new THREE.EdgesGeometry(panelGeo);
-        const edgesMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 });
+        // Glowing edge material for highlights
+        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x00a3e0, transparent: true, opacity: 0.5 });
 
-        for (let i = 0; i < panelCount; i++) {
-            // The solid glass screen
-            const mesh = new THREE.Mesh(panelGeo, glassMaterial);
+        // Base geometry
+        const baseGeo = new THREE.BoxGeometry(1, 1, 1);
+        const edgesGeo = new THREE.EdgesGeometry(baseGeo);
+
+        for (let i = 0; i < blockCount; i++) {
+            const mesh = new THREE.Mesh(baseGeo, blockMaterial);
+            const edges = new THREE.LineSegments(edgesGeo, edgeMaterial);
+            mesh.add(edges);
             
-            // The glowing neon border
-            const edges = new THREE.LineSegments(edgesGeo, edgesMat);
-            mesh.add(edges); // Attach border to the screen
-            
-            // Optional: Add a tiny UI element on the screen (a mini box to look like a chart)
-            const chartGeo = new THREE.BoxGeometry(2, 1, 0.06);
-            const chartMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.3 });
-            const chart = new THREE.Mesh(chartGeo, chartMat);
-            chart.position.set((Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 0.8, 0.02);
-            mesh.add(chart);
-
-            // Store default data on the mesh for animations
-            mesh.userData = {
-                id: i,
-                baseScale: Math.random() * 0.4 + 0.8 // slight size variations
-            };
-
-            panels.push(mesh);
-            sceneGroup.add(mesh);
+            blocks.push(mesh);
+            masterGroup.add(mesh);
         }
 
-        // --- 4. The Architectural Layout Math ---
-        // We calculate exactly where each screen should go for each phase
+        // --- 3. Radio Waves (For Phase 4) ---
+        // Rings that will pulse outward from the towers
+        const ringCount = 6;
+        const rings = [];
+        const ringGeo = new THREE.RingGeometry(0.5, 0.6, 64);
+        const ringMat = new THREE.MeshBasicMaterial({ 
+            color: 0x38bdf8, 
+            side: THREE.DoubleSide, 
+            transparent: true, 
+            opacity: 0 
+        });
 
+        for(let i=0; i<ringCount; i++) {
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.visible = false;
+            masterGroup.add(ring);
+            rings.push(ring);
+        }
+
+        // --- 4. Architectural Formations (The Math) ---
+
+        // PHASE 1: The Core Sphere
         function getSphereLayout(i) {
-            // Panels hide inside the core, scaled to 0
-            return { pos: new THREE.Vector3(0, 0, 0), rot: new THREE.Euler(0, 0, 0), scale: 0.001 };
-        }
-
-        function getCylinderLayout(i) {
-            // Massive wrapping cylinder of screens
-            const tierCount = 3; // 3 rows of screens
-            const panelsPerTier = panelCount / tierCount;
-            const tier = Math.floor(i / panelsPerTier);
-            const indexInTier = i % panelsPerTier;
+            const phi = Math.acos(-1 + (2 * i) / blockCount);
+            const theta = Math.sqrt(blockCount * Math.PI) * phi;
+            const radius = 8;
             
-            const angle = (indexInTier / panelsPerTier) * Math.PI * 2;
-            const radius = 14;
-            const yPos = (tier - 1) * 3.5; // Space out the tiers vertically
+            const pos = new THREE.Vector3(
+                radius * Math.cos(theta) * Math.sin(phi),
+                radius * Math.sin(theta) * Math.sin(phi),
+                radius * Math.cos(phi)
+            );
             
-            const pos = new THREE.Vector3(Math.cos(angle) * radius, yPos, Math.sin(angle) * radius);
-            
-            // Screens must face the center
+            // Blocks face outward
             const dummy = new THREE.Object3D();
             dummy.position.copy(pos);
-            dummy.lookAt(0, yPos, 0); 
-            
-            return { pos: pos, rot: dummy.rotation, scale: 1 };
+            dummy.lookAt(0,0,0);
+
+            // Shape them into cubes
+            return { pos: pos, rot: dummy.rotation, scale: new THREE.Vector3(1.5, 1.5, 1.5) };
         }
 
-        function getOrbitLayout(i) {
-            // Random orbits around the center
-            const angle1 = Math.random() * Math.PI * 2;
-            const angle2 = Math.random() * Math.PI * 2;
-            const radius = 9 + Math.random() * 8; // Scatters between 9 and 17
+        // PHASE 2: Isometric Data Layout (Ref: image_848128)
+        function getIsometricLayout(i) {
+            const gridSize = Math.ceil(Math.sqrt(blockCount));
+            const spacing = 3;
             
-            const x = Math.cos(angle1) * radius;
-            const y = (Math.random() - 0.5) * 15;
-            const z = Math.sin(angle1) * radius;
+            const col = i % gridSize;
+            const row = Math.floor(i / gridSize);
             
-            const pos = new THREE.Vector3(x, y, z);
+            // Create a staggered grid height like server racks / UI blocks
+            const height = 1 + Math.random() * 4;
             
-            // Random tilts for that "floating in space" look
-            const rot = new THREE.Euler(Math.random() * 0.5, angle1 + Math.PI/2, Math.random() * 0.2);
+            const pos = new THREE.Vector3(
+                (col - gridSize/2) * spacing,
+                (height / 2) - 5, // Center vertically
+                (row - gridSize/2) * spacing
+            );
             
-            return { pos: pos, rot: rot, scale: Math.random() * 0.5 + 0.5 };
+            return { 
+                pos: pos, 
+                rot: new THREE.Euler(0, 0, 0), 
+                scale: new THREE.Vector3(2, height, 2) 
+            };
         }
 
-        function getNOCLayout(i) {
-            // Architectural Office Layout (Desks and Wall Monitors)
-            const pos = new THREE.Vector3();
-            const rot = new THREE.Euler(0, 0, 0);
+        // PHASE 3: Fiber Optic Cables (Ref: image_8484c4 foreground)
+        function getFiberLayout(i) {
+            // Group blocks into long sweeping lines
+            const lines = 10;
+            const blocksPerLine = Math.floor(blockCount / lines);
+            const lineIndex = Math.floor(i / blocksPerLine);
+            const posInLine = i % blocksPerLine;
             
-            if (i < 9) {
-                // The Wall: 3x3 grid of massive monitors in the back
-                const col = i % 3;
-                const row = Math.floor(i / 3);
-                pos.set((col - 1) * 5, (row) * 3, -8);
+            // Flowing sine wave logic
+            const zLength = 40;
+            const zPos = (posInLine / blocksPerLine) * zLength - (zLength/2);
+            
+            const xOffset = (lineIndex - lines/2) * 2;
+            const yOffset = Math.sin(zPos * 0.2 + lineIndex) * 3;
+            
+            const pos = new THREE.Vector3(xOffset, yOffset, zPos);
+            
+            // Stretch the blocks massively along the Z axis to look like cables
+            return { 
+                pos: pos, 
+                rot: new THREE.Euler(0, 0, 0), 
+                scale: new THREE.Vector3(0.2, 0.2, 8) 
+            };
+        }
+
+        // PHASE 4: Holographic Cell Towers (Ref: image_8484c4 & image_848807)
+        function getTowerLayout(i) {
+            // Build 3 distinct masts
+            const towerCount = 3;
+            const blocksPerTower = Math.floor(blockCount / towerCount);
+            const towerIndex = Math.floor(i / blocksPerTower);
+            const localIndex = i % blocksPerTower;
+            
+            const xPositions = [-12, 0, 12]; // Left, Center, Right towers
+            const towerX = xPositions[towerIndex];
+            const towerZ = (towerIndex === 1) ? 5 : -5; // Center tower pushed forward
+            
+            let pos, scale;
+            
+            // Build the architecture of the mast
+            if (localIndex < blocksPerTower * 0.7) {
+                // Main vertical trunk (stacked blocks getting thinner)
+                const heightIndex = localIndex / (blocksPerTower * 0.7);
+                const yPos = heightIndex * 20 - 10;
+                const thickness = 2 - (heightIndex * 1.5); // Tapers at the top
+                pos = new THREE.Vector3(towerX, yPos, towerZ);
+                scale = new THREE.Vector3(thickness, 1.5, thickness);
             } else {
-                // The Desks: Rows of screens lying horizontally or tilted like laptops
-                const deskIndex = i - 9;
-                const row = Math.floor(deskIndex / 6); // 6 screens per desk row
-                const col = deskIndex % 6;
+                // Antennas / Microwave drums attached to the sides
+                const sideIndex = localIndex % 4;
+                const heightOffset = Math.random() * 10;
+                const angle = (sideIndex / 4) * Math.PI * 2;
                 
-                pos.set((col - 2.5) * 5, -5, (row * 6) - 2);
-                
-                // Tilt them like workstation monitors
-                rot.set(-Math.PI / 6, 0, 0); 
+                pos = new THREE.Vector3(
+                    towerX + Math.cos(angle) * 1.5,
+                    heightOffset,
+                    towerZ + Math.sin(angle) * 1.5
+                );
+                // Wide flat blocks mimicking drum antennas
+                scale = new THREE.Vector3(1.5, 2, 0.5); 
             }
             
-            return { pos: pos, rot: rot, scale: 0.9 };
+            // Aim the side antennas
+            const dummy = new THREE.Object3D();
+            dummy.position.copy(pos);
+            dummy.lookAt(towerX, pos.y, towerZ);
+
+            return { pos: pos, rot: dummy.rotation, scale: scale };
         }
 
-        const layouts = [getSphereLayout, getCylinderLayout, getOrbitLayout, getNOCLayout];
-        const statusNames = ["CORE ONLINE", "COMMAND CYLINDER", "CLOUD ORBIT", "ISOMETRIC NOC"];
+        const layouts = [getSphereLayout, getIsometricLayout, getFiberLayout, getTowerLayout];
         let currentLayoutIndex = -1;
         let isAnimating = false;
 
@@ -366,62 +397,70 @@
             if (currentLayoutIndex === layoutIndex || isAnimating) return;
             isAnimating = true;
             currentLayoutIndex = layoutIndex;
-            
-            document.getElementById('shape-status').innerText = statusNames[layoutIndex];
 
             const layoutFunc = layouts[layoutIndex];
 
-            // 1. Animate the Central Core Sphere
-            // If Phase 1, make it huge. Otherwise, shrink it down so screens take focus.
-            const coreTargetScale = layoutIndex === 0 ? 2.5 : (layoutIndex === 3 ? 0.001 : 0.8);
-            gsap.to(centralCore.scale, {
-                x: coreTargetScale, y: coreTargetScale, z: coreTargetScale,
-                duration: 2, ease: "power3.inOut"
-            });
-
-            // 2. Animate the Master Camera/Group Angle
+            // Master Group Rotation to enhance the view of the specific structure
             let targetGroupRotX = 0;
             let targetGroupRotY = 0;
-            if (layoutIndex === 3) {
-                // Isometric view for the physical NOC
+            
+            if (layoutIndex === 1) { // Isometric View
+                targetGroupRotX = Math.PI / 6;
+                targetGroupRotY = -Math.PI / 4;
+            } else if (layoutIndex === 2) { // Fiber flow
                 targetGroupRotX = Math.PI / 8;
-                targetGroupRotY = -Math.PI / 6;
+                targetGroupRotY = -Math.PI / 8;
+            } else if (layoutIndex === 3) { // Towers (Looking slightly up)
+                targetGroupRotX = -0.1;
+                targetGroupRotY = 0;
             }
 
-            gsap.to(sceneGroup.rotation, {
-                x: targetGroupRotX,
-                z: layoutIndex === 3 ? -0.05 : 0, // Slight tilt for isometric
+            gsap.to(masterGroup.rotation, {
+                x: targetGroupRotX, y: targetGroupRotY,
                 duration: 2.5, ease: "power3.inOut"
             });
 
-            // 3. Animate every single UI Panel physically through space
-            panels.forEach((panel, i) => {
+            // Morph every individual block
+            blocks.forEach((block, i) => {
                 const target = layoutFunc(i);
                 
-                // Animate Position
-                gsap.to(panel.position, {
+                gsap.to(block.position, {
                     x: target.pos.x, y: target.pos.y, z: target.pos.z,
-                    duration: 2 + Math.random() * 1, // Staggered finish times
-                    ease: "power3.inOut"
+                    duration: 2 + Math.random() * 1.5,
+                    ease: "expo.inOut"
                 });
 
-                // Animate Rotation (using Quaternions for smooth 3D rotation)
                 const targetQuaternion = new THREE.Quaternion().setFromEuler(target.rot);
-                gsap.to(panel.quaternion, {
+                gsap.to(block.quaternion, {
                     x: targetQuaternion.x, y: targetQuaternion.y, z: targetQuaternion.z, w: targetQuaternion.w,
-                    duration: 2 + Math.random() * 1,
-                    ease: "power3.inOut"
+                    duration: 2 + Math.random() * 1.5,
+                    ease: "expo.inOut"
                 });
 
-                // Animate Scale
-                const finalScale = target.scale * panel.userData.baseScale;
-                gsap.to(panel.scale, {
-                    x: finalScale, y: finalScale, z: finalScale,
-                    duration: 2, ease: "power3.inOut"
+                gsap.to(block.scale, {
+                    x: target.scale.x, y: target.scale.y, z: target.scale.z,
+                    duration: 2 + Math.random() * 1.5,
+                    ease: "expo.inOut"
+                });
+                
+                // Color shifts: Make fiber optic (Phase 3) glow bright cyan
+                const targetEmissive = layoutIndex === 2 ? new THREE.Color(0x38bdf8) : new THREE.Color(0x00a3e0);
+                gsap.to(block.material.emissive, {
+                    r: targetEmissive.r, g: targetEmissive.g, b: targetEmissive.b,
+                    duration: 2
                 });
             });
 
-            setTimeout(() => { isAnimating = false; }, 3000);
+            // Manage Radio Wave Rings for Phase 4
+            if (layoutIndex === 3) {
+                rings.forEach(ring => ring.visible = true);
+            } else {
+                rings.forEach(ring => {
+                    gsap.to(ring.material, {opacity: 0, duration: 1, onComplete: () => ring.visible = false});
+                });
+            }
+
+            setTimeout(() => { isAnimating = false; }, 3500);
         }
 
         // --- 5. Continuous Animation Loop ---
@@ -430,25 +469,40 @@
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            // The core is always alive and pulsing
-            centralCore.rotation.y = time * 0.2;
-            centralCore.rotation.z = time * 0.1;
-            
-            // Constant subtle floating behavior based on current state
             if (!isAnimating) {
-                if (currentLayoutIndex === 1) {
-                    // Cylinder slowly revolves around the user
-                    sceneGroup.rotation.y = time * 0.05;
+                if (currentLayoutIndex === 0) {
+                    // Sphere rotates
+                    masterGroup.rotation.y = time * 0.2;
+                    masterGroup.rotation.z = Math.sin(time * 0.5) * 0.1;
+                } else if (currentLayoutIndex === 1) {
+                    // Isometric breathes
+                    masterGroup.position.y = Math.sin(time * 2) * 0.5;
                 } else if (currentLayoutIndex === 2) {
-                    // Orbiting cloud slowly spins
-                    sceneGroup.rotation.y = time * 0.08;
-                    // Make individual panels bob up and down
-                    panels.forEach((p, i) => {
-                        p.position.y += Math.sin(time * 2 + i) * 0.01;
+                    // Fiber optic flow effect (move texture/glow along the lines)
+                    blocks.forEach((block, i) => {
+                        block.position.y += Math.sin(time * 3 + i) * 0.02;
                     });
                 } else if (currentLayoutIndex === 3) {
-                    // Isometric desk layout stays rigid, but the whole room breathes
-                    sceneGroup.position.y = Math.sin(time * 1.5) * 0.2;
+                    // Radiating waves from towers
+                    const xPositions = [-12, 0, 12];
+                    const zPositions = [-5, 5, -5];
+                    
+                    rings.forEach((ring, i) => {
+                        const towerIdx = i % 3;
+                        const delay = (i > 2) ? 1.5 : 0; // Second set of rings offset in time
+                        
+                        // Loop math for rings
+                        const progress = ((time + delay) % 3) / 3; 
+                        
+                        ring.position.set(xPositions[towerIdx], 10, zPositions[towerIdx]); // Top of towers
+                        ring.lookAt(xPositions[towerIdx], 20, zPositions[towerIdx]); // Face up
+                        
+                        const scale = progress * 25; // Expand massively
+                        ring.scale.set(scale, scale, scale);
+                        
+                        // Fade out as they get larger
+                        ring.material.opacity = (1 - progress) * 0.8;
+                    });
                 }
             }
 
@@ -456,7 +510,7 @@
         }
         animate();
 
-        // --- 6. Scroll Triggers ---
+        // --- 6. Scroll Logic ---
         const slides = document.querySelectorAll('.slide');
         window.addEventListener('scroll', () => {
             let windowHeight = window.innerHeight;
@@ -473,10 +527,9 @@
             });
         });
 
-        // Initialize Phase 1 immediately
+        // Start Phase 1
         transitionToLayout(0);
 
-        // Window Resize Handling
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
