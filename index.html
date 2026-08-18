@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC - Master 3D Presentation Experience</title>
+    <title>Omantel NSOC — Master 3D Command Presentation</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,8 +12,8 @@
         }
 
         body {
-            background-color: #010409;
-            color: #f0f6fc;
+            background-color: #000208;
+            color: #f1f5f9;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow-x: hidden;
         }
@@ -29,30 +29,31 @@
             pointer-events: none;
         }
 
-        /* Presentation Chapters / Sections */
+        /* Presentation Chapters */
         .section {
             position: relative;
             min-height: 100vh;
             width: 100vw;
             display: flex;
             align-items: center;
-            padding: 5rem 0 5rem 8%;
+            padding: 6rem 0 6rem 8%;
             z-index: 2;
         }
 
-        /* Pro-Max Glassmorphism Card */
+        /* Cinematic Glassmorphism Presentation Card */
         .presentation-card {
-            background: rgba(13, 17, 23, 0.88);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(0, 163, 224, 0.4);
-            border-radius: 24px;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(0, 163, 224, 0.35);
+            border-radius: 28px;
             padding: 3rem;
-            max-width: 720px;
+            max-width: 760px;
             opacity: 0;
-            transform: translateY(40px);
-            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.85), 
-                        0 0 50px rgba(0, 163, 224, 0.2);
+            transform: translateY(50px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), 
+                        0 0 60px rgba(0, 163, 224, 0.18),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .category-tag {
@@ -64,8 +65,8 @@
             font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            padding: 0.45rem 1rem;
+            letter-spacing: 0.18em;
+            padding: 0.5rem 1.1rem;
             border-radius: 30px;
             margin-bottom: 1.25rem;
             border: 1px solid rgba(56, 189, 248, 0.5);
@@ -77,11 +78,11 @@
             height: 6px;
             background-color: #38bdf8;
             border-radius: 50%;
-            box-shadow: 0 0 8px #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
         }
 
         h1 {
-            font-size: 2.6rem;
+            font-size: 2.5rem;
             font-weight: 800;
             letter-spacing: -0.03em;
             line-height: 1.15;
@@ -92,10 +93,11 @@
         }
 
         h3 {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: #38bdf8;
             margin-top: 1.25rem;
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
         p {
@@ -113,17 +115,17 @@
         ul li {
             position: relative;
             padding-left: 1.25rem;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.45rem;
             color: #cbd5e1;
             font-size: 0.92rem;
         }
 
         ul li::before {
-            content: "•";
+            content: "▪";
             position: absolute;
             left: 0;
-            color: #38bdf8;
-            font-weight: bold;
+            color: #00a3e0;
+            font-size: 0.8rem;
         }
 
         .grid-features {
@@ -134,10 +136,16 @@
         }
 
         .feature-box {
-            background: rgba(22, 27, 34, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 1.1rem;
-            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            padding: 1.15rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-box:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
         }
 
         .feature-box h4 {
@@ -152,7 +160,7 @@
             margin: 0;
         }
 
-        /* Floating Scroll Indicator */
+        /* Ambient Scroll Guide */
         .scroll-indicator {
             position: fixed;
             bottom: 2.5rem;
@@ -181,155 +189,155 @@
     <div class="scroll-indicator"><span>↓</span> Scroll to Explore NSOC Master Presentation</div>
     <div id="webgl-container"></div>
 
-    <!-- Chapter 1: Overview -->
+    <!-- Chapter 1 -->
     <section class="section">
         <div class="presentation-card" id="slide-1">
             <span class="category-tag">01 — NSOC Overview</span>
             <h1>Network & Service Operations Center</h1>
-            <p>The core heartbeat of Omantel's telecommunications architecture, unifying network surveillance and service delivery into a single cohesive ecosystem.</p>
+            <p>The centralized nerve center of Omantel's telecommunications infrastructure, orchestrating nationwide digital resilience 24/7/365.</p>
             <ul>
-                <li>24/7/365 continuous national monitoring and operational command.</li>
-                <li>Simultaneous oversight of underlying network infrastructure and customer-facing services.</li>
-                <li>Complete operational cycle: Event Management, Incident Management, Problem Management, Change Management, and Preventive Maintenance.</li>
+                <li>Continuous surveillance of physical network elements and digital services.</li>
+                <li>Holistic operational cycle spanning event detection, incident resolution, and preventive tuning.</li>
+                <li>Unifying national connectivity under a single command umbrella.</li>
             </ul>
         </div>
     </section>
 
-    <!-- Chapter 2: Hierarchy & Escalation -->
+    <!-- Chapter 2 -->
     <section class="section">
         <div class="presentation-card" id="slide-2">
             <span class="category-tag">02 — Hierarchy & Escalation</span>
             <h1>Front Office & Back Office Structure</h1>
-            <p>A highly structured multi-tier operational model engineered for rapid isolation and flawless technical resolution.</p>
+            <p>A synchronized multi-tier operational model engineered for rapid isolation, expert analysis, and seamless field execution.</p>
             <div class="grid-features">
                 <div class="feature-box">
-                    <h4>Front Office</h4>
-                    <p>First-line defense managing incoming alarms, live event tracking, and initial triage.</p>
+                    <h4>Front Office (Tier 1)</h4>
+                    <p>Live alarm surveillance, initial triage, and customer impact tracking.</p>
                 </div>
                 <div class="feature-box">
-                    <h4>Back Office</h4>
-                    <p>Specialized domain engineers executing deep root-cause analysis and complex mitigation.</p>
+                    <h4>Back Office (Tier 2/3)</h4>
+                    <p>Domain engineers driving root-cause diagnosis and complex remediation.</p>
                 </div>
             </div>
-            <h3>Escalation Pathway</h3>
-            <p style="font-size:0.9rem; color:#38bdf8;">Front Office → Back Office → Field Intervention / Vendor Partner</p>
+            <h3>Escalation Workflow</h3>
+            <p style="font-size: 0.88rem; color: #38bdf8;">Front Office → Back Office → Field Intervention / Vendor Partner</p>
         </div>
     </section>
 
-    <!-- Chapter 3: Organizational Matrix -->
+    <!-- Chapter 3 -->
     <section class="section">
         <div class="presentation-card" id="slide-3">
             <span class="category-tag">03 — Organizational Structure</span>
             <h1>Core Operational Domains</h1>
-            <p>Specialized technical verticals working in unison to keep every layer of the network performing at elite standards.</p>
+            <p>Specialized technical verticals working in unison to protect every architectural layer of Omantel's network.</p>
             <ul>
-                <li><strong>Fixed & Service Desk:</strong> Fixed-line voice/broadband and subscriber request routing.</li>
-                <li><strong>Transport & Transmission:</strong> Optical fiber, microwave backhaul, and VSAT links.</li>
-                <li><strong>IP Core & Datacom:</strong> Packet routing, enterprise connectivity, and switching infrastructure.</li>
-                <li><strong>INOC & Enterprise:</strong> International submarine gateways, MPLS, ILL, and SD-WAN.</li>
-                <li><strong>Service Operations & Cybersecurity:</strong> Service availability, degradation tracking, threat detection, and mitigation.</li>
+                <li><strong>Fixed & Service Desk:</strong> Broadband operations and subscriber request management.</li>
+                <li><strong>Transport & Transmission:</strong> Optical fiber, microwave links, and VSAT systems.</li>
+                <li><strong>IP Core & Datacom:</strong> High-capacity routing, switching, and enterprise data pathways.</li>
+                <li><strong>INOC & Enterprise:</strong> Submarine international gateways, MPLS, ILL, and SD-WAN.</li>
+                <li><strong>Service Operations & Cybersecurity:</strong> Availability monitoring, threat detection, and response.</li>
             </ul>
         </div>
     </section>
 
-    <!-- Chapter 4: Fixed & Service Desk -->
+    <!-- Chapter 4 -->
     <section class="section">
         <div class="presentation-card" id="slide-4">
             <span class="category-tag">04 — Fixed & Service Desk</span>
             <h1>Fixed Networks & Subscriber Support</h1>
-            <p>Managing fixed-line integrity, voice channels, and comprehensive customer-facing request lifecycles.</p>
+            <p>Managing fixed-line integrity and governing end-to-end customer service lifecycles.</p>
             <div class="grid-features">
                 <div class="feature-box">
                     <h4>Fixed Operations</h4>
-                    <p>Real-time alarm monitoring, threshold tracking, and automated ticketing for fixed broadband and voice.</p>
+                    <p>Real-time alarm monitoring, threshold metrics, and automated ticketing.</p>
                 </div>
                 <div class="feature-box">
                     <h4>Service Desk</h4>
-                    <p>Handling service requests, incident logging, ticket management, and strict SLA/KPI enforcement.</p>
+                    <p>Service request handling, incident logging, and strict SLA/KPI enforcement.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Chapter 5: Transport & Datacom -->
+    <!-- Chapter 5 -->
     <section class="section">
         <div class="presentation-card" id="slide-5">
             <span class="category-tag">05 — Transport & Datacom</span>
             <h1>Transport Links & Datacom Infrastructure</h1>
-            <p>Securing end-to-end physical connectivity and high-speed data transmission across national networks.</p>
+            <p>Securing physical backbone connectivity and high-speed data transmission across the nation.</p>
             <ul>
-                <li><strong>IP Core:</strong> High-capacity IP network routing, core services, and backbone reachability.</li>
-                <li><strong>Transmission:</strong> Optical fiber links, microwave relays, VSAT, and optical transport monitoring.</li>
-                <li><strong>Datacom:</strong> Enterprise-grade data connectivity, network infrastructure troubleshooting, and alarm isolation.</li>
+                <li><strong>IP Core:</strong> IP network routing, core reachability, and high-performance packet services.</li>
+                <li><strong>Transmission:</strong> Fiber optic lines, microwave relays, VSAT, and optical transport links.</li>
+                <li><strong>Datacom:</strong> Enterprise data connectivity, infrastructure monitoring, and troubleshooting.</li>
             </ul>
         </div>
     </section>
 
-    <!-- Chapter 6: INOC & Enterprise -->
+    <!-- Chapter 6 -->
     <section class="section">
         <div class="presentation-card" id="slide-6">
             <span class="category-tag">06 — INOC & Enterprise Services</span>
             <h1>International Gateways & Corporate Solutions</h1>
-            <p>Connecting Oman to global submarine cable systems and delivering enterprise-class network architectures.</p>
+            <p>Connecting Oman to global submarine cable systems and managing enterprise-grade network fabrics.</p>
             <div class="grid-features">
                 <div class="feature-box">
                     <h4>INOC (International NOC)</h4>
-                    <p>Overseeing submarine cables, international Internet gateways, and cross-border voice/IP transit.</p>
+                    <p>Submarine cables, international internet gateways, and voice transit.</p>
                 </div>
                 <div class="feature-box">
                     <h4>Enterprise Operations</h4>
-                    <p>Dedicated management for MPLS, Point-to-Point (P2P), Leased Lines (ILL), and SD-WAN.</p>
+                    <p>Dedicated management for MPLS, Point-to-Point, ILL, and SD-WAN.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Chapter 7: Service Operations & Cybersecurity -->
+    <!-- Chapter 7 -->
     <section class="section">
         <div class="presentation-card" id="slide-7">
             <span class="category-tag">07 — Service Operations & Security</span>
             <h1>Service Integrity & Cyber Protection</h1>
             <p>Guaranteeing optimal service performance while defending critical infrastructure against digital threats.</p>
             <ul>
-                <li><strong>Service Operations:</strong> Tracking service availability, measuring performance degradation, and coordinating incident impact analysis.</li>
-                <li><strong>Cybersecurity:</strong> Continuous security monitoring, threat detection, incident response, and active coordination with network operations.</li>
+                <li><strong>Service Operations:</strong> Tracking service availability, measuring degradation, and assessing customer impact.</li>
+                <li><strong>Cybersecurity:</strong> Continuous security monitoring, threat detection, and coordination with network teams.</li>
             </ul>
         </div>
     </section>
 
-    <!-- Chapter 8: Alarm Management & Systems -->
+    <!-- Chapter 8 -->
     <section class="section">
         <div class="presentation-card" id="slide-8">
             <span class="category-tag">08 — Operations & Alarms</span>
             <h1>Alarm Management & Monitoring Systems</h1>
-            <p>The technological backbone driving automated event correlation and network visibility.</p>
+            <p>The technological engine driving automated event correlation and network visibility.</p>
             <div class="grid-features">
                 <div class="feature-box">
                     <h4>Alarm Lifecycle</h4>
-                    <p>Generation → Collection → Display → Correlation → Severity Filtering → Acknowledgement → Escalation → Clearance.</p>
+                    <p>Generation → Collection → Correlation → Filtering → Escalation → Clearance.</p>
                 </div>
                 <div class="feature-box">
                     <h4>Operational Systems</h4>
-                    <p>Network Management Systems (NMS), Ticketing platforms, topology mapping, and knowledge documentation repositories.</p>
+                    <p>NMS tools, ticketing systems, topology mapping, and documentation repositories.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Chapter 9: Incident Lifecycle & Interaction -->
+    <!-- Chapter 9 -->
     <section class="section">
         <div class="presentation-card" id="slide-9">
             <span class="category-tag">09 — Incident Workflow</span>
             <h1>Ticket Lifecycle & Department Interaction</h1>
-            <p>A standardized protocol ensuring seamless transitions from initial detection to final verification.</p>
+            <p>Standardized protocols ensuring smooth collaboration from initial detection to final closure.</p>
             <ul>
-                <li><strong>Lifecycle Steps:</strong> Detection → Analysis → Classification → Assignment → Escalation → Investigation → Resolution → Verification → Closure.</li>
-                <li><strong>Cross-Department Interaction:</strong> Alarm Event → Front Office Triage → Relevant Domain Back Office → Field/Vendor Action → Verification & Closure.</li>
+                <li><strong>Lifecycle:</strong> Detection → Analysis → Classification → Assignment → Investigation → Resolution → Closure.</li>
+                <li><strong>Interaction:</strong> Alarm → Front Office → Back Office Domain → Field/Vendor → Network Verification.</li>
             </ul>
         </div>
     </section>
 
-    <!-- Chapter 10: Escalation Matrix & KPIs -->
+    <!-- Chapter 10 -->
     <section class="section">
         <div class="presentation-card" id="slide-10">
             <span class="category-tag">10 — Escalation & KPIs</span>
@@ -337,27 +345,27 @@
             <p>Measuring operational excellence through defined escalation tiers and stringent performance indicators.</p>
             <div class="grid-features">
                 <div class="feature-box">
-                    <h4>Escalation Hierarchy</h4>
-                    <p>Level 1 (Front Office) → Level 2 (Back Office) → Level 3 (Domain Experts) → Level 4 (Vendor / Management).</p>
+                    <h4>Escalation Tiers</h4>
+                    <p>Level 1 (Front Office) to Level 4 (Vendor / Senior Management).</p>
                 </div>
                 <div class="feature-box">
                     <h4>Key Performance Indicators</h4>
-                    <p>Availability, MTTA, MTTR, alarm volume, critical incident rate, and SLA compliance.</p>
+                    <p>Availability, MTTA, MTTR, alarm volume, and SLA compliance rates.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Chapter 11: Reactive vs Proactive & Simulation -->
+    <!-- Chapter 11 -->
     <section class="section">
         <div class="presentation-card" id="slide-11">
             <span class="category-tag">11 — Strategy & Simulation</span>
-            <h1>Proactive Operations & Incident Simulation</h1>
+            <h1>Proactive Operations & Complete Simulation</h1>
             <p>Shifting from reactive recovery to predictive prevention across a unified ecosystem.</p>
             <ul>
-                <li><strong>Reactive:</strong> Alarm triggered → Incident logged → Troubleshooting → Recovery.</li>
-                <li><strong>Proactive:</strong> Continuous monitoring → Advanced analysis → Prediction → Preventive maintenance.</li>
-                <li><strong>Complete Simulation:</strong> Transport link failure → Automated alarm → Front Office detection → Back Office investigation → Field/Vendor fix → Service restoration & closure.</li>
+                <li><strong>Reactive vs Proactive:</strong> Moving from alarm firefighting to predictive analysis and preventive action.</li>
+                <li><strong>Complete Simulation:</strong> Transport link failure → Automated alarm → Front Office detection → Back Office investigation → Field/Vendor intervention → Service restoration & closure.</li>
+                <li><strong>One Ecosystem:</strong> Alarms, tickets, services, network domains, and engineers working as a unified entity.</li>
             </ul>
         </div>
     </section>
@@ -375,94 +383,115 @@
         const scene = new THREE.Scene();
 
         const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 8);
+        camera.position.set(0, 0, 8.5);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        // 2. High-Tech Cyberpunk Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        // 2. Cinematic Lighting Design
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
         scene.add(ambientLight);
 
-        const mainLight = new THREE.PointLight(0x00a3e0, 8, 15); // Omantel Cyan
-        mainLight.position.set(3, 4, 4);
-        scene.add(mainLight);
+        const cyanLight = new THREE.PointLight(0x00a3e0, 10, 18); // Omantel Cyan
+        cyanLight.position.set(4, 4, 5);
+        scene.add(cyanLight);
 
-        const accentLight = new THREE.PointLight(0x38bdf8, 5, 15);
-        accentLight.position.set(-4, -3, 3);
-        scene.add(accentLight);
+        const blueLight = new THREE.PointLight(0x38bdf8, 6, 18);
+        blueLight.position.set(-4, -4, 4);
+        scene.add(blueLight);
 
-        // 3. Create Multi-Component Advanced 3D Infrastructure Cluster
-        const nocGroup = new THREE.Group();
+        const rimLight = new THREE.PointLight(0xffffff, 4, 15);
+        rimLight.position.set(0, 6, -3);
+        scene.add(rimLight);
 
-        // Central Server Hub Array (Multiple interconnected racks)
-        const rackGroup = new THREE.Group();
-        for (let i = -1; i <= 1; i++) {
-            const rackGeo = new THREE.BoxGeometry(0.5, 2.2, 0.5);
+        // 3. Cybernetic Network Core Matrix (Advanced High-End 3D Asset)
+        const coreCluster = new THREE.Group();
+
+        // Central Server Hub Pillars
+        const serverGroup = new THREE.Group();
+        for (let i = 0; i < 4; i++) {
+            const angle = (i / 4) * Math.PI * 2;
+            const rackGeo = new THREE.BoxGeometry(0.4, 2.6, 0.4);
             const rackMat = new THREE.MeshStandardMaterial({ 
-                color: 0x0f172a, 
+                color: 0x090d16, 
                 metalness: 0.95, 
-                roughness: 0.1 
+                roughness: 0.12 
             });
             const rack = new THREE.Mesh(rackGeo, rackMat);
-            rack.position.x = i * 0.7;
-            rackGroup.add(rack);
+            rack.position.set(Math.cos(angle) * 0.9, 0, Math.sin(angle) * 0.9);
+            serverGroup.add(rack);
         }
-        nocGroup.add(rackGroup);
+        coreCluster.add(serverGroup);
 
-        // Glowing Screen Wall Panels (Simulating Command Center Video Walls)
-        const panelGeo = new THREE.PlaneGeometry(2.4, 1.4);
-        const panelMat = new THREE.MeshBasicMaterial({ 
+        // Central Holographic Command Panel / Monolith
+        const monoGeo = new THREE.BoxGeometry(1.2, 2.2, 0.15);
+        const monoMat = new THREE.MeshStandardMaterial({ 
             color: 0x00a3e0, 
-            wireframe: false,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.85
+            emissive: 0x00a3e0, 
+            emissiveIntensity: 0.5,
+            metalness: 0.8,
+            roughness: 0.2
         });
-        const commandScreen = new THREE.Mesh(panelGeo, panelMat);
-        commandScreen.position.set(0, 0, 0.35);
-        nocGroup.add(commandScreen);
+        const monolith = new THREE.Mesh(monoGeo, monoMat);
+        coreCluster.add(monolith);
 
-        // Secondary Floating Data Ring / Torus Knot Core
-        const coreGeo = new THREE.TorusKnotGeometry(1.2, 0.08, 128, 32);
-        const coreMat = new THREE.MeshStandardMaterial({ 
+        // Nested Rotating Cyber Rings (Torus & Torus Knot)
+        const ringGeo1 = new THREE.TorusGeometry(1.8, 0.03, 16, 100);
+        const ringMat = new THREE.MeshStandardMaterial({ 
             color: 0x38bdf8, 
-            metalness: 0.8, 
-            roughness: 0.2,
+            metalness: 0.9, 
+            roughness: 0.1,
             emissive: 0x00a3e0,
-            emissiveIntensity: 0.5
+            emissiveIntensity: 0.4
         });
-        const dataCore = new THREE.Mesh(coreGeo, coreMat);
-        dataCore.scale.set(0.7, 0.7, 0.7);
-        nocGroup.add(dataCore);
+        const ring1 = new THREE.Mesh(ringGeo1, ringMat);
+        ring1.rotation.x = Math.PI / 3;
+        coreCluster.add(ring1);
 
-        // Particle Field (Representing Data Packets & Network Telemetry)
-        const particleCount = 400;
+        const ringGeo2 = new THREE.TorusGeometry(2.3, 0.02, 16, 100);
+        const ring2 = new THREE.Mesh(ringGeo2, ringMat);
+        ring2.rotation.y = Math.PI / 4;
+        coreCluster.add(ring2);
+
+        const knotGeo = new THREE.TorusKnotGeometry(1.2, 0.05, 128, 32);
+        const knotMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: 0x38bdf8,
+            emissiveIntensity: 0.3
+        });
+        const dataKnot = new THREE.Mesh(knotGeo, knotMat);
+        dataKnot.scale.set(0.6, 0.6, 0.6);
+        coreCluster.add(dataKnot);
+
+        // Immersive Particle Network Field
+        const particleCount = 500;
         const particleGeo = new THREE.BufferGeometry();
         const particlePositions = new Float32Array(particleCount * 3);
 
         for(let i = 0; i < particleCount * 3; i++) {
-            particlePositions[i] = (Math.random() - 0.5) * 14;
+            particlePositions[i] = (Math.random() - 0.5) * 16;
         }
 
         particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
         const particleMat = new THREE.PointsMaterial({
             color: 0x38bdf8,
-            size: 0.04,
+            size: 0.035,
             transparent: true,
-            opacity: 0.7
+            opacity: 0.75
         });
         const particleField = new THREE.Points(particleGeo, particleMat);
         scene.add(particleField);
 
-        scene.add(nocGroup);
+        scene.add(coreCluster);
 
         // 4. Initial Animation State (Slide 1)
         gsap.to("#slide-1", { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
 
-        // 5. Master Scroll-Driven Timeline Configuration across all 11 Chapters
+        // 5. Master Scroll-Driven Timeline Configuration (All 11 Chapters)
         const presentationTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: "body",
@@ -472,83 +501,79 @@
             }
         });
 
-        // Dynamic 3D choreography mapped across the chapters
         presentationTimeline
-            // Chapter 1 -> 2
-            .to(nocGroup.rotation, { y: Math.PI * 0.5, x: Math.PI * 0.1, duration: 2 }, 0)
-            .to(nocGroup.position, { x: 1.3, y: 0, duration: 2 }, 0)
+            // Ch 1 -> 2
+            .to(coreCluster.rotation, { y: Math.PI * 0.6, x: Math.PI * 0.15, duration: 2 }, 0)
+            .to(coreCluster.position, { x: 1.4, y: 0, duration: 2 }, 0)
             .to("#slide-1", { opacity: 0, y: -40, duration: 0.4 }, 0)
             .to("#slide-2", { opacity: 1, y: 0, duration: 0.4 }, 0.4)
 
-            // Chapter 2 -> 3
-            .to(nocGroup.rotation, { y: Math.PI * 1.0, x: -Math.PI * 0.1, duration: 2 }, 2)
-            .to(nocGroup.position, { x: -1.3, y: 0.2, duration: 2 }, 2)
+            // Ch 2 -> 3
+            .to(coreCluster.rotation, { y: Math.PI * 1.2, x: -Math.PI * 0.15, duration: 2 }, 2)
+            .to(coreCluster.position, { x: -1.4, y: 0.2, duration: 2 }, 2)
             .to("#slide-2", { opacity: 0, y: -40, duration: 0.4 }, 2)
             .to("#slide-3", { opacity: 1, y: 0, duration: 0.4 }, 2.4)
 
-            // Chapter 3 -> 4
-            .to(nocGroup.rotation, { y: Math.PI * 1.5, x: Math.PI * 0.15, duration: 2 }, 4)
-            .to(nocGroup.position, { x: 1.3, y: -0.1, duration: 2 }, 4)
+            // Ch 3 -> 4
+            .to(coreCluster.rotation, { y: Math.PI * 1.8, x: Math.PI * 0.2, duration: 2 }, 4)
+            .to(coreCluster.position, { x: 1.4, y: -0.1, duration: 2 }, 4)
             .to("#slide-3", { opacity: 0, y: -40, duration: 0.4 }, 4)
             .to("#slide-4", { opacity: 1, y: 0, duration: 0.4 }, 4.4)
 
-            // Chapter 4 -> 5
-            .to(nocGroup.rotation, { y: Math.PI * 2.0, x: -Math.PI * 0.15, duration: 2 }, 6)
-            .to(nocGroup.position, { x: -1.3, y: 0.1, duration: 2 }, 6)
+            // Ch 4 -> 5
+            .to(coreCluster.rotation, { y: Math.PI * 2.4, x: -Math.PI * 0.1, duration: 2 }, 6)
+            .to(coreCluster.position, { x: -1.4, y: 0.1, duration: 2 }, 6)
             .to("#slide-4", { opacity: 0, y: -40, duration: 0.4 }, 6)
             .to("#slide-5", { opacity: 1, y: 0, duration: 0.4 }, 6.4)
 
-            // Chapter 5 -> 6
-            .to(nocGroup.rotation, { y: Math.PI * 2.5, x: Math.PI * 0.1, duration: 2 }, 8)
-            .to(nocGroup.position, { x: 1.3, y: 0, duration: 2 }, 8)
+            // Ch 5 -> 6
+            .to(coreCluster.rotation, { y: Math.PI * 3.0, x: Math.PI * 0.15, duration: 2 }, 8)
+            .to(coreCluster.position, { x: 1.4, y: 0, duration: 2 }, 8)
             .to("#slide-5", { opacity: 0, y: -40, duration: 0.4 }, 8)
             .to("#slide-6", { opacity: 1, y: 0, duration: 0.4 }, 8.4)
 
-            // Chapter 6 -> 7
-            .to(nocGroup.rotation, { y: Math.PI * 3.0, x: -Math.PI * 0.1, duration: 2 }, 10)
-            .to(nocGroup.position, { x: -1.3, y: -0.1, duration: 2 }, 10)
+            // Ch 6 -> 7
+            .to(coreCluster.rotation, { y: Math.PI * 3.6, x: -Math.PI * 0.2, duration: 2 }, 10)
+            .to(coreCluster.position, { x: -1.4, y: -0.1, duration: 2 }, 10)
             .to("#slide-6", { opacity: 0, y: -40, duration: 0.4 }, 10)
             .to("#slide-7", { opacity: 1, y: 0, duration: 0.4 }, 10.4)
 
-            // Chapter 7 -> 8
-            .to(nocGroup.rotation, { y: Math.PI * 3.5, x: Math.PI * 0.2, duration: 2 }, 12)
-            .to(nocGroup.position, { x: 1.3, y: 0.1, duration: 2 }, 12)
+            // Ch 7 -> 8
+            .to(coreCluster.rotation, { y: Math.PI * 4.2, x: Math.PI * 0.1, duration: 2 }, 12)
+            .to(coreCluster.position, { x: 1.4, y: 0.1, duration: 2 }, 12)
             .to("#slide-7", { opacity: 0, y: -40, duration: 0.4 }, 12)
             .to("#slide-8", { opacity: 1, y: 0, duration: 0.4 }, 12.4)
 
-            // Chapter 8 -> 9
-            .to(nocGroup.rotation, { y: Math.PI * 4.0, x: -Math.PI * 0.2, duration: 2 }, 14)
-            .to(nocGroup.position, { x: -1.3, y: 0, duration: 2 }, 14)
+            // Ch 8 -> 9
+            .to(coreCluster.rotation, { y: Math.PI * 4.8, x: -Math.PI * 0.1, duration: 2 }, 14)
+            .to(coreCluster.position, { x: -1.4, y: 0, duration: 2 }, 14)
             .to("#slide-8", { opacity: 0, y: -40, duration: 0.4 }, 14)
             .to("#slide-9", { opacity: 1, y: 0, duration: 0.4 }, 14.4)
 
-            // Chapter 9 -> 10
-            .to(nocGroup.rotation, { y: Math.PI * 4.5, x: Math.PI * 0.1, duration: 2 }, 16)
-            .to(nocGroup.position, { x: 1.3, y: -0.1, duration: 2 }, 16)
+            // Ch 9 -> 10
+            .to(coreCluster.rotation, { y: Math.PI * 5.4, x: Math.PI * 0.15, duration: 2 }, 16)
+            .to(coreCluster.position, { x: 1.4, y: -0.1, duration: 2 }, 16)
             .to("#slide-9", { opacity: 0, y: -40, duration: 0.4 }, 16)
             .to("#slide-10", { opacity: 1, y: 0, duration: 0.4 }, 16.4)
 
-            // Chapter 10 -> 11
-            .to(nocGroup.rotation, { y: Math.PI * 5.0, x: 0, duration: 2 }, 18)
-            .to(nocGroup.position, { x: 0, y: 0, duration: 2 }, 18)
+            // Ch 10 -> 11
+            .to(coreCluster.rotation, { y: Math.PI * 6.0, x: 0, duration: 2 }, 18)
+            .to(coreCluster.position, { x: 0, y: 0, duration: 2 }, 18)
             .to("#slide-10", { opacity: 0, y: -40, duration: 0.4 }, 18)
             .to("#slide-11", { opacity: 1, y: 0, duration: 0.4 }, 18.4);
 
         // Continuous Organic Idle Motion Loops
-        gsap.to(nocGroup.position, {
-            y: "+=0.15",
+        gsap.to(coreCluster.position, {
+            y: "+=0.18",
             duration: 2.5,
             repeat: -1,
             yoyo: true,
             ease: "sine.inOut"
         });
 
-        gsap.to(dataCore.rotation, {
-            y: "+=6.28",
-            duration: 10,
-            repeat: -1,
-            ease: "none"
-        });
+        gsap.to(ring1.rotation, { z: "+=6.28", duration: 15, repeat: -1, ease: "none" });
+        gsap.to(ring2.rotation, { z: "-=6.28", duration: 20, repeat: -1, ease: "none" });
+        gsap.to(dataKnot.rotation, { y: "+=6.28", duration: 10, repeat: -1, ease: "none" });
 
         // 6. Render Loop
         function animateScene() {
