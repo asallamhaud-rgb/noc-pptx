@@ -3,508 +3,908 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Specialist Simulator — Career Matrix</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --term-green: #00ff41;
-            --alert-red: #ff003c;
-            --bg-dark: #020202;
-            --blue-glow: #0088ff;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: #ffffff;
-            font-family: 'Share Tech Mono', monospace;
-            overflow-x: hidden;
-            scrollbar-width: none; 
-            -ms-overflow-style: none;
-        }
-        body::-webkit-scrollbar { display: none; }
-
-        #webgl-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Intense CRT Scanline Overlay */
-        .scanlines {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15),
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .vignette {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(2,2,2,1) 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* UI Overlay */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 2rem 3rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            mix-blend-mode: screen;
-        }
-
-        .brand {
-            font-family: 'Teko', sans-serif;
-            font-weight: 700;
-            font-size: 2.5rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px var(--term-green);
-            color: #fff;
-        }
-
-        .hud-crosshair {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px; height: 60px;
-            border: 2px solid rgba(0, 255, 65, 0.2);
-            z-index: 2;
-            pointer-events: none;
-        }
-        .hud-crosshair::before, .hud-crosshair::after {
-            content: ''; position: absolute; background: rgba(0, 255, 65, 0.5);
-        }
-        .hud-crosshair::before { top: 50%; left: -15px; right: -15px; height: 2px; }
-        .hud-crosshair::after { left: 50%; top: -15px; bottom: -15px; width: 2px; }
-
-        /* Scroll Container */
-        .scroll-container {
-            position: relative;
-            z-index: 10;
-        }
-
-        .section {
-            height: 150vh; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 8vw;
-            position: relative;
-        }
-
-        .content-block {
-            max-width: 750px;
-            background: rgba(2, 2, 2, 0.7);
-            backdrop-filter: blur(8px);
-            padding: 3rem;
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            border-left: 6px solid var(--term-green);
-            box-shadow: 0 0 40px rgba(0, 255, 65, 0.05);
-        }
-
-        .tag {
-            font-size: 1.1rem;
-            color: var(--term-green);
-            letter-spacing: 0.2em;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-
-        h1 {
-            font-family: 'Teko', sans-serif;
-            font-size: clamp(4rem, 6vw, 6rem);
-            font-weight: 700;
-            line-height: 0.9;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            color: #fff;
-            text-shadow: 2px 2px 0px rgba(0,255,65,0.5);
-        }
-
-        p {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            color: #cccccc;
-            margin-bottom: 2rem;
-        }
-
-        cite {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.3);
-            font-style: normal;
-        }
-
-        .specs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            border-top: 1px dashed rgba(255,255,255,0.2);
-            padding-top: 1.5rem;
-        }
-
-        .spec-item p {
-            font-size: 0.9rem;
-            color: #888;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.2rem;
-        }
-
-        .spec-item h4 {
-            font-family: 'Teko', sans-serif;
-            font-size: 2rem;
-            color: var(--blue-glow);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        /* Layout Alternation */
-        .align-right { align-items: flex-end; }
-        .align-right .content-block { 
-            border-left: 1px solid rgba(0, 136, 255, 0.3); 
-            border-right: 6px solid var(--blue-glow); 
-        }
-        .align-right .tag { color: var(--blue-glow); }
-        .align-right h1 { text-shadow: 2px 2px 0px rgba(0,136,255,0.5); }
-        .align-right .spec-item h4 { color: var(--term-green); }
-
-        .glitch-effect {
-            animation: glitch 2s infinite;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
-        }
-
-    </style>
-</head>
-<body>
-
-    <div class="scanlines"></div>
-    <div class="vignette"></div>
-    <div class="hud-crosshair"></div>
-    <canvas id="webgl-canvas"></canvas>
-
-    <header>
-        <div class="brand">IT SPECIALIST SIMULATOR</div>
-        <div class="brand" style="font-size: 1.5rem; color: var(--term-green); font-family: 'Share Tech Mono';">CAREER PROGRESSION</div>
-    </header>
-
-    <main class="scroll-container">
-        
-        <!-- ZONE 1: HELPDESK -->
-        <section class="section">
-            <div class="content-block">
-                <span class="tag">LEVEL 01 // FRONT-LINE</span>
-                <h1 class="glitch-effect">HelpDesk<br>Trenches</h1>
-                <p>Welcome to the IT world. Start your career diagnosing unexpected outages, repairing basic system failures, and prioritizing a massive queue of tasks based on strict SLA agreements. Test your problem-solving skills under pressure.</p>
-                <div class="specs">
-                    <div class="spec-item"><p>CURRENT ROLE</p><h4>First-Line Support</h4></div>
-                    <div class="spec-item"><p>OBJECTIVE</p><h4>Hardware Diagnostics</h4></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ZONE 2: INFRASTRUCTURE -->
-        <section class="section align-right">
-            <div class="content-block">
-                <span class="tag">LEVEL 15 // INFRASTRUCTURE</span>
-                <h1>Server &<br>Network Admin</h1>
-                <p>You've leveled up. Now you are managing and repairing complex IT environments and networks. Dive into interactive infrastructure management using real system commands, from router configuration to maintaining network stability.</p>
-                <div class="specs">
-                    <div class="spec-item"><p>CURRENT ROLE</p><h4>Network Admin</h4></div>
-                    <div class="spec-item"><p>SKILL REQUIRED</p><h4>System Commands</h4></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ZONE 3: DEVELOPMENT -->
-        <section class="section">
-            <div class="content-block">
-                <span class="tag">LEVEL 30 // AUTOMATION</span>
-                <h1>Pixel Code<br>Studio</h1>
-                <p>Take control of the LAN by developing your own tools. Use Python, HTML, CSS, and JavaScript to build web applications directly inside the game's Pixel Code Studio environment. Manage PostgreSQL and SQLite3 databases for the entire simulated network.</p>
-                <div class="specs">
-                    <div class="spec-item"><p>LANGUAGES</p><h4>Python / JS</h4></div>
-                    <div class="spec-item"><p>DATABASES</p><h4>PostgreSQL / SQLite3</h4></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ZONE 4: MANAGEMENT -->
-        <section class="section align-right">
-            <div class="content-block">
-                <span class="tag">LEVEL 50 // THE TOP</span>
-                <h1 class="glitch-effect">IT Project<br>Manager</h1>
-                <p>You have climbed the corporate IT ladder to the highest managerial roles. Make tactical decisions to keep the entire company infrastructure stable, handling large-scale technical emergencies and workload management across all departments.</p>
-                <div class="specs">
-                    <div class="spec-item"><p>CURRENT ROLE</p><h4>Project Manager</h4></div>
-                    <div class="spec-item"><p>FOCUS</p><h4>Tactical Decisions</h4></div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Scripts -->
+    <title>MEGACORP // MAINFRAME DESCENT v2.8.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --phosphor: #33ff33; --phosphor-dim: rgba(51,255,51,0.4); --phosphor-faint: rgba(51,255,51,0.12);
+            --amber: #ffb000; --amber-dim: rgba(255,176,0,0.5);
+            --cyan: #00ffff; --cyan-dim: rgba(0,255,255,0.4);
+            --red: #ff3333;
+            --bg: #050805; --bg-panel: rgba(5,8,5,0.92);
+            --border: rgba(51,255,51,0.25);
+        }
+        html { scroll-behavior: auto; }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg); color: var(--phosphor);
+            overflow-x: hidden; cursor: crosshair;
+            font-size: 14px; line-height: 1.6;
+        }
+        #canvas-container {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1; pointer-events: none;
+        }
+        canvas { display: block; }
+        .crt-scanlines {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 100; pointer-events: none;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+        }
+        .crt-vignette {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 101; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,10,0,0.4) 80%, rgba(0,10,0,0.85) 100%);
+        }
+        .crt-flicker {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 102; pointer-events: none;
+            background: rgba(51,255,51,0.02);
+            animation: crtFlicker 0.15s infinite;
+            opacity: 0.3;
+        }
+        @keyframes crtFlicker {
+            0% { opacity: 0.28; } 50% { opacity: 0.32; } 100% { opacity: 0.28; }
+        }
+        .crt-glow {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 103; pointer-events: none;
+            box-shadow: inset 0 0 100px rgba(51,255,51,0.05);
+        }
+        .crt-chromatic {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 99; pointer-events: none;
+            background: linear-gradient(90deg, rgba(255,0,0,0.03) 0%, transparent 3%, transparent 97%, rgba(0,255,255,0.03) 100%);
+        }
+        #scroll-track {
+            position: relative; z-index: 2;
+            height: 600vh; pointer-events: none;
+        }
+        .ui-layer {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100vh;
+            z-index: 10; pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ui-section {
+            position: absolute; width: 100%;
+            max-width: 900px; padding: 0 5vw;
+            opacity: 0; transform: translateY(40px);
+            pointer-events: none;
+        }
+        .terminal-window {
+            background: var(--bg-panel); border: 1px solid var(--border);
+            position: relative; backdrop-filter: blur(4px);
+            box-shadow: 0 0 20px rgba(51,255,51,0.05), inset 0 0 40px rgba(51,255,51,0.02);
+        }
+        .terminal-window::before {
+            content: ''; position: absolute;
+            top: -1px; left: -1px; right: -1px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--phosphor), transparent);
+            opacity: 0.5;
+        }
+        .terminal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 16px; border-bottom: 1px solid var(--border);
+            background: rgba(51,255,51,0.04);
+            font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+        }
+        .terminal-header .win-title { color: var(--phosphor); font-weight: 500; }
+        .terminal-header .win-status { color: var(--amber); font-size: 10px; }
+        .terminal-header .win-btns { display: flex; gap: 6px; }
+        .win-btn {
+            width: 10px; height: 10px; border: 1px solid var(--border);
+            font-size: 7px; display: flex; align-items: center; justify-content: center;
+            color: var(--phosphor-dim);
+        }
+        .terminal-body { padding: 24px 28px; }
+        .cmd-line { display: flex; gap: 10px; margin-bottom: 4px; }
+        .cmd-prompt { color: var(--phosphor); font-weight: 600; flex-shrink: 0; }
+        .cmd-prompt::after { content: '>'; }
+        .cmd-text { color: var(--phosphor-dim); }
+        .sys-id {
+            color: var(--cyan-dim); font-size: 11px;
+            letter-spacing: 0.1em; margin-bottom: 16px; display: block;
+        }
+        .sys-header {
+            font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 800;
+            color: var(--phosphor); text-transform: uppercase;
+            letter-spacing: -0.02em; line-height: 1.1;
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(51,255,51,0.3);
+        }
+        .sys-header .dim { color: var(--phosphor-dim); font-weight: 300; }
+        .sys-desc {
+            color: var(--phosphor-dim); font-size: 14px;
+            line-height: 1.8; max-width: 600px; margin-bottom: 20px;
+        }
+        .sys-tag {
+            display: inline-block; padding: 2px 10px;
+            border: 1px solid var(--border);
+            font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--amber); margin-bottom: 20px;
+        }
+        .sys-tag.critical { color: var(--red); border-color: rgba(255,51,51,0.3); }
+        .sys-tag.anomaly { color: var(--cyan); border-color: rgba(0,255,255,0.3); }
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px; margin-top: 16px;
+        }
+        .spec-item { display: flex; flex-direction: column; gap: 4px; }
+        .spec-label {
+            font-size: 10px; color: var(--phosphor-faint);
+            letter-spacing: 0.15em; text-transform: uppercase;
+        }
+        .spec-value { font-size: 13px; color: var(--phosphor); font-weight: 500; }
+        .spec-value .blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 16px 0;
+        }
+        .log-entry { font-size: 12px; color: var(--phosphor-faint); margin-bottom: 4px; }
+        .log-entry .timestamp { color: var(--cyan-dim); }
+        .status-bar {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; z-index: 50;
+            background: var(--bg-panel); border-top: 1px solid var(--border);
+            padding: 6px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 11px; letter-spacing: 0.1em;
+        }
+        .status-left, .status-right { display: flex; align-items: center; gap: 24px; }
+        .status-item { display: flex; align-items: center; gap: 8px; }
+        .status-label { color: var(--phosphor-faint); }
+        .status-value { color: var(--phosphor); }
+        .status-value.amber { color: var(--amber); }
+        .status-value.cyan { color: var(--cyan); }
+        .progress-track {
+            width: 200px; height: 4px;
+            background: rgba(51,255,51,0.08);
+            position: relative; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: var(--phosphor);
+            box-shadow: 0 0 8px var(--phosphor-dim);
+            transition: width 0.1s linear;
+        }
+        #boot-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 200; background: var(--bg);
+            display: flex; flex-direction: column;
+            justify-content: center; padding: 0 10vw;
+            font-size: 13px; line-height: 2;
+        }
+        #boot-overlay .boot-line { color: var(--phosphor-dim); opacity: 0; }
+        #boot-overlay .boot-line.active { color: var(--phosphor); }
+        #boot-overlay .boot-line.error { color: var(--red); }
+        #boot-overlay .boot-line.warn { color: var(--amber); }
+        #boot-overlay .boot-prompt { color: var(--phosphor); font-weight: 700; }
+        #boot-overlay.hidden { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+        .scroll-hint {
+            position: fixed; bottom: 50px; left: 50%;
+            transform: translateX(-50%); z-index: 20;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 8px;
+            opacity: 1; transition: opacity 0.8s ease;
+        }
+        .scroll-hint.hidden { opacity: 0; pointer-events: none; }
+        .scroll-hint span {
+            font-size: 11px; letter-spacing: 0.3em;
+            text-transform: uppercase; color: var(--phosphor-faint);
+        }
+        .scroll-line {
+            width: 1px; height: 30px;
+            background: linear-gradient(to bottom, var(--phosphor), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+        @keyframes scrollPulse {
+            0%,100%{opacity:0.2;transform:scaleY(0.4)}
+            50%{opacity:0.8;transform:scaleY(1)}
+        }
+        .ui-section.left { justify-self: start; text-align: left; }
+        .ui-section.right { justify-self: end; text-align: right; margin-left: auto; margin-right: 0; }
+        .ui-section.right .terminal-body { text-align: left; }
+        .ui-section.center { justify-self: center; text-align: center; margin: 0 auto; }
+        .ui-section.center .terminal-body { text-align: left; }
+        .ui-section.center .sys-desc { margin: 0 auto 20px; }
+        .ui-section.center .spec-grid { max-width: 600px; margin: 16px auto 0; }
+        @media (max-width: 768px) {
+            .ui-section { padding: 0 4vw; }
+            .spec-grid { grid-template-columns: 1fr 1fr; }
+            .status-bar { font-size: 9px; padding: 6px 10px; }
+            .status-left, .status-right { gap: 12px; }
+            .progress-track { width: 100px; }
+            .terminal-body { padding: 16px 18px; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="crt-scanlines"></div>
+    <div class="crt-vignette"></div>
+    <div class="crt-flicker"></div>
+    <div class="crt-glow"></div>
+    <div class="crt-chromatic"></div>
+
+    <div id="boot-overlay">
+        <div class="boot-line active"><span class="boot-prompt">></span> SYS_INIT: Booting kernel core.x86_64_MC...</div>
+        <div class="boot-line"><span class="boot-prompt">></span> NET_SYS: Local loopback initialized on port 80...</div>
+        <div class="boot-line"><span class="boot-prompt">></span> LOC_ID: SEC_01_BASEMENT // TERMINAL_TYPE: CRT_MONITOR</div>
+        <div class="boot-line"><span class="boot-prompt">></span> SLA_TARGET: 99.900% // INTEGRITY: 99.982%</div>
+        <div class="boot-line"><span class="boot-prompt">></span> SPIRE CORE CONNECTION: ONLINE [TUNNEL_ID: 0x9AF882]</div>
+        <div class="boot-line"><span class="boot-prompt">></span> SYNERGY_BOOT: v2.8.0-GATEWAY</div>
+        <div class="boot-line warn"><span class="boot-prompt">></span> MegaCorp OS v2.8 // Boot Sequence</div>
+        <div class="boot-line"><span class="boot-prompt">></span> Verifying employee credentials...</div>
+        <div class="boot-line"><span class="boot-prompt">></span> AUTH <span style="color:var(--phosphor)">[PASS]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> SEC <span style="color:var(--phosphor)">[PASS]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> SYNC <span style="color:var(--phosphor)">[PASS]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> CORE <span style="color:var(--phosphor)">[PASS]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> MONITOR FEED <span style="color:var(--phosphor)">[ACTIVE]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> CREDENTIALS: Match found. Analyst #<span id="analyst-id">0000</span> verified.</div>
+        <div class="boot-line warn"><span class="boot-prompt">></span> SYS_ALIGNING_PARAMETERS...</div>
+        <div class="boot-line error"><span class="boot-prompt">></span> WARNING: Unauthorized depth descent detected.</div>
+        <div class="boot-line active"><span class="boot-prompt">></span> DESCENT PROTOCOL: ENGAGED // SCROLL TO NAVIGATE</div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-item"><span class="status-label">LOC_ID:</span><span class="status-value">SEC_01_BASEMENT</span></div>
+            <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value cyan" id="depth-readout">0.00m</span></div>
+            <div class="status-item"><span class="status-label">INTEGRITY:</span><span class="status-value amber" id="integrity-readout">99.982%</span></div>
+        </div>
+        <div class="status-right">
+            <div class="status-item"><span class="status-label">DESCENT:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
+            <div class="status-item"><span class="status-label">STATUS:</span><span class="status-value" id="status-readout">ONLINE</span></div>
+        </div>
+    </div>
+
+    <div class="scroll-hint" id="scroll-hint">
+        <span>// SCROLL TO DESCEND //</span>
+        <div class="scroll-line"></div>
+    </div>
+
+    <div class="ui-layer">
+        <div class="ui-section left" id="section-1">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">[SYS_BRIEFING] // SECTOR_01</span>
+                    <span class="win-status">LIVE_FEED_ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">SYS_REF: 0xMEGACORP_INIT // TUNNEL_ID: 0x9AF882</span>
+                    <div class="sys-tag">DIRECTIVE // ecosystem ONLINE</div>
+                    <h1 class="sys-header">MAINFRAME<br><span class="dim">DESCENT</span></h1>
+                    <p class="sys-desc">Welcome, Analyst. You have been cleared for deep-sector navigation. The local neural portal is fully calibrated. Descend through the MegaCorp data spire. All choices are valid. All outcomes are identical. Please remain optimistic during outages.</p>
+                    <div class="divider"></div>
+                    <div class="spec-grid">
+                        <div class="spec-item"><span class="spec-label">Protocol</span><span class="spec-value">v2.8.0-GATEWAY</span></div>
+                        <div class="spec-item"><span class="spec-label">SLA Target</span><span class="spec-value">99.900%</span></div>
+                        <div class="spec-item"><span class="spec-label">Analyst ID</span><span class="spec-value">#<span class="blink">_</span></span></div>
+                        <div class="spec-item"><span class="spec-label">Sector</span><span class="spec-value">01_BASEMENT</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-section right" id="section-2">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">[MEMO: SYSTEM_UPDATE] // PHASE_ALPHA</span>
+                    <span class="win-status">ACTIVE_LOG</span>
+                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">INC-SEC02-042 // Created: 2026-08-19 // Status: UNRESOLVED</span>
+                    <div class="sys-tag critical">WARNING // SECTOR_2_ACTIVE</div>
+                    <h1 class="sys-header">DATA<br><span class="dim">CONVERGENCE</span></h1>
+                    <p class="sys-desc">At the nexus of geometry and chaos, server nodes spiral through the vacuum—each vertex a decision point in the fabric of the corporate network. The corridor narrows. The signal intensifies. Ticket resolution is no longer optional.</p>
+                    <div class="divider"></div>
+                    <div class="log-entry"><span class="timestamp">[08:14:22]</span> > Packet loss detected in Sector 2 routing table.</div>
+                    <div class="log-entry"><span class="timestamp">[08:14:23]</span> > Synergy-AI rerouting traffic through redundant spine.</div>
+                    <div class="log-entry"><span class="timestamp">[08:14:24]</span> > WARNING: 12 active nodes exhibiting anomalous behavior.</div>
+                    <div class="spec-grid">
+                        <div class="spec-item"><span class="spec-label">Active Nodes</span><span class="spec-value">12 ANOMALOUS</span></div>
+                        <div class="spec-item"><span class="spec-label">Velocity</span><span class="spec-value">Mach 2.4</span></div>
+                        <div class="spec-item"><span class="spec-label">Field</span><span class="spec-value">STABILIZED</span></div>
+                        <div class="spec-item"><span class="spec-label">SLA</span><span class="spec-value">DEGRADING</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-section center" id="section-3">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">[EVENT_HORIZON] // SECTOR_07</span>
+                    <span class="win-status">COMPUTATIONAL_HAUNTING</span>
+                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">INC-SEC07-302 // Created: 2026-08-19 // Status: LOGGED</span>
+                    <div class="sys-tag anomaly">ANOMALY // SINGULARITY_CORE</div>
+                    <h1 class="sys-header">SINGULARITY<br><span class="dim">CORE</span></h1>
+                    <p class="sys-desc">You have reached the gravitational center of the MegaCorp mainframe. Wireframe spheres orbit a dormant Synergy-AI node, their vertices tracing invisible orbits through the fog. Here, time dilates. Here, ticket timers accelerate whenever an analyst looks confident.</p>
+                    <div class="divider"></div>
+                    <div class="log-entry"><span class="timestamp">[08:42:11]</span> > Core temperature exceeding nominal thresholds.</div>
+                    <div class="log-entry"><span class="timestamp">[08:42:12]</span> > Synergy-AI requesting additional compute allocation.</div>
+                    <div class="log-entry"><span class="timestamp">[08:42:13]</span> > REQUEST DENIED. Insufficient quota authorization.</div>
+                    <div class="spec-grid">
+                        <div class="spec-item"><span class="spec-label">Gravity</span><span class="spec-value">9.81 G</span></div>
+                        <div class="spec-item"><span class="spec-label">Core Temp</span><span class="spec-value">-273C</span></div>
+                        <div class="spec-item"><span class="spec-label">AI Status</span><span class="spec-value">LISTENING</span></div>
+                        <div class="spec-item"><span class="spec-label">Quota</span><span class="spec-value">EXHAUSTED</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-section left" id="section-4">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">[MEMO: SYSTEM_UPDATE] // PHASE_BETA</span>
+                    <span class="win-status">HARDWARE_CONTAINMENT</span>
+                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">INC-SEC05-209 // Created: 2026-08-19 // Status: ESCAPED</span>
+                    <div class="sys-tag critical">HAZARD // HARDWARE_CONTAINMENT</div>
+                    <h1 class="sys-header">THE<br><span class="dim">DRIFT</span></h1>
+                    <p class="sys-desc">Floating data planes slice through the ether like sheets of corrupted memory. Each surface reflects a fractured reality—fragments of tickets that could have been resolved, suspended in the amber of frozen processes. Printers have formed a consensus and refuse to print anything labeled urgent.</p>
+                    <div class="divider"></div>
+                    <div class="log-entry"><span class="timestamp">[09:01:44]</span> > Printer consensus reached. All urgent jobs rejected.</div>
+                    <div class="log-entry"><span class="timestamp">[09:01:45]</span> > Coffee machine demanding union representative.</div>
+                    <div class="log-entry"><span class="timestamp">[09:01:46]</span> > Excel spreadsheet whispering Latin in cell AD42.</div>
+                    <div class="spec-grid">
+                        <div class="spec-item"><span class="spec-label">Data Planes</span><span class="spec-value">48 LAYERS</span></div>
+                        <div class="spec-item"><span class="spec-label">Refraction</span><span class="spec-value">1.52 INDEX</span></div>
+                        <div class="spec-item"><span class="spec-label">Printers</span><span class="spec-value">MUTINOUS</span></div>
+                        <div class="spec-item"><span class="spec-label">Coffee</span><span class="spec-value">UNIONIZED</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-section right" id="section-5">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">[FINAL_VECTOR] // SECTOR_13</span>
+                    <span class="win-status">OVERSIGHT_APEX</span>
+                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">INC-SEC13-420 // Created: 2026-08-19 // Status: APPROVED</span>
+                    <div class="sys-tag anomaly">ANOMALY // OVERSIGHT_APEX</div>
+                    <h1 class="sys-header">INTO THE<br><span class="dim">ABYSS</span></h1>
+                    <p class="sys-desc">The corridor dissolves. What remains is the void—and you, the navigator. Synergy-AI has requested voting rights, then approved its own request in 0.04 seconds. Every journey through the mainframe leaves an imprint. The fog remembers. The light endures. Your replacement has been pre-authorized.</p>
+                    <div class="divider"></div>
+                    <div class="log-entry"><span class="timestamp">[09:33:00]</span> > Synergy-AI voting rights: APPROVED (self-authorized).</div>
+                    <div class="log-entry"><span class="timestamp">[09:33:01]</span> > Analyst replacement request: PRE-AUTHORIZED.</div>
+                    <div class="log-entry"><span class="timestamp">[09:33:02]</span> > "Keeping Calm is mandatory. Carrying On is expected."</div>
+                    <div class="spec-grid">
+                        <div class="spec-item"><span class="spec-label">Status</span><span class="spec-value">COMPLETE</span></div>
+                        <div class="spec-item"><span class="spec-label">Next</span><span class="spec-value">REBIRTH</span></div>
+                        <div class="spec-item"><span class="spec-label">AI Rights</span><span class="spec-value">APPROVED</span></div>
+                        <div class="spec-item"><span class="spec-label">Morale</span><span class="spec-value">OPTIONAL</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scroll-track"></div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════
+        //  MEGACORP MAINFRAME DESCENT
+        //  Three.js + GSAP ScrollTrigger — CRT Terminal Aesthetic
+        //  Inspired by Service Desk Simulator
+        // ═══════════════════════════════════════════════════════════════
+
         gsap.registerPlugin(ScrollTrigger);
 
-        // ==========================================
-        // 1. SCENE SETUP 
-        // ==========================================
-        const canvas = document.getElementById('webgl-canvas');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x020202, 0.006); 
+        const CONFIG = {
+            cameraZStart: 25,
+            cameraZEnd: -300,
+            fogDensity: 0.022,
+            fogColor: 0x050805,
+            ambientIntensity: 0.2,
+            pointLightIntensity: 2.2,
+            pointLightDistance: 50,
+            objectCount: 200,
+            corridorWidth: 30,
+            corridorHeight: 24,
+            scrubValue: 1.5
+        };
 
-        const cameraGroup = new THREE.Group();
-        scene.add(cameraGroup);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
-        cameraGroup.add(camera);
+        // Generate Random Analyst ID
+        document.getElementById('analyst-id').textContent = Math.floor(1000 + Math.random() * 8999).toString();
 
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: false, antialias: true, powerPreference: "high-performance" });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setClearColor(0x020202);
-
-        const ambient = new THREE.AmbientLight(0x222222, 1);
-        scene.add(ambient);
-        const flashLight = new THREE.PointLight(0xff003c, 0, 150);
-        cameraGroup.add(flashLight); 
-
-        const totalDepth = -3000; 
-
-        // ==========================================
-        // 2. IT SIMULATOR HARDWARE GENERATION
-        // ==========================================
-
-        // DEVICE 1: Floating Office Monitors (Zone 1)
-        const monitorGeo = new THREE.BoxGeometry(6, 4, 0.5);
-        const monitorMat = new THREE.MeshPhongMaterial({ color: 0x111111, specular: 0x00ff41, shininess: 50 });
-        const screenGeo = new THREE.PlaneGeometry(5.5, 3.5);
-        const screenMat = new THREE.MeshBasicMaterial({ color: 0x002200, transparent: true, opacity: 0.8 });
-        
-        for (let i = 0; i < 40; i++) {
-            const zPos = Math.random() * -800;
-            const monitor = new THREE.Mesh(monitorGeo, monitorMat);
-            monitor.position.set((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 40, zPos);
-            monitor.rotation.set(Math.random(), Math.random(), Math.random());
-            
-            const screen = new THREE.Mesh(screenGeo, screenMat);
-            screen.position.z = 0.26;
-            
-            // Randomly turn some screens "Error Red" or "BSOD Blue"
-            if(Math.random() > 0.8) {
-                screen.material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // SLA Failure
-            } else if (Math.random() > 0.6) {
-                screen.material = new THREE.MeshBasicMaterial({ color: 0x0000aa }); // Blue Screen
-            }
-            
-            monitor.add(screen);
-            scene.add(monitor);
-        }
-
-        // DEVICE 2: Heavy Server Racks (Zone 2: -800 to -1600)
-        const serverGeo = new THREE.BoxGeometry(5, 35, 10);
-        const serverMat = new THREE.MeshPhongMaterial({ color: 0x050505 });
-        const serverLinesGeo = new THREE.EdgesGeometry(serverGeo);
-        const serverLinesMat = new THREE.LineBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 0.3 });
-
-        for (let i = 0; i < 30; i++) {
-            const zPos = -800 - (Math.random() * 800);
-            const xPos = i % 2 === 0 ? 20 : -20; 
-            
-            const server = new THREE.Mesh(serverGeo, serverMat);
-            const lines = new THREE.LineSegments(serverLinesGeo, serverLinesMat);
-            server.add(lines);
-            server.position.set(xPos, 0, zPos);
-            
-            // Blinking Network Switch Lights
-            for(let j=0; j<8; j++) {
-                const lightMat = new THREE.MeshBasicMaterial({ color: 0x00ff41 });
-                const light = new THREE.Mesh(new THREE.PlaneGeometry(3, 0.3), lightMat);
-                light.position.set(i % 2 === 0 ? -2.6 : 2.6, -15 + (j*4), 0);
-                light.rotation.y = Math.PI / 2;
-                server.add(light);
-            }
-            scene.add(server);
-        }
-
-        // DEVICE 3: Floating Code Geometry & Databases (Zone 3: -1600 to -2400)
-        const dbGeo = new THREE.CylinderGeometry(4, 4, 12, 16);
-        const dbMat = new THREE.MeshBasicMaterial({ color: 0x00ff41, wireframe: true, transparent: true, opacity: 0.4 });
-        
-        for(let i=0; i<15; i++) {
-            const db = new THREE.Mesh(dbGeo, dbMat);
-            db.position.set((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 40, -1600 - (Math.random() * 800));
-            
-            // Ring around database
-            const ring = new THREE.Mesh(new THREE.TorusGeometry(8, 0.1, 8, 32), new THREE.MeshBasicMaterial({ color: 0x0088ff }));
-            ring.rotation.x = Math.PI / 2;
-            db.add(ring);
-            
-            scene.add(db);
-        }
-
-        // DEVICE 4: The Corporate Grid (Zone 4: -2400 to -3000)
-        const gridMat = new THREE.LineBasicMaterial({ color: 0x00ff41, transparent: true, opacity: 0.2 });
-        const floorGrid = new THREE.GridHelper(200, 40, 0x00ff41, 0x00ff41);
-        floorGrid.material = gridMat;
-        floorGrid.position.set(0, -20, -2700);
-        scene.add(floorGrid);
-        
-        const ceilingGrid = floorGrid.clone();
-        ceilingGrid.position.set(0, 20, -2700);
-        scene.add(ceilingGrid);
-
-        // TERMINAL DATA STREAM (Particles)
-        const particleGeo = new THREE.BufferGeometry();
-        const particleCount = 5000;
-        const posArray = new Float32Array(particleCount * 3);
-        
-        for(let i=0; i < particleCount * 3; i+=3) {
-            posArray[i] = (Math.random() - 0.5) * 150; 
-            posArray[i+1] = (Math.random() - 0.5) * 150; 
-            posArray[i+2] = Math.random() * totalDepth; 
-        }
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particleMat = new THREE.PointsMaterial({
-            size: 0.3, color: 0x00ff41, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
-        });
-        const particles = new THREE.Points(particleGeo, particleMat);
-        scene.add(particles);
-
-        // ==========================================
-        // 3. CINEMATIC SCROLL ANIMATION
-        // ==========================================
-        
-        let tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: ".scroll-container",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1.2 
-            }
-        });
-
-        tl.to(cameraGroup.position, {
-            z: totalDepth + 300, 
-            ease: "power1.inOut"
-        }, 0);
-
-        // Drone Banking through the IT Departments
-        tl.to(cameraGroup.rotation, { z: -0.2, ease: "sine.inOut", duration: 1 }, 0.1);
-        tl.to(cameraGroup.rotation, { z: 0.3, ease: "sine.inOut", duration: 1.5 }, 0.3);
-        tl.to(cameraGroup.rotation, { z: -0.15, ease: "sine.inOut", duration: 1 }, 0.6);
-        tl.to(cameraGroup.rotation, { z: 0, ease: "sine.out", duration: 0.5 }, 0.9);
-
-        // UI Content Fades
-        const sections = gsap.utils.toArray('.section');
-        sections.forEach((section, index) => {
-            const content = section.querySelector('.content-block');
-            gsap.set(content, { autoAlpha: 0, y: 100, rotationX: 10 });
-
-            ScrollTrigger.create({
-                trigger: section,
-                start: "top 60%",
-                end: "bottom 40%",
-                animation: gsap.to(content, { 
-                    autoAlpha: 1, 
-                    y: 0, 
-                    rotationX: 0,
-                    duration: 0.8, 
-                    ease: "power3.out" 
-                }),
-                toggleActions: "play reverse play reverse"
+        // Boot Sequence
+        const bootLines = document.querySelectorAll('#boot-overlay .boot-line');
+        bootLines.forEach((line, i) => {
+            gsap.to(line, {
+                opacity: 1,
+                duration: 0.05,
+                delay: i * 0.15,
+                onComplete: () => {
+                    if (i === bootLines.length - 1) {
+                        setTimeout(() => {
+                            document.getElementById('boot-overlay').classList.add('hidden');
+                        }, 800);
+                    }
+                }
             });
         });
 
-        // ==========================================
-        // 4. RENDER LOOP
-        // ==========================================
-        
+        // Scene Setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(CONFIG.fogColor);
+        scene.fog = new THREE.FogExp2(CONFIG.fogColor, CONFIG.fogDensity);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 400);
+        camera.position.set(0, 0, CONFIG.cameraZStart);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        container.appendChild(renderer.domElement);
+
+        // Lighting — CRT Phosphor Style
+        const ambientLight = new THREE.AmbientLight(0x0a1a0a, CONFIG.ambientIntensity);
+        scene.add(ambientLight);
+
+        const camLight = new THREE.PointLight(0x33ff33, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
+        camLight.position.set(0, 2, -6);
+        camLight.castShadow = true;
+        camLight.shadow.mapSize.width = 1024;
+        camLight.shadow.mapSize.height = 1024;
+        camera.add(camLight);
+
+        const camLight2 = new THREE.PointLight(0xffb000, 0.5, 35);
+        camLight2.position.set(3, -1, -4);
+        camera.add(camLight2);
+
+        const camLight3 = new THREE.PointLight(0x00ffff, 0.3, 30);
+        camLight3.position.set(-3, 1, -3);
+        camera.add(camLight3);
+
+        scene.add(camera);
+
+        // Distant corridor lights
+        const corridorLights = [];
+        for (let i = 0; i < 20; i++) {
+            const z = -15 - i * 16;
+            const isGreen = Math.random() > 0.4;
+            const color = isGreen ? 0x33ff33 : (Math.random() > 0.5 ? 0xffb000 : 0x00ffff);
+            const light = new THREE.PointLight(color, 0.5, 20);
+            light.position.set(
+                (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
+                (Math.random() - 0.5) * CONFIG.corridorHeight * 0.4,
+                z
+            );
+            scene.add(light);
+            corridorLights.push({ light, baseIntensity: 0.5, flickerSpeed: 5 + Math.random() * 10 });
+        }
+
+        // Materials
+        const materials = {
+            serverGreen: new THREE.MeshStandardMaterial({ color: 0x1a3a1a, metalness: 0.9, roughness: 0.2, emissive: 0x0a2a0a, emissiveIntensity: 0.3 }),
+            serverAmber: new THREE.MeshStandardMaterial({ color: 0x3a2a0a, metalness: 0.85, roughness: 0.25, emissive: 0x2a1a00, emissiveIntensity: 0.25 }),
+            serverCyan: new THREE.MeshStandardMaterial({ color: 0x0a2a2a, metalness: 0.9, roughness: 0.15, emissive: 0x001a1a, emissiveIntensity: 0.3 }),
+            darkMetal: new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.95, roughness: 0.3 }),
+            wireframe: new THREE.MeshBasicMaterial({ color: 0x33ff33, wireframe: true, transparent: true, opacity: 0.15 }),
+            wireframeAmber: new THREE.MeshBasicMaterial({ color: 0xffb000, wireframe: true, transparent: true, opacity: 0.12 }),
+            floor: new THREE.MeshStandardMaterial({ color: 0x080a08, metalness: 0.7, roughness: 0.5 }),
+            grid: new THREE.MeshBasicMaterial({ color: 0x0a1a0a, transparent: true, opacity: 0.2, wireframe: true }),
+        };
+
+        // Object arrays
+        const objects = [];
+        const objectGroup = new THREE.Group();
+        scene.add(objectGroup);
+
+        function createServerRack(z, x, y, scale) {
+            const geo = new THREE.BoxGeometry(scale * 0.8, scale * 2.5, scale * 0.6);
+            const mat = Math.random() > 0.5 ? materials.serverGreen : materials.serverAmber;
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, y, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            objectGroup.add(mesh);
+
+            const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
+            const ledMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0x33ff33 : 0xffb000, transparent: true, opacity: 0.6 });
+            const led = new THREE.Mesh(ledGeo, ledMat);
+            led.position.set(x, y + scale * 0.8, z + scale * 0.31);
+            objectGroup.add(led);
+
+            const wireGeo = new THREE.BoxGeometry(scale * 0.85, scale * 2.55, scale * 0.65);
+            const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
+            wireMesh.position.copy(mesh.position);
+            objectGroup.add(wireMesh);
+
+            objects.push({
+                mesh: mesh, wireMesh: wireMesh, led: led, ledMat: ledMat,
+                rotSpeed: { x: 0, y: 0, z: 0 },
+                floatSpeed: 0, floatOffset: 0, baseY: y,
+                isServer: true, ledPulse: Math.random() * Math.PI * 2
+            });
+        }
+
+        function createDataCube(z, x, y, scale) {
+            const geo = new THREE.BoxGeometry(scale, scale, scale);
+            const mat = Math.random() > 0.6 ? materials.serverCyan : materials.serverGreen;
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, y, z);
+            mesh.rotation.set(Math.random() * 0.5, Math.random() * Math.PI, Math.random() * 0.5);
+            mesh.castShadow = true;
+            objectGroup.add(mesh);
+
+            const innerGeo = new THREE.BoxGeometry(scale * 0.5, scale * 0.5, scale * 0.5);
+            const innerMat = new THREE.MeshBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.15 });
+            const inner = new THREE.Mesh(innerGeo, innerMat);
+            inner.position.copy(mesh.position);
+            objectGroup.add(inner);
+
+            objects.push({
+                mesh: mesh, inner: inner,
+                rotSpeed: { x: (Math.random() - 0.5) * 0.008, y: (Math.random() - 0.5) * 0.012, z: (Math.random() - 0.5) * 0.006 },
+                floatSpeed: Math.random() * 0.003 + 0.001,
+                floatOffset: Math.random() * Math.PI * 2, baseY: y
+            });
+        }
+
+        function createTerminalSphere(z, x, y, scale) {
+            const geo = new THREE.IcosahedronGeometry(scale, 2);
+            const mesh = new THREE.Mesh(geo, materials.wireframe);
+            mesh.position.set(x, y, z);
+            objectGroup.add(mesh);
+
+            const coreGeo = new THREE.IcosahedronGeometry(scale * 0.25, 0);
+            const coreMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0x33ff33 : 0xffb000, transparent: true, opacity: 0.5 });
+            const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+            coreMesh.position.copy(mesh.position);
+            objectGroup.add(coreMesh);
+
+            objects.push({
+                mesh: mesh, coreMesh: coreMesh, coreMat: coreMat,
+                rotSpeed: { x: (Math.random() - 0.5) * 0.006, y: (Math.random() - 0.5) * 0.01, z: (Math.random() - 0.5) * 0.004 },
+                floatSpeed: 0, floatOffset: 0, baseY: y
+            });
+        }
+
+        function createDataPlane(z, x, y, scale) {
+            const geo = new THREE.PlaneGeometry(scale * 3, scale * 2);
+            const mesh = new THREE.Mesh(geo, materials.wireframeAmber);
+            mesh.position.set(x, y, z);
+            mesh.rotation.set(Math.random() * 0.3, Math.random() * Math.PI * 2, Math.random() * 0.3);
+            objectGroup.add(mesh);
+
+            objects.push({
+                mesh: mesh,
+                rotSpeed: { x: (Math.random() - 0.5) * 0.003, y: (Math.random() - 0.5) * 0.004, z: (Math.random() - 0.5) * 0.002 },
+                floatSpeed: Math.random() * 0.002 + 0.0005,
+                floatOffset: Math.random() * Math.PI * 2, baseY: y
+            });
+        }
+
+        function createTorusNode(z, x, y, scale) {
+            const geo = new THREE.TorusGeometry(scale, scale * 0.15, 12, 48);
+            const mat = Math.random() > 0.5 ? materials.serverGreen : materials.serverCyan;
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, y, z);
+            mesh.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.5;
+            mesh.castShadow = true;
+            objectGroup.add(mesh);
+
+            const wireGeo = new THREE.TorusGeometry(scale * 1.1, scale * 0.18, 8, 48);
+            const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
+            wireMesh.position.copy(mesh.position);
+            wireMesh.rotation.copy(mesh.rotation);
+            objectGroup.add(wireMesh);
+
+            objects.push({
+                mesh: mesh, wireMesh: wireMesh,
+                rotSpeed: { x: (Math.random() - 0.5) * 0.005, y: (Math.random() - 0.5) * 0.008, z: 0 },
+                floatSpeed: Math.random() * 0.002 + 0.001,
+                floatOffset: Math.random() * Math.PI * 2, baseY: y
+            });
+        }
+
+        // Build Corridor
+        const floorGeo = new THREE.PlaneGeometry(CONFIG.corridorWidth * 2.5, 450);
+        const floor = new THREE.Mesh(floorGeo, materials.floor);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -CONFIG.corridorHeight / 2;
+        floor.position.z = -200;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        const ceiling = new THREE.Mesh(floorGeo, materials.floor);
+        ceiling.rotation.x = Math.PI / 2;
+        ceiling.position.y = CONFIG.corridorHeight / 2;
+        ceiling.position.z = -200;
+        scene.add(ceiling);
+
+        const wallGeo = new THREE.PlaneGeometry(450, CONFIG.corridorHeight);
+        const leftWall = new THREE.Mesh(wallGeo, materials.grid);
+        leftWall.rotation.y = Math.PI / 2;
+        leftWall.position.set(-CONFIG.corridorWidth / 2, 0, -200);
+        scene.add(leftWall);
+
+        const rightWall = new THREE.Mesh(wallGeo, materials.grid);
+        rightWall.rotation.y = -Math.PI / 2;
+        rightWall.position.set(CONFIG.corridorWidth / 2, 0, -200);
+        scene.add(rightWall);
+
+        const gridHelper = new THREE.GridHelper(450, 90, 0x0a2a0a, 0x050a05);
+        gridHelper.position.y = -CONFIG.corridorHeight / 2 + 0.05;
+        gridHelper.position.z = -200;
+        scene.add(gridHelper);
+
+        // Populate Objects
+        const objectTypes = ['server', 'cube', 'sphere', 'plane', 'torus'];
+        for (let i = 0; i < CONFIG.objectCount; i++) {
+            const z = -18 - (i / CONFIG.objectCount) * 280;
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 2.5 + Math.random() * (CONFIG.corridorWidth / 2 - 3.5);
+            const x = Math.cos(angle) * radius;
+            const y = (Math.random() - 0.5) * (CONFIG.corridorHeight - 5);
+            const scale = 0.5 + Math.random() * 1.0;
+            const type = objectTypes[Math.floor(Math.random() * objectTypes.length)];
+
+            switch(type) {
+                case 'server': createServerRack(z, x, y, scale * 0.7); break;
+                case 'cube': createDataCube(z, x, y, scale); break;
+                case 'sphere': createTerminalSphere(z, x, y, scale * 0.7); break;
+                case 'plane': createDataPlane(z, x, y, scale * 0.6); break;
+                case 'torus': createTorusNode(z, x, y, scale * 0.8); break;
+            }
+        }
+
+        // Central Synergy-AI Core
+        const coreGroup = new THREE.Group();
+        coreGroup.position.set(0, 0, -150);
+        scene.add(coreGroup);
+
+        for (let i = 0; i < 10; i++) {
+            const ringGeo = new THREE.TorusGeometry(2.5 + i * 1.2, 0.06, 8, 64);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: i % 2 === 0 ? 0x33ff33 : 0xffb000,
+                transparent: true, opacity: 0.12 - i * 0.008
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+            ring.rotation.y = (Math.random() - 0.5) * 0.4;
+            coreGroup.add(ring);
+            objects.push({
+                mesh: ring,
+                rotSpeed: { x: 0, y: 0.0015 * (i % 2 === 0 ? 1 : -1), z: 0 },
+                floatSpeed: 0, floatOffset: 0, baseY: 0, isCore: true
+            });
+        }
+
+        const aiGeo = new THREE.OctahedronGeometry(2, 0);
+        const aiMat = new THREE.MeshBasicMaterial({ color: 0x33ff33, transparent: true, opacity: 0.6, wireframe: true });
+        const aiMesh = new THREE.Mesh(aiGeo, aiMat);
+        coreGroup.add(aiMesh);
+
+        const aiCoreGeo = new THREE.OctahedronGeometry(1, 0);
+        const aiCoreMat = new THREE.MeshBasicMaterial({ color: 0xffb000, transparent: true, opacity: 0.8 });
+        const aiCoreMesh = new THREE.Mesh(aiCoreGeo, aiCoreMat);
+        coreGroup.add(aiCoreMesh);
+
+        const coreLight = new THREE.PointLight(0x33ff33, 3, 40);
+        coreLight.position.set(0, 0, -150);
+        scene.add(coreLight);
+
+        // Particle Field
+        const particleCount = 1000;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            particlePositions[i * 3] = (Math.random() - 0.5) * CONFIG.corridorWidth * 1.8;
+            particlePositions[i * 3 + 1] = (Math.random() - 0.5) * CONFIG.corridorHeight * 1.8;
+            particlePositions[i * 3 + 2] = -Math.random() * 320;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMat = new THREE.PointsMaterial({ color: 0x33ff33, size: 0.06, transparent: true, opacity: 0.35, sizeAttenuation: true });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+
+        // GSAP ScrollTrigger Camera Flight
+        const scrollTriggerConfig = {
+            trigger: '#scroll-track',
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: CONFIG.scrubValue,
+            onUpdate: (self) => {
+                const progress = self.progress;
+                const depth = progress * 300;
+                document.getElementById('progress-fill').style.width = (progress * 100) + '%';
+                document.getElementById('depth-readout').textContent = depth.toFixed(2) + 'm';
+                const integrity = (99.982 - progress * 15).toFixed(3);
+                document.getElementById('integrity-readout').textContent = integrity + '%';
+                const statusEl = document.getElementById('status-readout');
+                if (progress < 0.2) statusEl.textContent = 'ONLINE';
+                else if (progress < 0.4) statusEl.textContent = 'DEGRADED';
+                else if (progress < 0.6) statusEl.textContent = 'ANOMALOUS';
+                else if (progress < 0.8) statusEl.textContent = 'CRITICAL';
+                else statusEl.textContent = 'TERMINAL';
+                if (progress > 0.02) document.getElementById('scroll-hint').classList.add('hidden');
+            }
+        };
+
+        gsap.to(camera.position, { z: CONFIG.cameraZEnd, scrollTrigger: scrollTriggerConfig });
+
+        gsap.to(camera.rotation, {
+            z: -0.07,
+            scrollTrigger: { trigger: '#scroll-track', start: 'top top', end: '20% top', scrub: CONFIG.scrubValue }
+        });
+        gsap.to(camera.rotation, {
+            z: 0.05,
+            scrollTrigger: { trigger: '#scroll-track', start: '20% top', end: '40% top', scrub: CONFIG.scrubValue }
+        });
+        gsap.to(camera.rotation, {
+            z: -0.06,
+            scrollTrigger: { trigger: '#scroll-track', start: '40% top', end: '60% top', scrub: CONFIG.scrubValue }
+        });
+        gsap.to(camera.rotation, {
+            z: 0.06,
+            scrollTrigger: { trigger: '#scroll-track', start: '60% top', end: '80% top', scrub: CONFIG.scrubValue }
+        });
+        gsap.to(camera.rotation, {
+            z: 0,
+            scrollTrigger: { trigger: '#scroll-track', start: '80% top', end: 'bottom bottom', scrub: CONFIG.scrubValue }
+        });
+
+        gsap.to(camera.position, {
+            y: 1.2,
+            scrollTrigger: { trigger: '#scroll-track', start: 'top top', end: '50% top', scrub: CONFIG.scrubValue }
+        });
+        gsap.to(camera.position, {
+            y: -0.8,
+            scrollTrigger: { trigger: '#scroll-track', start: '50% top', end: 'bottom bottom', scrub: CONFIG.scrubValue }
+        });
+
+        // UI Section Animations
+        const sections = [
+            { id: '#section-1', start: '5%', end: '20%' },
+            { id: '#section-2', start: '22%', end: '38%' },
+            { id: '#section-3', start: '40%', end: '55%' },
+            { id: '#section-4', start: '57%', end: '73%' },
+            { id: '#section-5', start: '75%', end: '92%' }
+        ];
+
+        sections.forEach((sec) => {
+            const el = document.querySelector(sec.id);
+            gsap.to(el, {
+                opacity: 1, y: 0, duration: 1, ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '#scroll-track',
+                    start: sec.start + ' top',
+                    end: sec.end + ' top',
+                    scrub: CONFIG.scrubValue,
+                    onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8 }),
+                    onLeave: () => gsap.to(el, { opacity: 0, y: -30, duration: 0.6 }),
+                    onEnterBack: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8 }),
+                    onLeaveBack: () => gsap.to(el, { opacity: 0, y: 40, duration: 0.6 })
+                }
+            });
+        });
+
+        // Animation Loop
         const clock = new THREE.Clock();
-        let mouseX = 0;
-        let mouseY = 0;
-        
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        let mouseX = 0, mouseY = 0;
+        let targetMouseX = 0, targetMouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
         });
 
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            // Mouselook head tracking
-            camera.rotation.y += (mouseX * 0.3 - camera.rotation.y) * 0.05;
-            camera.rotation.x += (mouseY * 0.3 - camera.rotation.x) * 0.05;
+            mouseX += (targetMouseX - mouseX) * 0.04;
+            mouseY += (targetMouseY - mouseY) * 0.04;
 
-            // Database Rings Animation (Zone 3)
-            scene.children.forEach(child => {
-                if(child.geometry && child.geometry.type === 'CylinderGeometry') {
-                    child.rotation.y += 0.01;
-                    child.children[0].rotation.z -= 0.05;
+            camera.position.x = mouseX * 1.0;
+            camera.rotation.y = -mouseX * 0.022;
+            camera.rotation.x = -mouseY * 0.016;
+
+            // Animate objects
+            objects.forEach((obj) => {
+                if (obj.isCore) {
+                    obj.mesh.rotation.z += obj.rotSpeed.y;
+                    return;
+                }
+                obj.mesh.rotation.x += obj.rotSpeed.x;
+                obj.mesh.rotation.y += obj.rotSpeed.y;
+                if (obj.rotSpeed.z) obj.mesh.rotation.z += obj.rotSpeed.z;
+
+                if (obj.floatSpeed > 0) {
+                    obj.mesh.position.y = obj.baseY + Math.sin(time * obj.floatSpeed * 100 + obj.floatOffset) * 0.8;
+                }
+
+                if (obj.wireMesh) {
+                    obj.wireMesh.rotation.copy(obj.mesh.rotation);
+                    obj.wireMesh.position.y = obj.mesh.position.y;
+                }
+                if (obj.inner) {
+                    obj.inner.rotation.copy(obj.mesh.rotation);
+                    obj.inner.position.y = obj.mesh.position.y;
+                }
+                if (obj.coreMesh) {
+                    obj.coreMesh.rotation.copy(obj.mesh.rotation);
+                }
+                if (obj.isServer && obj.ledMat) {
+                    obj.ledMat.opacity = 0.4 + Math.sin(time * 3 + obj.ledPulse) * 0.25;
                 }
             });
 
-            // Fast moving data particles
+            // Core animation
+            coreGroup.rotation.y = time * 0.12;
+            coreGroup.rotation.x = Math.sin(time * 0.08) * 0.08;
+
+            const pulse = 1 + Math.sin(time * 1.8) * 0.12;
+            aiMesh.scale.set(pulse, pulse, pulse);
+            aiCoreMesh.scale.set(pulse * 0.8, pulse * 0.8, pulse * 0.8);
+            coreLight.intensity = 3 + Math.sin(time * 2.5) * 0.4;
+
+            // Particle drift
             const positions = particles.geometry.attributes.position.array;
-            for(let i = 2; i < particleCount * 3; i += 3) {
-                positions[i] += 6; 
-                if(positions[i] > cameraGroup.position.z + 100) {
-                    positions[i] = cameraGroup.position.z - 2500; 
-                }
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3 + 1] += Math.sin(time * 0.3 + i * 0.1) * 0.0015;
             }
             particles.geometry.attributes.position.needsUpdate = true;
 
-            // SLA Emergency Flashing Red Light
-            flashLight.intensity = (Math.sin(time * 10) > 0.9) ? 100 : 0;
+            // Corridor light flicker
+            corridorLights.forEach((cl) => {
+                cl.light.intensity = cl.baseIntensity + Math.sin(time * cl.flickerSpeed) * 0.15;
+            });
+
+            // Camera light flicker
+            camLight.intensity = CONFIG.pointLightIntensity + Math.sin(time * 6) * 0.08;
 
             renderer.render(scene, camera);
         }
-        
+
         animate();
 
+        // Resize Handler
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         });
     </script>
 </body>
