@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omantel NSOC — The Matrix Override</title>
+    <title>IT Specialist Simulator — Career Matrix</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --brand-cyan: #00e5ff;
-            --alert-red: #ff0055;
-            --bg-dark: #000103;
+            --term-green: #00ff41;
+            --alert-red: #ff003c;
+            --bg-dark: #020202;
+            --blue-glow: #0088ff;
         }
 
         * {
@@ -25,7 +26,7 @@
         body {
             background-color: var(--bg-dark);
             color: #ffffff;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Share Tech Mono', monospace;
             overflow-x: hidden;
             scrollbar-width: none; 
             -ms-overflow-style: none;
@@ -60,7 +61,7 @@
         .vignette {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,1,3,1) 100%);
+            background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(2,2,2,1) 100%);
             z-index: 2;
             pointer-events: none;
         }
@@ -79,29 +80,29 @@
         }
 
         .brand {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.8rem;
-            letter-spacing: 0.2em;
+            font-family: 'Teko', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            text-shadow: 0 0 10px var(--brand-cyan);
+            text-shadow: 0 0 10px var(--term-green);
+            color: #fff;
         }
 
         .hud-crosshair {
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 50px; height: 50px;
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            border-radius: 50%;
+            width: 60px; height: 60px;
+            border: 2px solid rgba(0, 255, 65, 0.2);
             z-index: 2;
             pointer-events: none;
         }
         .hud-crosshair::before, .hud-crosshair::after {
-            content: ''; position: absolute; background: rgba(0, 229, 255, 0.5);
+            content: ''; position: absolute; background: rgba(0, 255, 65, 0.5);
         }
-        .hud-crosshair::before { top: 50%; left: -10px; right: -10px; height: 1px; }
-        .hud-crosshair::after { left: 50%; top: -10px; bottom: -10px; width: 1px; }
+        .hud-crosshair::before { top: 50%; left: -15px; right: -15px; height: 2px; }
+        .hud-crosshair::after { left: 50%; top: -15px; bottom: -15px; width: 2px; }
 
         /* Scroll Container */
         .scroll-container {
@@ -109,9 +110,8 @@
             z-index: 10;
         }
 
-        /* Drama Typography */
         .section {
-            height: 150vh; /* Taller sections for faster feeling scroll */
+            height: 150vh; 
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -120,84 +120,91 @@
         }
 
         .content-block {
-            max-width: 700px;
-            background: rgba(0, 1, 3, 0.6);
-            backdrop-filter: blur(10px);
+            max-width: 750px;
+            background: rgba(2, 2, 2, 0.7);
+            backdrop-filter: blur(8px);
             padding: 3rem;
-            border-left: 4px solid var(--brand-cyan);
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
-            transform: skewX(-5deg);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-left: 6px solid var(--term-green);
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.05);
         }
 
         .tag {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            color: var(--alert-red);
-            letter-spacing: 0.4em;
+            font-size: 1.1rem;
+            color: var(--term-green);
+            letter-spacing: 0.2em;
             margin-bottom: 1rem;
             display: inline-block;
-            text-shadow: 0 0 8px var(--alert-red);
         }
 
         h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(3rem, 5vw, 5rem);
-            font-weight: 900;
-            line-height: 1;
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(4rem, 6vw, 6rem);
+            font-weight: 700;
+            line-height: 0.9;
             margin-bottom: 1.5rem;
             text-transform: uppercase;
             color: #fff;
+            text-shadow: 2px 2px 0px rgba(0,255,65,0.5);
         }
 
         p {
-            font-size: 1.4rem;
-            line-height: 1.5;
-            color: #b0bec5;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #cccccc;
             margin-bottom: 2rem;
-            transform: skewX(5deg); /* Counter-skew */
+        }
+
+        cite {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-style: normal;
         }
 
         .specs {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px dashed rgba(255,255,255,0.2);
             padding-top: 1.5rem;
-            transform: skewX(5deg);
         }
 
         .spec-item p {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            color: var(--brand-cyan);
-            letter-spacing: 0.2em;
+            font-size: 0.9rem;
+            color: #888;
+            letter-spacing: 0.1em;
             margin-bottom: 0.2rem;
         }
 
         .spec-item h4 {
-            font-size: 1.5rem;
-            color: #fff;
-            font-weight: 700;
+            font-family: 'Teko', sans-serif;
+            font-size: 2rem;
+            color: var(--blue-glow);
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         /* Layout Alternation */
         .align-right { align-items: flex-end; }
         .align-right .content-block { 
-            border-left: none; 
-            border-right: 4px solid var(--alert-red); 
-            transform: skewX(5deg);
+            border-left: 1px solid rgba(0, 136, 255, 0.3); 
+            border-right: 6px solid var(--blue-glow); 
         }
-        .align-right p, .align-right .specs { transform: skewX(-5deg); }
+        .align-right .tag { color: var(--blue-glow); }
+        .align-right h1 { text-shadow: 2px 2px 0px rgba(0,136,255,0.5); }
+        .align-right .spec-item h4 { color: var(--term-green); }
 
         .glitch-effect {
-            animation: glitch 3s infinite;
+            animation: glitch 2s infinite;
         }
 
         @keyframes glitch {
-            0% { text-shadow: 2px 0 0 red, -2px 0 0 blue; }
-            5% { text-shadow: -2px 0 0 red, 2px 0 0 blue; }
-            10% { text-shadow: 0 0 0 transparent; }
-            100% { text-shadow: 0 0 0 transparent; }
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
         }
 
     </style>
@@ -210,60 +217,60 @@
     <canvas id="webgl-canvas"></canvas>
 
     <header>
-        <div class="brand">Omantel <span style="color:var(--brand-cyan)">NSOC</span></div>
-        <div class="brand" style="font-size: 1rem; color: var(--alert-red);">SYSTEM: ONLINE</div>
+        <div class="brand">IT SPECIALIST SIMULATOR</div>
+        <div class="brand" style="font-size: 1.5rem; color: var(--term-green); font-family: 'Share Tech Mono';">CAREER PROGRESSION</div>
     </header>
 
     <main class="scroll-container">
         
-        <!-- ZONE 1: SERVER AISLE -->
+        <!-- ZONE 1: HELPDESK -->
         <section class="section">
             <div class="content-block">
-                <span class="tag">SEC-01 // CORE ROUTING</span>
-                <h1 class="glitch-effect">Data Center<br>Monoliths</h1>
-                <p>Navigating through the primary IP backbone. Thousands of stacked high-capacity enterprise packet switches orchestrating seamless BGP peering and gateway routing.</p>
+                <span class="tag">LEVEL 01 // FRONT-LINE</span>
+                <h1 class="glitch-effect">HelpDesk<br>Trenches</h1>
+                <p>Welcome to the IT world. Start your career diagnosing unexpected outages, repairing basic system failures, and prioritizing a massive queue of tasks based on strict SLA agreements. Test your problem-solving skills under pressure.</p>
                 <div class="specs">
-                    <div class="spec-item"><p>INFRASTRUCTURE</p><h4>Tier-4 Racks</h4></div>
-                    <div class="spec-item"><p>THROUGHPUT</p><h4>Multi-Terabit</h4></div>
+                    <div class="spec-item"><p>CURRENT ROLE</p><h4>First-Line Support</h4></div>
+                    <div class="spec-item"><p>OBJECTIVE</p><h4>Hardware Diagnostics</h4></div>
                 </div>
             </div>
         </section>
 
-        <!-- ZONE 2: 5G ANTENNA ARRAYS -->
+        <!-- ZONE 2: INFRASTRUCTURE -->
         <section class="section align-right">
             <div class="content-block">
-                <span class="tag">SEC-02 // WIRELESS RAN</span>
-                <h1>3.5 GHz MIMO<br>Arrays</h1>
-                <p>Passing through the Mobile RAN domain. Featuring high-gain active beamforming panels, optimized Complementary Split Ring Resonator (CSRR) structures, and miniaturized 5G footprints.</p>
+                <span class="tag">LEVEL 15 // INFRASTRUCTURE</span>
+                <h1>Server &<br>Network Admin</h1>
+                <p>You've leveled up. Now you are managing and repairing complex IT environments and networks. Dive into interactive infrastructure management using real system commands, from router configuration to maintaining network stability.</p>
                 <div class="specs">
-                    <div class="spec-item"><p>ANTENNA TYPE</p><h4>Massive MIMO</h4></div>
-                    <div class="spec-item"><p>GEOMETRY</p><h4>Rectangular Patch</h4></div>
+                    <div class="spec-item"><p>CURRENT ROLE</p><h4>Network Admin</h4></div>
+                    <div class="spec-item"><p>SKILL REQUIRED</p><h4>System Commands</h4></div>
                 </div>
             </div>
         </section>
 
-        <!-- ZONE 3: RADAR/TRACKING -->
+        <!-- ZONE 3: DEVELOPMENT -->
         <section class="section">
             <div class="content-block">
-                <span class="tag">SEC-03 // TELEMETRY</span>
-                <h1>Airborne<br>Tracking</h1>
-                <p>Real-time surveillance and spatial radiation lobes scanning the sector. Calculating radar range equations, dynamic link budgets, and signal-to-noise detection thresholds across the grid.</p>
+                <span class="tag">LEVEL 30 // AUTOMATION</span>
+                <h1>Pixel Code<br>Studio</h1>
+                <p>Take control of the LAN by developing your own tools. Use Python, HTML, CSS, and JavaScript to build web applications directly inside the game's Pixel Code Studio environment. Manage PostgreSQL and SQLite3 databases for the entire simulated network.</p>
                 <div class="specs">
-                    <div class="spec-item"><p>SYSTEM</p><h4>Phased Array Radar</h4></div>
-                    <div class="spec-item"><p>COVERAGE</p><h4>3D Spatial Lobes</h4></div>
+                    <div class="spec-item"><p>LANGUAGES</p><h4>Python / JS</h4></div>
+                    <div class="spec-item"><p>DATABASES</p><h4>PostgreSQL / SQLite3</h4></div>
                 </div>
             </div>
         </section>
 
-        <!-- ZONE 4: SUBSEA CORE -->
+        <!-- ZONE 4: MANAGEMENT -->
         <section class="section align-right">
             <div class="content-block">
-                <span class="tag">SEC-04 // FIBER OPTICS</span>
-                <h1 class="glitch-effect">Subsea DWDM<br>Nexus</h1>
-                <p>Plunging into the national transmission hub. Dense Wavelength Division Multiplexing optical networks firing localized photonic data streams globally.</p>
+                <span class="tag">LEVEL 50 // THE TOP</span>
+                <h1 class="glitch-effect">IT Project<br>Manager</h1>
+                <p>You have climbed the corporate IT ladder to the highest managerial roles. Make tactical decisions to keep the entire company infrastructure stable, handling large-scale technical emergencies and workload management across all departments.</p>
                 <div class="specs">
-                    <div class="spec-item"><p>TRANSPORT</p><h4>Photonic Lines</h4></div>
-                    <div class="spec-item"><p>LATENCY</p><h4>Ultra-Low</h4></div>
+                    <div class="spec-item"><p>CURRENT ROLE</p><h4>Project Manager</h4></div>
+                    <div class="spec-item"><p>FOCUS</p><h4>Tactical Decisions</h4></div>
                 </div>
             </div>
         </section>
@@ -279,149 +286,125 @@
         gsap.registerPlugin(ScrollTrigger);
 
         // ==========================================
-        // 1. SCENE SETUP (HIGH DRAMA)
+        // 1. SCENE SETUP 
         // ==========================================
         const canvas = document.getElementById('webgl-canvas');
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000103, 0.008); // Thick dark fog
+        scene.fog = new THREE.FogExp2(0x020202, 0.006); 
 
-        // We wrap the camera in a group to allow independent banking and shaking
         const cameraGroup = new THREE.Group();
         scene.add(cameraGroup);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
         cameraGroup.add(camera);
 
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: false, antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setClearColor(0x000103);
+        renderer.setClearColor(0x020202);
 
-        // Lights
-        const ambient = new THREE.AmbientLight(0x111122, 1);
+        const ambient = new THREE.AmbientLight(0x222222, 1);
         scene.add(ambient);
-        const flashLight = new THREE.PointLight(0xff0055, 0, 100);
-        cameraGroup.add(flashLight); // Attaches light to drone
+        const flashLight = new THREE.PointLight(0xff003c, 0, 150);
+        cameraGroup.add(flashLight); 
 
-        const totalDepth = -2500; // Extremely deep tunnel
+        const totalDepth = -3000; 
 
         // ==========================================
-        // 2. PROCEDURAL HARDWARE GENERATION
+        // 2. IT SIMULATOR HARDWARE GENERATION
         // ==========================================
 
-        // DEVICE 1: Server Monoliths (Zone 1)
-        const serverGeo = new THREE.BoxGeometry(4, 30, 8);
-        const serverMat = new THREE.MeshPhongMaterial({ 
-            color: 0x050505, specular: 0x00e5ff, shininess: 100, 
-            emissive: 0x002233, emissiveIntensity: 0.5 
-        });
-        const serverLinesGeo = new THREE.EdgesGeometry(serverGeo);
-        const serverLinesMat = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.3 });
-
+        // DEVICE 1: Floating Office Monitors (Zone 1)
+        const monitorGeo = new THREE.BoxGeometry(6, 4, 0.5);
+        const monitorMat = new THREE.MeshPhongMaterial({ color: 0x111111, specular: 0x00ff41, shininess: 50 });
+        const screenGeo = new THREE.PlaneGeometry(5.5, 3.5);
+        const screenMat = new THREE.MeshBasicMaterial({ color: 0x002200, transparent: true, opacity: 0.8 });
+        
         for (let i = 0; i < 40; i++) {
-            const zPos = Math.random() * -600;
-            const xPos = i % 2 === 0 ? 15 : -15; // Left and right aisles
+            const zPos = Math.random() * -800;
+            const monitor = new THREE.Mesh(monitorGeo, monitorMat);
+            monitor.position.set((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 40, zPos);
+            monitor.rotation.set(Math.random(), Math.random(), Math.random());
+            
+            const screen = new THREE.Mesh(screenGeo, screenMat);
+            screen.position.z = 0.26;
+            
+            // Randomly turn some screens "Error Red" or "BSOD Blue"
+            if(Math.random() > 0.8) {
+                screen.material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // SLA Failure
+            } else if (Math.random() > 0.6) {
+                screen.material = new THREE.MeshBasicMaterial({ color: 0x0000aa }); // Blue Screen
+            }
+            
+            monitor.add(screen);
+            scene.add(monitor);
+        }
+
+        // DEVICE 2: Heavy Server Racks (Zone 2: -800 to -1600)
+        const serverGeo = new THREE.BoxGeometry(5, 35, 10);
+        const serverMat = new THREE.MeshPhongMaterial({ color: 0x050505 });
+        const serverLinesGeo = new THREE.EdgesGeometry(serverGeo);
+        const serverLinesMat = new THREE.LineBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 0.3 });
+
+        for (let i = 0; i < 30; i++) {
+            const zPos = -800 - (Math.random() * 800);
+            const xPos = i % 2 === 0 ? 20 : -20; 
             
             const server = new THREE.Mesh(serverGeo, serverMat);
             const lines = new THREE.LineSegments(serverLinesGeo, serverLinesMat);
             server.add(lines);
-            
             server.position.set(xPos, 0, zPos);
             
-            // Add glowing "drive lights" to the servers
-            for(let j=0; j<5; j++) {
-                const lightGeo = new THREE.PlaneGeometry(2, 0.2);
-                const lightMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, side: THREE.DoubleSide });
-                const light = new THREE.Mesh(lightGeo, lightMat);
-                light.position.set(i % 2 === 0 ? -2.1 : 2.1, -10 + (j*4), 0);
+            // Blinking Network Switch Lights
+            for(let j=0; j<8; j++) {
+                const lightMat = new THREE.MeshBasicMaterial({ color: 0x00ff41 });
+                const light = new THREE.Mesh(new THREE.PlaneGeometry(3, 0.3), lightMat);
+                light.position.set(i % 2 === 0 ? -2.6 : 2.6, -15 + (j*4), 0);
                 light.rotation.y = Math.PI / 2;
                 server.add(light);
             }
             scene.add(server);
         }
 
-        // DEVICE 2: 5G Massive MIMO Patch Arrays (Zone 2: -600 to -1200)
-        const panelGeo = new THREE.BoxGeometry(10, 15, 1);
-        const panelMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.2 });
+        // DEVICE 3: Floating Code Geometry & Databases (Zone 3: -1600 to -2400)
+        const dbGeo = new THREE.CylinderGeometry(4, 4, 12, 16);
+        const dbMat = new THREE.MeshBasicMaterial({ color: 0x00ff41, wireframe: true, transparent: true, opacity: 0.4 });
         
-        for (let i = 0; i < 15; i++) {
-            const zPos = -600 - (Math.random() * 600);
-            const panel = new THREE.Mesh(panelGeo, panelMat);
-            panel.position.set((Math.random() - 0.5) * 60, (Math.random() - 0.5) * 40, zPos);
-            panel.rotation.set(Math.random(), Math.random(), 0);
-
-            // Create the patch antenna grids on the panel
-            const patchGrid = new THREE.GridHelper(10, 8, 0xff0055, 0xff0055);
-            patchGrid.rotation.x = Math.PI / 2;
-            patchGrid.position.z = 0.6;
-            panel.add(patchGrid);
+        for(let i=0; i<15; i++) {
+            const db = new THREE.Mesh(dbGeo, dbMat);
+            db.position.set((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 40, -1600 - (Math.random() * 800));
             
-            scene.add(panel);
+            // Ring around database
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(8, 0.1, 8, 32), new THREE.MeshBasicMaterial({ color: 0x0088ff }));
+            ring.rotation.x = Math.PI / 2;
+            db.add(ring);
+            
+            scene.add(db);
         }
 
-        // DEVICE 3: Spinning Radar/Tracking Dishes (Zone 3: -1200 to -1800)
-        const radars = [];
-        const dishGeo = new THREE.CylinderGeometry(8, 0, 3, 32, 1, true);
-        const dishMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: 0.5 });
-        const baseGeo = new THREE.CylinderGeometry(1, 1, 10, 8);
-        const baseMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+        // DEVICE 4: The Corporate Grid (Zone 4: -2400 to -3000)
+        const gridMat = new THREE.LineBasicMaterial({ color: 0x00ff41, transparent: true, opacity: 0.2 });
+        const floorGrid = new THREE.GridHelper(200, 40, 0x00ff41, 0x00ff41);
+        floorGrid.material = gridMat;
+        floorGrid.position.set(0, -20, -2700);
+        scene.add(floorGrid);
+        
+        const ceilingGrid = floorGrid.clone();
+        ceilingGrid.position.set(0, 20, -2700);
+        scene.add(ceilingGrid);
 
-        for (let i = 0; i < 8; i++) {
-            const zPos = -1200 - (i * 80);
-            const radarGroup = new THREE.Group();
-            
-            const base = new THREE.Mesh(baseGeo, baseMat);
-            base.position.y = -5;
-            radarGroup.add(base);
-
-            const dish = new THREE.Mesh(dishGeo, dishMat);
-            dish.rotation.x = Math.PI / 2.5; // Angle the dish
-            
-            // Antenna feed
-            const feed = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 6), new THREE.MeshBasicMaterial({ color: 0xff0055 }));
-            feed.position.set(0, 3, 0);
-            dish.add(feed);
-
-            radarGroup.add(dish);
-            radarGroup.position.set(i % 2 === 0 ? 25 : -25, -10, zPos);
-            scene.add(radarGroup);
-            
-            radars.push({ group: radarGroup, dish: dish, speed: 0.02 + Math.random() * 0.05 });
-        }
-
-        // DEVICE 4: Subsea Fiber Optic Core (Zone 4: -1800 to -2500)
-        const fiberGroup = new THREE.Group();
-        const curveGeo = new THREE.TubeGeometry(
-            new THREE.CatmullRomCurve3([
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(10, 20, -50),
-                new THREE.Vector3(-10, -20, -100),
-                new THREE.Vector3(0, 0, -200)
-            ]), 
-            64, 0.5, 8, false
-        );
-        const curveMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true });
-
-        for (let i = 0; i < 30; i++) {
-            const tube = new THREE.Mesh(curveGeo, curveMat);
-            tube.position.set((Math.random()-0.5)*40, (Math.random()-0.5)*40, -1800 - (Math.random()*700));
-            tube.rotation.z = Math.random() * Math.PI;
-            fiberGroup.add(tube);
-        }
-        scene.add(fiberGroup);
-
-        // HYPER-SPEED DATA PARTICLES (Flying past camera)
+        // TERMINAL DATA STREAM (Particles)
         const particleGeo = new THREE.BufferGeometry();
-        const particleCount = 4000;
+        const particleCount = 5000;
         const posArray = new Float32Array(particleCount * 3);
         
         for(let i=0; i < particleCount * 3; i+=3) {
-            posArray[i] = (Math.random() - 0.5) * 100; // X
-            posArray[i+1] = (Math.random() - 0.5) * 100; // Y
-            posArray[i+2] = Math.random() * totalDepth; // Z
+            posArray[i] = (Math.random() - 0.5) * 150; 
+            posArray[i+1] = (Math.random() - 0.5) * 150; 
+            posArray[i+2] = Math.random() * totalDepth; 
         }
         particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         const particleMat = new THREE.PointsMaterial({
-            size: 0.2, color: 0xffffff, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
+            size: 0.3, color: 0x00ff41, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
         });
         const particles = new THREE.Points(particleGeo, particleMat);
         scene.add(particles);
@@ -435,27 +418,26 @@
                 trigger: ".scroll-container",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1.2 // High scrub for snappy drone movement
+                scrub: 1.2 
             }
         });
 
-        // The main flight path down the Z axis
         tl.to(cameraGroup.position, {
-            z: totalDepth + 200, // Stop just before the end
+            z: totalDepth + 300, 
             ease: "power1.inOut"
         }, 0);
 
-        // Drone Banking (Rolling the camera on Z axis to simulate corners)
-        tl.to(cameraGroup.rotation, { z: -0.3, ease: "sine.inOut", duration: 1 }, 0.1);
-        tl.to(cameraGroup.rotation, { z: 0.4, ease: "sine.inOut", duration: 1.5 }, 0.3);
-        tl.to(cameraGroup.rotation, { z: -0.2, ease: "sine.inOut", duration: 1 }, 0.6);
+        // Drone Banking through the IT Departments
+        tl.to(cameraGroup.rotation, { z: -0.2, ease: "sine.inOut", duration: 1 }, 0.1);
+        tl.to(cameraGroup.rotation, { z: 0.3, ease: "sine.inOut", duration: 1.5 }, 0.3);
+        tl.to(cameraGroup.rotation, { z: -0.15, ease: "sine.inOut", duration: 1 }, 0.6);
         tl.to(cameraGroup.rotation, { z: 0, ease: "sine.out", duration: 0.5 }, 0.9);
 
-        // HTML Content Fades
+        // UI Content Fades
         const sections = gsap.utils.toArray('.section');
         sections.forEach((section, index) => {
             const content = section.querySelector('.content-block');
-            gsap.set(content, { autoAlpha: 0, x: index % 2 === 0 ? -100 : 100, scale: 0.8 });
+            gsap.set(content, { autoAlpha: 0, y: 100, rotationX: 10 });
 
             ScrollTrigger.create({
                 trigger: section,
@@ -463,17 +445,17 @@
                 end: "bottom 40%",
                 animation: gsap.to(content, { 
                     autoAlpha: 1, 
-                    x: 0, 
-                    scale: 1, 
+                    y: 0, 
+                    rotationX: 0,
                     duration: 0.8, 
-                    ease: "back.out(1.7)" 
+                    ease: "power3.out" 
                 }),
                 toggleActions: "play reverse play reverse"
             });
         });
 
         // ==========================================
-        // 4. RENDER LOOP & PHYSICS
+        // 4. RENDER LOOP
         // ==========================================
         
         const clock = new THREE.Clock();
@@ -489,40 +471,36 @@
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            // Mouselook (Head tracking)
+            // Mouselook head tracking
             camera.rotation.y += (mouseX * 0.3 - camera.rotation.y) * 0.05;
             camera.rotation.x += (mouseY * 0.3 - camera.rotation.x) * 0.05;
 
-            // Animate Radars (Zone 3)
-            radars.forEach(r => {
-                r.dish.rotation.y += r.speed;
+            // Database Rings Animation (Zone 3)
+            scene.children.forEach(child => {
+                if(child.geometry && child.geometry.type === 'CylinderGeometry') {
+                    child.rotation.y += 0.01;
+                    child.children[0].rotation.z -= 0.05;
+                }
             });
 
-            // Animate Subsea Fibers (Zone 4)
-            fiberGroup.children.forEach((tube, i) => {
-                tube.rotation.x += 0.005;
-                tube.position.y += Math.sin(time * 2 + i) * 0.05; // Floating effect
-            });
-
-            // Warp Speed Particles Effect (Move particles towards camera)
+            // Fast moving data particles
             const positions = particles.geometry.attributes.position.array;
             for(let i = 2; i < particleCount * 3; i += 3) {
-                positions[i] += 4; // Speed of particles
-                if(positions[i] > cameraGroup.position.z) {
-                    positions[i] = cameraGroup.position.z - 2000; // Reset far away
+                positions[i] += 6; 
+                if(positions[i] > cameraGroup.position.z + 100) {
+                    positions[i] = cameraGroup.position.z - 2500; 
                 }
             }
             particles.geometry.attributes.position.needsUpdate = true;
 
-            // Dramatic Red Flashing Alarm Light on the drone/camera
-            flashLight.intensity = (Math.sin(time * 8) > 0.8) ? 5 : 0;
+            // SLA Emergency Flashing Red Light
+            flashLight.intensity = (Math.sin(time * 10) > 0.9) ? 100 : 0;
 
             renderer.render(scene, camera);
         }
         
         animate();
 
-        // Handle Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
