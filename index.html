@@ -291,14 +291,20 @@
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">03 // PROTOCOLS</span>
+                    <span class="win-title">03 // INCIDENT CLASSIFICATION</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">DATA FLOW // STAGE_03</span>
-                    <h1 class="sys-header">SIGNAL<br><span class="dim">ROUTING</span></h1>
-                    <p class="sys-desc">Information traverses the network in elegant loops. The camera path mathematically calculates spline tension to ensure your journey through the clusters remains perfectly smooth.</p>
+                    <span class="sys-id">OPERATIONS PROTOCOL // STAGE_03</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 15px;">INCIDENT CLASSIFICATION:<br><span class="dim">SEVERITY LEVELS</span></h1>
+                    <div class="sys-desc" style="font-size: 14px; line-height: 1.5;">
+                        <p style="margin-bottom: 8px;"><strong>> P1 — Emergency:</strong> Critical outage / massive impact</p>
+                        <p style="margin-bottom: 8px;"><strong>> P2 — Critical:</strong> Severe service degradation</p>
+                        <p style="margin-bottom: 8px;"><strong>> P3 — Major:</strong> Significant issue / immediate action</p>
+                        <p style="margin-bottom: 8px;"><strong>> P4 — Minor:</strong> No traffic or service impact</p>
+                        <p style="margin-bottom: 0;"><strong>> P5 — Warning:</strong> Early indicator / threshold alert</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -458,7 +464,6 @@
             }, delay);
             delay += 600 + Math.random() * 400; 
         });
-
 
         // --- THREE.JS & GSAP LOGIC ---
         gsap.registerPlugin(ScrollTrigger);
@@ -646,125 +651,92 @@
         for (let i = 0; i < numSections; i++) {
             const progress = i / (numSections - 1);
             const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
-            
             const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
             const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
-            
             pathPoints.push(new THREE.Vector3(x, y, z));
         }
-        
-        const curve = new THREE.CatmullRomCurve3(pathPoints);
 
-        const tl = gsap.timeline({
+        const curve = new THREE.CatmullRomCurve3(pathPoints);
+        curve.curveType = 'centripetal';
+
+        // Bind Camera to Scroll
+        const scrollObject = { progress: 0 };
+        gsap.to(scrollObject, {
+            progress: 1,
+            ease: "none",
             scrollTrigger: {
-                trigger: '#scroll-track',
-                start: 'top top',
-                end: 'bottom bottom',
+                trigger: "#scroll-track",
+                start: "top top",
+                end: "bottom bottom",
                 scrub: CONFIG.scrubValue,
                 onUpdate: (self) => {
-                    document.getElementById('progress-fill').style.width = `${self.progress * 100}%`;
+                    const p = self.progress;
+                    const point = curve.getPoint(p);
+                    camera.position.copy(point);
                     
-                    const depth = Math.abs(camera.position.z - CONFIG.cameraZStart).toFixed(2);
-                    document.getElementById('depth-readout').textContent = `${depth}m`;
+                    const lookAtPoint = curve.getPoint(Math.min(p + 0.01, 1));
+                    camera.lookAt(lookAtPoint);
 
-                    const currentSlide = Math.min(10, Math.max(1, Math.ceil(self.progress * 10)));
-                    document.getElementById('slide-readout').textContent = `${currentSlide.toString().padStart(2, '0')}/10`;
-
-                    if (self.progress > 0.01) {
-                        titleScreen.style.opacity = '0';
-                        titleScreen.style.pointerEvents = 'none';
-                    } else if (bootScreen.style.display === 'none') {
-                        titleScreen.style.opacity = '1';
-                        titleScreen.style.pointerEvents = 'auto';
-                    }
+                    const currentDepth = (p * Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart)).toFixed(2);
+                    document.getElementById('depth-readout').textContent = currentDepth + 'm';
+                    document.getElementById('progress-fill').style.width = (p * 100) + '%';
+                    
+                    const activeSlide = Math.min(Math.floor(p * numSections) + 1, numSections);
+                    document.getElementById('slide-readout').textContent = String(activeSlide).padStart(2, '0') + '/' + String(numSections).padStart(2, '0');
                 }
             }
         });
 
-        const camDummy = { t: 0 };
-        tl.to(camDummy, {
-            t: 1,
-            ease: "none",
-            onUpdate: () => {
-                const pos = curve.getPoint(camDummy.t);
-                camera.position.copy(pos);
-                
-                const lookAhead = Math.min(1, camDummy.t + 0.01);
-                const lookPos = curve.getPoint(lookAhead);
-                camera.lookAt(lookPos);
-            }
-        }, 0);
-
+        // Bind Sections visibility
         sections.forEach((section, index) => {
-            const startProgress = Math.max(0, (index / numSections) - 0.06);
-            const peakProgress = index / numSections;
-            const endProgress = Math.min(1, (index / numSections) + 0.06);
-
-            tl.fromTo(section, 
-                { opacity: 0, y: 50, pointerEvents: 'none' },
-                { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.03, ease: "power2.out" },
-                startProgress
-            );
-
-            if (index < numSections - 1) {
-                tl.to(section,
-                    { opacity: 0, y: -50, pointerEvents: 'none', duration: 0.03, ease: "power2.in" },
-                    peakProgress + 0.02
-                );
-            }
+            const startP = index / numSections;
+            const endP = (index + 1) / numSections;
+            
+            ScrollTrigger.create({
+                trigger: "#scroll-track",
+                start: `${startP * 100}% top`,
+                end: `${endP * 100}% top`,
+                scrub: true,
+                onEnter: () => gsap.to(section, { opacity: 1, y: 0, duration: 0.4 }),
+                onLeave: () => gsap.to(section, { opacity: 0, y: -50, duration: 0.4 }),
+                onEnterBack: () => gsap.to(section, { opacity: 1, y: 0, duration: 0.4 }),
+                onLeaveBack: () => gsap.to(section, { opacity: 0, y: 50, duration: 0.4 })
+            });
         });
 
-        // --- ANIMATION LOOP ---
+        // Animation Loop
         const clock = new THREE.Clock();
-
         function animate() {
             requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
 
-            const elapsedTime = clock.getElapsedTime();
-
-            objects.forEach(obj => {
-                obj.mesh.rotation.x += obj.rotSpeed.x;
-                obj.mesh.rotation.y += obj.rotSpeed.y;
-                obj.mesh.rotation.z += obj.rotSpeed.z;
-
-                if (obj.wireMesh) {
-                    obj.wireMesh.rotation.copy(obj.mesh.rotation);
+            objects.forEach((obj) => {
+                if (obj.mesh) {
+                    obj.mesh.rotation.x += obj.rotSpeed.x;
+                    obj.mesh.rotation.y += obj.rotSpeed.y;
+                    obj.mesh.rotation.z += obj.rotSpeed.z;
                 }
-                if (obj.wireLine) {
-                    obj.wireLine.rotation.copy(obj.mesh.rotation);
-                }
-
-                if (obj.floatSpeed !== 0) {
-                    obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * obj.floatSpeed * 20 + obj.floatOffset) * 0.5;
-                    if (obj.wireMesh) obj.wireMesh.position.y = obj.mesh.position.y;
-                    if (obj.wireLine) obj.wireLine.position.y = obj.mesh.position.y;
-                    if (obj.isServer && obj.led) {
-                        obj.led.position.y = obj.mesh.position.y + 0.8 * (obj.mesh.geometry.parameters ? obj.mesh.geometry.parameters.height / 2.5 : 1);
-                    }
-                }
-
+                if (obj.wireMesh) obj.wireMesh.rotation.copy(obj.mesh.rotation);
+                if (obj.wireLine) obj.wireLine.rotation.copy(obj.mesh.rotation);
                 if (obj.isServer && obj.ledMat) {
-                    obj.ledPulse += 0.05;
-                    obj.ledMat.opacity = 0.5 + Math.sin(obj.ledPulse) * 0.4;
+                    obj.ledMat.opacity = 0.5 + Math.sin(time * 4 + obj.ledPulse) * 0.4;
                 }
             });
 
             corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.2;
+                item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.3;
             });
 
             renderer.render(scene, camera);
         }
-
         animate();
 
-        // --- WINDOW RESIZE ---
+        // Resize Listener
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
     </script>
 </body>
 </html>
