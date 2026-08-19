@@ -1,600 +1,713 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOC NOC // MAINFRAME</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg: #ffb6c1; 
-            --bg-panel: rgba(255, 192, 203, 0.75); 
-            --border: rgba(199, 21, 133, 0.5);
-            --text-main: #5a1836;
-            --text-muted: #9e476e;
-            --primary: #c71585; 
-            --primary-dim: rgba(199, 21, 133, 0.6);
-            --accent1: #ff1493;
-        }
-        html { scroll-behavior: auto; }
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--bg); color: var(--text-main);
-            overflow-x: hidden; cursor: crosshair;
-            font-size: 16px; line-height: 1.6;
-        }
-        
-        /* Boot Sequence Screen */
-        #boot-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: var(--bg); z-index: 300;
-            display: flex; flex-direction: column;
-            padding: 50px; font-weight: 600;
-            color: var(--primary); font-size: 18px;
-            pointer-events: none;
-        }
-        .boot-line { margin-bottom: 8px; opacity: 0; }
-        .cursor {
-            display: inline-block; width: 12px; height: 20px;
-            background-color: var(--primary); margin-left: 5px;
-            vertical-align: middle; animation: blink 1s step-end infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOC NOC // MAINFRAME</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #ffb6c1; 
+            --bg-panel: rgba(255, 192, 203, 0.75); 
+            --border: rgba(199, 21, 133, 0.5);
+            --text-main: #5a1836;
+            --text-muted: #9e476e;
+            --primary: #c71585; 
+            --primary-dim: rgba(199, 21, 133, 0.6);
+            --accent1: #ff1493;
+        }
+        html { scroll-behavior: auto; }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg); color: var(--text-main);
+            overflow-x: hidden; cursor: crosshair;
+            font-size: 16px; line-height: 1.6;
+        }
+        
+        /* Boot Sequence Screen */
+        #boot-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--bg); z-index: 300;
+            display: flex; flex-direction: column;
+            padding: 50px; font-weight: 600;
+            color: var(--primary); font-size: 18px;
+            pointer-events: none;
+        }
+        .boot-line { margin-bottom: 8px; opacity: 0; }
+        .cursor {
+            display: inline-block; width: 12px; height: 20px;
+            background-color: var(--primary); margin-left: 5px;
+            vertical-align: middle; animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
 
-        #canvas-container {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 1; pointer-events: none;
-        }
-        canvas { display: block; }
-        
-        .crt-scanlines {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 100; pointer-events: none;
-            background: repeating-linear-gradient(0deg, rgba(199, 21, 133, 0.05), rgba(199, 21, 133, 0.05) 1px, transparent 1px, transparent 3px);
-            opacity: 0.8;
-        }
-        .crt-vignette {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 101; pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 182, 193, 0.5) 80%, rgba(199, 21, 133, 0.2) 100%);
-        }
+        #canvas-container {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1; pointer-events: none;
+        }
+        canvas { display: block; }
+        
+        .crt-scanlines {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 100; pointer-events: none;
+            background: repeating-linear-gradient(0deg, rgba(199, 21, 133, 0.05), rgba(199, 21, 133, 0.05) 1px, transparent 1px, transparent 3px);
+            opacity: 0.8;
+        }
+        .crt-vignette {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 101; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 182, 193, 0.5) 80%, rgba(199, 21, 133, 0.2) 100%);
+        }
 
-        #scroll-track {
-            position: relative; z-index: 2;
-            height: 1500vh; pointer-events: none;
-        }
-        
-        #title-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 200; background: transparent;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transition: opacity 0.8s ease; opacity: 0; 
-        }
-        .main-title {
-            font-size: clamp(5rem, 12vw, 10rem);
-            color: var(--primary); text-align: center;
-            line-height: 0.9; letter-spacing: -0.05em;
-            font-weight: 800; text-shadow: 0 10px 30px rgba(199, 21, 133, 0.15);
-        }
-        .author-credit {
-            position: absolute; bottom: 50px; right: 60px;
-            font-size: 16px; color: var(--primary);
-            font-weight: 700; letter-spacing: 0.05em;
-        }
-        
-        .ui-layer {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100vh;
-            z-index: 10; pointer-events: none;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .ui-section {
-            position: absolute; width: 100%;
-            max-width: 1000px; 
-            padding: 0 4vw;
-            opacity: 0; transform: translateY(60px);
-            pointer-events: none;
-        }
-        .terminal-window {
-            background: var(--bg-panel); border: 2px solid var(--border);
-            position: relative; backdrop-filter: blur(16px);
-            box-shadow: 0 12px 40px rgba(199, 21, 133, 0.15), inset 0 0 0 1px rgba(255,255,255,0.3);
-            border-radius: 8px;
-        }
-        .terminal-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 24px; border-bottom: 2px solid var(--border);
-            background: rgba(255, 182, 193, 0.8);
-            font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
-            border-radius: 8px 8px 0 0;
-        }
-        .terminal-header .win-title { color: var(--primary); font-weight: 800; }
-        .terminal-header .win-status { color: var(--text-muted); font-size: 11px; font-weight: 700; }
-        .terminal-header .win-btns { display: flex; gap: 8px; }
-        .win-btn {
-            width: 14px; height: 14px; border: 1px solid var(--border);
-            border-radius: 50%; background: var(--primary-dim);
-        }
-        .terminal-body { padding: 40px 48px; }
-        .sys-id {
-            color: var(--text-muted); font-size: 13px; font-weight: 700;
-            letter-spacing: 0.15em; margin-bottom: 20px; display: block;
-        }
-        .sys-header {
-            font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
-            color: var(--primary); text-transform: uppercase;
-            letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
-        }
-        .sys-header .dim { color: var(--text-muted); font-weight: 300; }
-        .sys-desc {
-            color: var(--text-main); font-size: 16px; font-weight: 500; 
-            line-height: 1.7; max-width: 850px;
-        }
-        .sys-desc strong { color: var(--primary); font-weight: 800; }
-        
-        .status-bar {
-            position: fixed; bottom: 0; left: 0;
-            width: 100%; z-index: 50;
-            background: var(--bg-panel); border-top: 2px solid var(--border);
-            padding: 12px 32px; backdrop-filter: blur(12px);
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 13px; letter-spacing: 0.1em; font-weight: 700;
-        }
-        .status-left, .status-right { display: flex; align-items: center; gap: 30px; }
-        .status-item { display: flex; align-items: center; gap: 10px; }
-        .status-label { color: var(--text-muted); }
-        .status-value { color: var(--primary); font-weight: 800; }
-        
-        .progress-track {
-            width: 300px; height: 8px; border-radius: 4px;
-            background: rgba(199, 21, 133, 0.2);
-            position: relative; overflow: hidden;
-            border: 1px solid rgba(199, 21, 133, 0.4);
-        }
-        .progress-fill {
-            height: 100%; width: 0%;
-            background: var(--primary);
-            transition: width 0.1s linear;
-        }
-        
-        .scroll-hint {
-            position: absolute; bottom: 100px; left: 50%;
-            transform: translateX(-50%); z-index: 20;
-            display: flex; flex-direction: column;
-            align-items: center; gap: 15px;
-        }
-        .scroll-hint span {
-            font-size: 14px; letter-spacing: 0.3em; font-weight: 800;
-            text-transform: uppercase; color: var(--primary);
-        }
-        .scroll-line {
-            width: 2px; height: 50px;
-            background: linear-gradient(to bottom, var(--primary), transparent);
-            animation: scrollPulse 2s ease-in-out infinite;
-        }
-        @keyframes scrollPulse {
-            0%,100%{opacity:0.2;transform:scaleY(0.4)}
-            50%{opacity:1;transform:scaleY(1)}
-        }
-        
-        .ui-section.left { justify-self: start; text-align: left; margin-left: 5vw; }
-        .ui-section.right { justify-self: end; text-align: right; margin-right: 5vw; margin-left: auto; }
-        .ui-section.right .terminal-body { text-align: left; }
-        .ui-section.center { justify-self: center; text-align: center; margin: 0 auto; }
-        .ui-section.center .terminal-body { text-align: left; }
-        
-        @media (max-width: 768px) {
-            .ui-section { padding: 0 5vw; max-width: 100%; }
-            .terminal-body { padding: 25px; }
-            .status-bar { font-size: 10px; padding: 10px; }
-            .status-left, .status-right { gap: 12px; }
-            .progress-track { width: 120px; }
-            .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
-        }
-    </style>
-</head><body>
+        #scroll-track {
+            position: relative; z-index: 2;
+            height: 1500vh; pointer-events: none;
+        }
+        
+        #title-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 200; background: transparent;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.8s ease; opacity: 0; 
+        }
+        .main-title {
+            font-size: clamp(5rem, 12vw, 10rem);
+            color: var(--primary); text-align: center;
+            line-height: 0.9; letter-spacing: -0.05em;
+            font-weight: 800; text-shadow: 0 10px 30px rgba(199, 21, 133, 0.15);
+        }
+        .author-credit {
+            position: absolute; bottom: 50px; right: 60px;
+            font-size: 16px; color: var(--primary);
+            font-weight: 700; letter-spacing: 0.05em;
+        }
+        
+        .ui-layer {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100vh;
+            z-index: 10; pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ui-section {
+            position: absolute; width: 100%;
+            max-width: 1000px; 
+            padding: 0 4vw;
+            opacity: 0; transform: translateY(60px);
+            pointer-events: none;
+        }
+        .terminal-window {
+            background: var(--bg-panel); border: 2px solid var(--border);
+            position: relative; backdrop-filter: blur(16px);
+            box-shadow: 0 12px 40px rgba(199, 21, 133, 0.15), inset 0 0 0 1px rgba(255,255,255,0.3);
+            border-radius: 8px;
+        }
+        .terminal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 24px; border-bottom: 2px solid var(--border);
+            background: rgba(255, 182, 193, 0.8);
+            font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
+            border-radius: 8px 8px 0 0;
+        }
+        .terminal-header .win-title { color: var(--primary); font-weight: 800; }
+        .terminal-header .win-status { color: var(--text-muted); font-size: 11px; font-weight: 700; }
+        .terminal-header .win-btns { display: flex; gap: 8px; }
+        .win-btn {
+            width: 14px; height: 14px; border: 1px solid var(--border);
+            border-radius: 50%; background: var(--primary-dim);
+        }
+        .terminal-body { padding: 40px 48px; }
+        .sys-id {
+            color: var(--text-muted); font-size: 13px; font-weight: 700;
+            letter-spacing: 0.15em; margin-bottom: 20px; display: block;
+        }
+        .sys-header {
+            font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
+            color: var(--primary); text-transform: uppercase;
+            letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
+        }
+        .sys-header .dim { color: var(--text-muted); font-weight: 300; }
+        .sys-desc {
+            color: var(--text-main); font-size: 16px; font-weight: 500; 
+            line-height: 1.7; max-width: 850px;
+        }
+        .sys-desc strong { color: var(--primary); font-weight: 800; }
+        
+        .status-bar {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; z-index: 50;
+            background: var(--bg-panel); border-top: 2px solid var(--border);
+            padding: 12px 32px; backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 13px; letter-spacing: 0.1em; font-weight: 700;
+        }
+        .status-left, .status-right { display: flex; align-items: center; gap: 30px; }
+        .status-item { display: flex; align-items: center; gap: 10px; }
+        .status-label { color: var(--text-muted); }
+        .status-value { color: var(--primary); font-weight: 800; }
+        
+        .progress-track {
+            width: 300px; height: 8px; border-radius: 4px;
+            background: rgba(199, 21, 133, 0.2);
+            position: relative; overflow: hidden;
+            border: 1px solid rgba(199, 21, 133, 0.4);
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: var(--primary);
+            transition: width 0.1s linear;
+        }
+        
+        .scroll-hint {
+            position: absolute; bottom: 100px; left: 50%;
+            transform: translateX(-50%); z-index: 20;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 15px;
+        }
+        .scroll-hint span {
+            font-size: 14px; letter-spacing: 0.3em; font-weight: 800;
+            text-transform: uppercase; color: var(--primary);
+        }
+        .scroll-line {
+            width: 2px; height: 50px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+        @keyframes scrollPulse {
+            0%,100%{opacity:0.2;transform:scaleY(0.4)}
+            50%{opacity:1;transform:scaleY(1)}
+        }
+        
+        .ui-section.left { justify-self: start; text-align: left; margin-left: 5vw; }
+        .ui-section.right { justify-self: end; text-align: right; margin-right: 5vw; margin-left: auto; }
+        .ui-section.right .terminal-body { text-align: left; }
+        .ui-section.center { justify-self: center; text-align: center; margin: 0 auto; }
+        .ui-section.center .terminal-body { text-align: left; }
+        
+        @media (max-width: 768px) {
+            .ui-section { padding: 0 5vw; max-width: 100%; }
+            .terminal-body { padding: 25px; }
+            .status-bar { font-size: 10px; padding: 10px; }
+            .status-left, .status-right { gap: 12px; }
+            .progress-track { width: 120px; }
+            .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
 
-    <!-- BOOT SEQUENCE SCREEN -->
-    <div id="boot-screen">
-        <div id="boot-text-container"></div>
-        <div><span class="cursor"></span></div>
-    </div>
+    <!-- BOOT SEQUENCE SCREEN -->
+    <div id="boot-screen">
+        <div id="boot-text-container"></div>
+        <div><span class="cursor"></span></div>
+    </div>
 
-    <div id="canvas-container"></div>
-    <div class="crt-scanlines"></div>
-    <div class="crt-vignette"></div>
+    <div id="canvas-container"></div>
+    <div class="crt-scanlines"></div>
+    <div class="crt-vignette"></div>
 
-    <!-- MAIN TITLE SCREEN -->
-    <div id="title-screen">
-        <h1 class="main-title">NOC<br>NOC</h1>
-        <div class="author-credit">Made by Asala Hassan Bait Mhaud</div>
-        <div class="scroll-hint">
-            <span>// SCROLL TO DESCEND //</span>
-            <div class="scroll-line"></div>
-        </div>
-    </div>
+    <!-- MAIN TITLE SCREEN -->
+    <div id="title-screen">
+        <h1 class="main-title">NOC<br>NOC</h1>
+        <div class="author-credit">Made by Asala Hassan Bait Mhaud</div>
+        <div class="scroll-hint">
+            <span>// SCROLL TO DESCEND //</span>
+            <div class="scroll-line"></div>
+        </div>
+    </div>
 
-    <div class="status-bar">
-        <div class="status-left">
-            <div class="status-item"><span class="status-label">SYS:</span><span class="status-value">ONLINE</span></div>
-            <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value" id="depth-readout">0.00m</span></div>
-        </div>
-        <div class="status-right">
-            <div class="status-item"><span class="status-label">NAV:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
-            <div class="status-item"><span class="status-label">SLIDE:</span><span class="status-value" id="slide-readout">01/10</span></div>
-        </div>
-    </div>
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-item"><span class="status-label">SYS:</span><span class="status-value">ONLINE</span></div>
+            <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value" id="depth-readout">0.00m</span></div>
+        </div>
+        <div class="status-right">
+            <div class="status-item"><span class="status-label">NAV:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
+            <div class="status-item"><span class="status-label">SLIDE:</span><span class="status-value" id="slide-readout">01/10</span></div>
+        </div>
+    </div>
 
-    <!-- 10 SLIDES -->
-    <div class="ui-layer">
-        <!-- Slide 1 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">01 // INTRODUCTION TO THE NOC</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">THE 24/7 COMMAND CENTER</span>
-                    <h1 class="sys-header">THE NOC:<br><span class="dim">HEARTBEAT OF OUR NETWORK</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 15px;"><strong>> WHAT IS THE NOC?</strong><br>Think of it as the ultimate control room for the entire network that never sleeps—operating 24/7.</p>
-                        <p style="margin-bottom: 15px;"><strong>> WHAT DOES IT DO?</strong><br>It keeps a constant eye on everything happening across the network to catch problems instantly, often fixing them before customers even notice.</p>
-                        <p><strong>> WHY IS IT IMPORTANT?</strong><br>Without it, we wouldn't have a centralized way to track outages, manage traffic, and keep millions of people connected around the clock.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- 10 SLIDES -->
+    <div class="ui-layer">
+        <!-- Slide 1 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">01 // INTRODUCTION TO THE NOC</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">THE 24/7 COMMAND CENTER</span>
+                    <h1 class="sys-header">THE NOC:<br><span class="dim">HEARTBEAT OF OUR NETWORK</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 15px;"><strong>> WHAT IS THE NOC?</strong><br>Think of it as the ultimate control room for the entire network that never sleeps—operating 24/7.</p>
+                        <p style="margin-bottom: 15px;"><strong>> WHAT DOES IT DO?</strong><br>It keeps a constant eye on everything happening across the network to catch problems instantly, often fixing them before customers even notice.</p>
+                        <p><strong>> WHY IS IT IMPORTANT?</strong><br>Without it, we wouldn't have a centralized way to track outages, manage traffic, and keep millions of people connected around the clock.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 2 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">02 // TRANSPORT</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">MOVING THE NETWORK TRAFFIC</span>
-                    <h1 class="sys-header">THE<br><span class="dim">INFRASTRUCTURE</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Transmission carries traffic between network locations and domains. Consists of topology, technologies, links, ports, cards, interfaces, and cross-site connectivity.</p>
-                        <p style="margin-bottom: 10px;"><strong>> VSAT (Very Small Aperture Terminal)</strong><br>Satellite-based communication useful for remote difficulty. Flow:<br>
-                        `Site` &#10142; `VSAT` &#10142; `Satellite` &#10142; `Hub/Gateway` &#10142; `Network`</p>
-                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS</strong><br>Alarm monitoring, calls, emails, ticket creation, escalations, first-level troubleshooting, Work Order (WO) dispatching, Change Request (CR) handling, Problem Management.</p>
-                        <p><strong>> DEVICES</strong><br>[TRANSPORT DEVICES — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 2 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">02 // TRANSPORT</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">MOVING THE NETWORK TRAFFIC</span>
+                    <h1 class="sys-header">THE<br><span class="dim">INFRASTRUCTURE</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Transmission carries traffic between network locations and domains. Consists of topology, technologies, links, ports, cards, interfaces, and cross-site connectivity.</p>
+                        <p style="margin-bottom: 10px;"><strong>> VSAT (Very Small Aperture Terminal)</strong><br>Satellite-based communication useful for remote difficulty. Flow:<br>
+                        `Site` &#10142; `VSAT` &#10142; `Satellite` &#10142; `Hub/Gateway` &#10142; `Network`</p>
+                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS</strong><br>Alarm monitoring, calls, emails, ticket creation, escalations, first-level troubleshooting, Work Order (WO) dispatching, Change Request (CR) handling, Problem Management.</p>
+                        <p><strong>> DEVICES</strong><br>[TRANSPORT DEVICES — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 3 -->
-        <div class="ui-section center">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">03 // RAN</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">CONNECTING MOBILE USERS</span>
-                    <h1 class="sys-header">RADIO ACCESS<br><span class="dim">NETWORK</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Provides the radio connection between users and the telecommunications network.<br>Flow: `Mobile User` &#10142; `Radio Site` &#10142; `RAN` &#10142; `Transport` &#10142; `Core Network`</p>
-                        <p style="margin-bottom: 10px;"><strong>> EVOLUTION</strong><br>Higher capacity, rates, lower latency from 2G &#10142; 3G &#10142; 4G &#10142; 5G. Roles of ERAN / HRAN.</p>
-                        <p style="margin-bottom: 10px;"><strong>> EQUIPMENT</strong><br>[RAN DEVICES — TO BE ADDED]</p>
-                        <p><strong>> OPERATIONS</strong><br>Monitoring, alarm/call/email triage, escalation, L1 troubleshooting, WO dispatch, closure, Problem Management.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 3 -->
+        <div class="ui-section center">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">03 // RAN</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">CONNECTING MOBILE USERS</span>
+                    <h1 class="sys-header">RADIO ACCESS<br><span class="dim">NETWORK</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Provides the radio connection between users and the telecommunications network.<br>Flow: `Mobile User` &#10142; `Radio Site` &#10142; `RAN` &#10142; `Transport` &#10142; `Core Network`</p>
+                        <p style="margin-bottom: 10px;"><strong>> EVOLUTION</strong><br>Higher capacity, rates, lower latency from 2G &#10142; 3G &#10142; 4G &#10142; 5G. Roles of ERAN / HRAN.</p>
+                        <p style="margin-bottom: 10px;"><strong>> EQUIPMENT</strong><br>[RAN DEVICES — TO BE ADDED]</p>
+                        <p><strong>> OPERATIONS</strong><br>Monitoring, alarm/call/email triage, escalation, L1 troubleshooting, WO dispatch, closure, Problem Management.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 4 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">04 // FIXED ACCESS</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">CONNECTING FIXED CUSTOMERS</span>
-                    <h1 class="sys-header">WIRELINE<br><span class="dim">CONNECTIVITY</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Providing fixed connectivity. Flow: `Customer` &#10142; `Access` &#10142; `Aggregation` &#10142; `Core` &#10142; `Service`</p>
-                        <p style="margin-bottom: 10px;"><strong>> GPON (Gigabit Passive Optical Network)</strong><br>Fiber-to-the-home. Flow: `OLT` &#10142; `Fiber` &#10142; `Splitter` &#10142; `ONT/ONU` &#10142; `Customer`</p>
-                        <p style="margin-bottom: 10px;"><strong>> MSAN & NGN / PRI</strong><br>MSAN aggregates customer access. NGN/PRI used for telecom/voice services.</p>
-                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS & DEVICES</strong><br>Alarm tracking, customer tickets, troubleshooting, WO dispatch, Problem Management.<br>[FIXED ACCESS DEVICES — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 4 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">04 // FIXED ACCESS</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">CONNECTING FIXED CUSTOMERS</span>
+                    <h1 class="sys-header">WIRELINE<br><span class="dim">CONNECTIVITY</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Providing fixed connectivity. Flow: `Customer` &#10142; `Access` &#10142; `Aggregation` &#10142; `Core` &#10142; `Service`</p>
+                        <p style="margin-bottom: 10px;"><strong>> GPON (Gigabit Passive Optical Network)</strong><br>Fiber-to-the-home. Flow: `OLT` &#10142; `Fiber` &#10142; `Splitter` &#10142; `ONT/ONU` &#10142; `Customer`</p>
+                        <p style="margin-bottom: 10px;"><strong>> MSAN & NGN / PRI</strong><br>MSAN aggregates customer access. NGN/PRI used for telecom/voice services.</p>
+                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS & DEVICES</strong><br>Alarm tracking, customer tickets, troubleshooting, WO dispatch, Problem Management.<br>[FIXED ACCESS DEVICES — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 5 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">05 // IP</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">THE CORE OF CONNECTIVITY</span>
-                    <h1 class="sys-header">ROUTING AND<br><span class="dim">SWITCHING</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Connects different network areas and services. Flow: `Access` &#10142; `Distribution` &#10142; `Core` &#10142; `Services / Internet`</p>
-                        <p style="margin-bottom: 10px;"><strong>> COMPONENTS</strong><br>Routers, switches across all layers, IP links.</p>
-                        <p style="margin-bottom: 10px;"><strong>> METRO / IP RINGS</strong><br>Ring topology provides alternative paths and network resilience.<br>`Site A` &#10142; `Site B` &#10142; `Site C` &#10142; `Site D` &#10142; `Site A`</p>
-                        <p><strong>> OPERATIONS & DEVICES</strong><br>Interface monitoring, connectivity checks, escalation, L1 troubleshooting, WO dispatch.<br>[IP DEVICES — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 5 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">05 // IP</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">THE CORE OF CONNECTIVITY</span>
+                    <h1 class="sys-header">ROUTING AND<br><span class="dim">SWITCHING</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Connects different network areas and services. Flow: `Access` &#10142; `Distribution` &#10142; `Core` &#10142; `Services / Internet`</p>
+                        <p style="margin-bottom: 10px;"><strong>> COMPONENTS</strong><br>Routers, switches across all layers, IP links.</p>
+                        <p style="margin-bottom: 10px;"><strong>> METRO / IP RINGS</strong><br>Ring topology provides alternative paths and network resilience.<br>`Site A` &#10142; `Site B` &#10142; `Site C` &#10142; `Site D` &#10142; `Site A`</p>
+                        <p><strong>> OPERATIONS & DEVICES</strong><br>Interface monitoring, connectivity checks, escalation, L1 troubleshooting, WO dispatch.<br>[IP DEVICES — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 6 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">06 // DATACOM</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">DELIVERING DATA SERVICES</span>
-                    <h1 class="sys-header">ENTERPRISE<br><span class="dim">CONNECTIVITY</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Responsible for data connectivity and related services.</p>
-                        <p style="margin-bottom: 10px;"><strong>> MPLS & ILL</strong><br>MPLS efficient forwarding for VPNs. ILL dedicated internet.</p>
-                        <p style="margin-bottom: 10px;"><strong>> P2P (Point-to-Point)</strong><br>Direct connectivity: `Site A` ───────── `Site B`</p>
-                        <p style="margin-bottom: 10px;"><strong>> SD-WAN</strong><br>Software control, dynamic path selection, multiple connections. Flow:<br>
-                        `Branch` &#10142; `SD-WAN` &#10142; `Multiple WAN Paths` &#10142; `HQ / Cloud`</p>
-                        <p><strong>> OPERATIONS & DEVICES</strong><br>Monitoring, ticketing, L1 troubleshooting, WO dispatch, CR/Problem Management.<br>[DATACOM DEVICES — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 6 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">06 // DATACOM</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">DELIVERING DATA SERVICES</span>
+                    <h1 class="sys-header">ENTERPRISE<br><span class="dim">CONNECTIVITY</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Responsible for data connectivity and related services.</p>
+                        <p style="margin-bottom: 10px;"><strong>> MPLS & ILL</strong><br>MPLS efficient forwarding for VPNs. ILL dedicated internet.</p>
+                        <p style="margin-bottom: 10px;"><strong>> P2P (Point-to-Point)</strong><br>Direct connectivity: `Site A` ───────── `Site B`</p>
+                        <p style="margin-bottom: 10px;"><strong>> SD-WAN</strong><br>Software control, dynamic path selection, multiple connections. Flow:<br>
+                        `Branch` &#10142; `SD-WAN` &#10142; `Multiple WAN Paths` &#10142; `HQ / Cloud`</p>
+                        <p><strong>> OPERATIONS & DEVICES</strong><br>Monitoring, ticketing, L1 troubleshooting, WO dispatch, CR/Problem Management.<br>[DATACOM DEVICES — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 7 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">07 // INOC</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">BRINGING NETWORK SERVICES TOGETHER</span>
-                    <h1 class="sys-header">INTEGRATED<br><span class="dim">OPERATIONS CENTER</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Interacts with different technical domains.</p>
-                        <p style="margin-bottom: 10px;"><strong>> INTERACTIONS</strong><br>
-                        `> Voice`: Service monitoring and control.<br>
-                        `> IP`: Connectivity and routing infrastructure.<br>
-                        `> Transmission`: Connectivity carrying services across the network.</p>
-                        <p style="margin-bottom: 10px;"><strong>> TOPOLOGY FLOW</strong><br>
-                        `Voice / Services` &#10142; `IP` &#10142; `Transport` &#10142; `Sites / Customers`</p>
-                        <p><strong>> DEVICES</strong><br>[INOC DEVICES — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 7 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">07 // INOC</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">BRINGING NETWORK SERVICES TOGETHER</span>
+                    <h1 class="sys-header">INTEGRATED<br><span class="dim">OPERATIONS CENTER</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Interacts with different technical domains.</p>
+                        <p style="margin-bottom: 10px;"><strong>> INTERACTIONS</strong><br>
+                        `> Voice`: Service monitoring and control.<br>
+                        `> IP`: Connectivity and routing infrastructure.<br>
+                        `> Transmission`: Connectivity carrying services across the network.</p>
+                        <p style="margin-bottom: 10px;"><strong>> TOPOLOGY FLOW</strong><br>
+                        `Voice / Services` &#10142; `IP` &#10142; `Transport` &#10142; `Sites / Customers`</p>
+                        <p><strong>> DEVICES</strong><br>[INOC DEVICES — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 8 -->
-        <div class="ui-section center">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">08 // SOC</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">PERFORMANCE & SERVICE MONITORING</span>
-                    <h1 class="sys-header">SERVICE<br><span class="dim">OPERATIONS CENTER</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Focuses on service performance and operational visibility.</p>
-                        <p style="margin-bottom: 10px;"><strong>> PERFORMANCE KPIs</strong><br>availability, uptime, traffic utilization, latency, packet loss, incident resolution time. KPIs define the network/service health.</p>
-                        <p style="margin-bottom: 10px;"><strong>> SMART CARE TOOL</strong><br>Service monitoring, analysis, performance visibility, supporting investigation.</p>
-                        <p><strong>> TOOLS</strong><br>[SOC DEVICES / TOOLS — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 8 -->
+        <div class="ui-section center">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">08 // SOC</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">PERFORMANCE & SERVICE MONITORING</span>
+                    <h1 class="sys-header">SERVICE<br><span class="dim">OPERATIONS CENTER</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Focuses on service performance and operational visibility.</p>
+                        <p style="margin-bottom: 10px;"><strong>> PERFORMANCE KPIs</strong><br>availability, uptime, traffic utilization, latency, packet loss, incident resolution time. KPIs define the network/service health.</p>
+                        <p style="margin-bottom: 10px;"><strong>> SMART CARE TOOL</strong><br>Service monitoring, analysis, performance visibility, supporting investigation.</p>
+                        <p><strong>> TOOLS</strong><br>[SOC DEVICES / TOOLS — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 9 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">09 // SERVICE DESK & SECURITY</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">STAGE_09</span>
-                    <h1 class="sys-header">FRONT OFFICE &<br><span class="dim">INFRASTRUCTURE PROTECTION</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;"><strong>> SERVICE DESK</strong><br>Communication point between users and technical operations. Ticket roles.<br>Flow: `Customer` &#10142; `Service Desk` &#10142; `NOC` &#10142; `Team` &#10142; `Resolution` &#10142; `Customer`</p>
-                        <p style="margin-bottom: 10px;"><strong>> PHYSICAL SECURITY</strong><br>Protects telecommunications infrastructure: site access control, restricted areas, hardware protection, environmental monitoring.</p>
-                        <p><strong>> SYSTEMS</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — TO BE ADDED]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Slide 9 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">09 // SERVICE DESK & SECURITY</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">STAGE_09</span>
+                    <h1 class="sys-header">FRONT OFFICE &<br><span class="dim">INFRASTRUCTURE PROTECTION</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;"><strong>> SERVICE DESK</strong><br>Communication point between users and technical operations. Ticket roles.<br>Flow: `Customer` &#10142; `Service Desk` &#10142; `NOC` &#10142; `Team` &#10142; `Resolution` &#10142; `Customer`</p>
+                        <p style="margin-bottom: 10px;"><strong>> PHYSICAL SECURITY</strong><br>Protects telecommunications infrastructure: site access control, restricted areas, hardware protection, environmental monitoring.</p>
+                        <p><strong>> SYSTEMS</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — TO BE ADDED]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Slide 10 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">10 // CONCLUSION</span>
-                    <span class="win-status">COMPLETE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">END OF LINE // STAGE_10</span>
-                    <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">`Customer` &#10142; `SD` &#10142; `NOC` &#10142; `Alarm/Monitoring` &#10142; `Identify Domain` &#10142; `L1 Troublshoot` &#10142; `Escalate` &#10142; `Resolv` &#10142; `Close` &#10142; `Problem Mgt`</p>
-                        <p style="margin-bottom: 10px;"><strong>> CORE TAKEAWAY</strong><br>Every domain has a different role, but they work together to keep the network and services running.</p>
-                        <p style="color: var(--text-muted); font-size: 14px;">Transport Devices | RAN Devices | Fixed Access Devices | IP Devices | Datacom Devices | INOC Devices | SOC Tools</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Slide 10 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">10 // CONCLUSION</span>
+                    <span class="win-status">COMPLETE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">END OF LINE // STAGE_10</span>
+                    <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">`Customer` &#10142; `SD` &#10142; `NOC` &#10142; `Alarm/Monitoring` &#10142; `Identify Domain` &#10142; `L1 Troublshoot` &#10142; `Escalate` &#10142; `Resolv` &#10142; `Close` &#10142; `Problem Mgt`</p>
+                        <p style="margin-bottom: 10px;"><strong>> CORE TAKEAWAY</strong><br>Every domain has a different role, but they work together to keep the network and services running.</p>
+                        <p style="color: var(--text-muted); font-size: 14px;">Transport Devices | RAN Devices | Fixed Access Devices | IP Devices | Datacom Devices | INOC Devices | SOC Tools</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div id="scroll-track"></div>
+    <div id="scroll-track"></div>
 
-    <script>
-        // --- BOOT SEQUENCE LOGIC ---
-        const bootContainer = document.getElementById('boot-text-container');
-        const bootScreen = document.getElementById('boot-screen');
-        const titleScreen = document.getElementById('title-screen');
-        
-        const bootLines = [
-            "INITIALIZING SYSTEM...",
-            "ESTABLISHING SECURE CONNECTION...",
-            "VERIFYING CREDENTIALS...",
-            "REQUESTING ACCESS...",
-            "PERMISSION GRANTED.",
-            "LOADING MAINFRAME..."
-        ];
+    <script>
+        // --- BOOT SEQUENCE LOGIC ---
+        const bootContainer = document.getElementById('boot-text-container');
+        const bootScreen = document.getElementById('boot-screen');
+        const titleScreen = document.getElementById('title-screen');
+        
+        const bootLines = [
+            "INITIALIZING SYSTEM...",
+            "ESTABLISHING SECURE CONNECTION...",
+            "VERIFYING CREDENTIALS...",
+            "REQUESTING ACCESS...",
+            "PERMISSION GRANTED.",
+            "LOADING MAINFRAME..."
+        ];
 
-        let delay = 300;
-        bootLines.forEach((line, index) => {
-            setTimeout(() => {
-                const p = document.createElement('div');
-                p.className = 'boot-line';
-                p.textContent = '> ' + line;
-                bootContainer.appendChild(p);
-                gsap.to(p, { opacity: 1, duration: 0.2 });
+        let delay = 300;
+        bootLines.forEach((line, index) => {
+            setTimeout(() => {
+                const p = document.createElement('div');
+                p.className = 'boot-line';
+                p.textContent = '> ' + line;
+                bootContainer.appendChild(p);
+                gsap.to(p, { opacity: 1, duration: 0.2 });
 
-                if (index === bootLines.length - 1) {
-                    setTimeout(() => {
-                        gsap.to(bootScreen, { 
-                            opacity: 0, 
-                            duration: 0.8, 
-                            ease: "power2.inOut",
-                            onComplete: () => {
-                                bootScreen.style.display = 'none';
-                                titleScreen.style.opacity = '1'; 
-                            }
-                        });
-                    }, 1200);
-                }
-            }, delay);
-            delay += 600 + Math.random() * 400; 
-        });
+                if (index === bootLines.length - 1) {
+                    setTimeout(() => {
+                        gsap.to(bootScreen, { 
+                            opacity: 0, 
+                            duration: 0.8, 
+                            ease: "power2.inOut",
+                            onComplete: () => {
+                                bootScreen.style.display = 'none';
+                                titleScreen.style.opacity = '1'; 
+                            }
+                        });
+                    }, 1200);
+                }
+            }, delay);
+            delay += 600 + Math.random() * 400; 
+        });
 
+        // --- THREE.JS & GSAP LOGIC ---
+        gsap.registerPlugin(ScrollTrigger);
 
-        // --- THREE.JS & GSAP LOGIC ---
-        gsap.registerPlugin(ScrollTrigger);
+        const CONFIG = {
+            cameraZStart: 25,
+            cameraZEnd: -450, 
+            fogDensity: 0.007, 
+            fogColor: 0xffb6c1, 
+            ambientIntensity: 2.2, 
+            pointLightIntensity: 1.5,
+            pointLightDistance: 100,
+            objectCount: 350,
+            corridorWidth: 35,
+            corridorHeight: 28,
+            scrubValue: 1.2
+        };
 
-        const CONFIG = {
-            cameraZStart: 25,
-            cameraZEnd: -450, 
-            fogDensity: 0.007, 
-            fogColor: 0xffb6c1, 
-            ambientIntensity: 2.2, 
-            pointLightIntensity: 1.5,
-            pointLightDistance: 100,
-            objectCount: 350,
-            corridorWidth: 35,
-            corridorHeight: 28,
-            scrubValue: 1.2
-        };
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(CONFIG.fogColor);
+        scene.fog = new THREE.FogExp2(CONFIG.fogColor, CONFIG.fogDensity);
 
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(CONFIG.fogColor);
-        scene.fog = new THREE.FogExp2(CONFIG.fogColor, CONFIG.fogDensity);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+        camera.position.set(0, 0, CONFIG.cameraZStart);
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
-        camera.position.set(0, 0, CONFIG.cameraZStart);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1; 
+        container.appendChild(renderer.domElement);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1; 
-        container.appendChild(renderer.domElement);
+        const ambientLight = new THREE.AmbientLight(0xffa6c9, CONFIG.ambientIntensity);
+        scene.add(ambientLight);
 
-        const ambientLight = new THREE.AmbientLight(0xffa6c9, CONFIG.ambientIntensity);
-        scene.add(ambientLight);
+        const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
+        camLight.position.set(0, 2, -6);
+        camLight.castShadow = true;
+        camLight.shadow.mapSize.width = 1024;
+        camLight.shadow.mapSize.height = 1024;
+        camLight.shadow.bias = -0.002;
+        camera.add(camLight);
 
-        const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
-        camLight.position.set(0, 2, -6);
-        camLight.castShadow = true;
-        camLight.shadow.mapSize.width = 1024;
-        camLight.shadow.mapSize.height = 1024;
-        camLight.shadow.bias = -0.002;
-        camera.add(camLight);
+        const camLight2 = new THREE.PointLight(0xff1493, 1.2, 50);
+        camLight2.position.set(5, -2, -5);
+        camera.add(camLight2);
+        scene.add(camera);
 
-        const camLight2 = new THREE.PointLight(0xff1493, 1.2, 50);
-        camLight2.position.set(5, -2, -5);
-        camera.add(camLight2);
-        scene.add(camera);
+        const corridorLights = [];
+        for (let i = 0; i < 30; i++) {
+            const z = -15 - i * 15;
+            const color = Math.random() > 0.5 ? 0xffb6c1 : 0xff1493;
+            const light = new THREE.PointLight(color, 0.9, 35);
+            light.position.set(
+                (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
+                (Math.random() - 0.5) * CONFIG.corridorHeight * 0.4,
+                z
+            );
+            scene.add(light);
+            corridorLights.push({ light, baseIntensity: 0.9, flickerSpeed: 2 + Math.random() * 5 });
+        }
 
-        const corridorLights = [];
-        for (let i = 0; i < 30; i++) {
-            const z = -15 - i * 15;
-            const color = Math.random() > 0.5 ? 0xffb6c1 : 0xff1493;
-            const light = new THREE.PointLight(color, 0.9, 35);
-            light.position.set(
-                (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
-                (Math.random() - 0.5) * CONFIG.corridorHeight * 0.4,
-                z
-            );
-            scene.add(light);
-            corridorLights.push({ light, baseIntensity: 0.9, flickerSpeed: 2 + Math.random() * 5 });
-        }
+        const materials = {
+            serverSoftPink: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.3 }),
+            serverPink: new THREE.MeshStandardMaterial({ color: 0xffb6c1, metalness: 0.2, roughness: 0.4 }),
+            serverMagenta: new THREE.MeshStandardMaterial({ color: 0xff69b4, metalness: 0.3, roughness: 0.5 }),
+            wireframe: new THREE.MeshBasicMaterial({ color: 0xc71585, wireframe: true, transparent: true, opacity: 0.35 }),
+            floor: new THREE.MeshStandardMaterial({ color: 0xffc0cb, metalness: 0.1, roughness: 0.8 }),
+            grid: new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.25, wireframe: true }),
+        };
 
-        const materials = {
-            serverSoftPink: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.3 }),
-            serverPink: new THREE.MeshStandardMaterial({ color: 0xffb6c1, metalness: 0.2, roughness: 0.4 }),
-            serverMagenta: new THREE.MeshStandardMaterial({ color: 0xff69b4, metalness: 0.3, roughness: 0.5 }),
-            wireframe: new THREE.MeshBasicMaterial({ color: 0xc71585, wireframe: true, transparent: true, opacity: 0.35 }),
-            floor: new THREE.MeshStandardMaterial({ color: 0xffc0cb, metalness: 0.1, roughness: 0.8 }),
-            grid: new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.25, wireframe: true }),
-        };
+        const objects = [];
+        const objectGroup = new THREE.Group();
+        scene.add(objectGroup);
 
-        const objects = [];
-        const objectGroup = new THREE.Group();
-        scene.add(objectGroup);
+        function createServerRack(z, x, y, scale) {
+            const geo = new THREE.BoxGeometry(scale * 0.8, scale * 2.5, scale * 0.6);
+            const mat = Math.random() > 0.5 ? materials.serverSoftPink : materials.serverPink;
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, y, z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            objectGroup.add(mesh);
 
-        function createServerRack(z, x, y, scale) {
-            const geo = new THREE.BoxGeometry(scale * 0.8, scale * 2.5, scale * 0.6);
-            const mat = Math.random() > 0.5 ? materials.serverSoftPink : materials.serverPink;
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, y, z);
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            objectGroup.add(mesh);
+            const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
+            const ledMat = new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.9 });
+            const led = new THREE.Mesh(ledGeo, ledMat);
+            led.position.set(x, y + scale * 0.8, z + scale * 0.31);
+            objectGroup.add(led);
 
-            const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
-            const ledMat = new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.9 });
-            const led = new THREE.Mesh(ledGeo, ledMat);
-            led.position.set(x, y + scale * 0.8, z + scale * 0.31);
-            objectGroup.add(led);
+            const wireGeo = new THREE.BoxGeometry(scale * 0.85, scale * 2.55, scale * 0.65);
+            const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
+            wireMesh.position.copy(mesh.position);
+            objectGroup.add(wireMesh);
 
-            const wireGeo = new THREE.BoxGeometry(scale * 0.85, scale * 2.55, scale * 0.65);
-            const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
-            wireMesh.position.copy(mesh.position);
-            objectGroup.add(wireMesh);
+            objects.push({
+                mesh: mesh, wireMesh: wireMesh, led: led, ledMat: ledMat,
+                rotSpeed: { x: 0, y: 0, z: 0 },
+                floatSpeed: 0, floatOffset: 0, baseY: y,
+                isServer: true, ledPulse: Math.random() * Math.PI
+            });
+        }
 
-            objects.push({
-                mesh: mesh, wireMesh: wireMesh, led: led, ledMat: ledMat,
-                rotSpeed: { x: 0, y: 0, z: 0 },
-                floatSpeed: 0, floatOffset: 0, baseY: y,
-                isServer: true, ledPulse: Math.random() * Math.PI 
+        // Generate Corridor Environment
+        for (let z = 0; z > CONFIG.cameraZEnd - 50; z -= 12) {
+            createServerRack(z, -CONFIG.corridorWidth / 2 + 2, -6, 3.5);
+            createServerRack(z, CONFIG.corridorWidth / 2 - 2, -6, 3.5);
+            if (Math.random() > 0.4) {
+                createServerRack(z + 6, -CONFIG.corridorWidth / 2 + 2, 6, 3.0);
+                createServerRack(z + 6, CONFIG.corridorWidth / 2 - 2, 6, 3.0);
+            }
+        }
+
+        // Floor and Ceiling Grids
+        const floorGeo = new THREE.PlaneGeometry(CONFIG.corridorWidth, Math.abs(CONFIG.cameraZEnd) + 100, 20, 100);
+        const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
+        floorMesh.rotation.x = -Math.PI / 2;
+        floorMesh.position.set(0, -12, CONFIG.cameraZEnd / 2);
+        floorMesh.receiveShadow = true;
+        scene.add(floorMesh);
+
+        const ceilingMesh = new THREE.Mesh(floorGeo, materials.floor);
+        ceilingMesh.rotation.x = Math.PI / 2;
+        ceilingMesh.position.set(0, 12, CONFIG.cameraZEnd / 2);
+        scene.add(ceilingMesh);
+
+        // --- GSAP Scroll Animation Setup ---
+        const sections = document.querySelectorAll('.ui-section');
+        const depthReadout = document.getElementById('depth-readout');
+        const slideReadout = document.getElementById('slide-readout');
+        const progressFill = document.getElementById('progress-fill');
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: '#scroll-track',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: CONFIG.scrubValue,
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    const currentDepth = (progress * Math.abs(CONFIG.cameraZEnd)).toFixed(2);
+                    depthReadout.textContent = currentDepth + 'm';
+                    progressFill.style.width = (progress * 100) + '%';
+
+                    const currentSlide = Math.min(10, Math.floor(progress * 10) + 1);
+                    slideReadout.textContent = (currentSlide < 10 ? '0' : '') + currentSlide + '/10';
+                }
+            }
+        });
+
+        // Camera Path Animation
+        tl.to(camera.position, {
+            z: CONFIG.cameraZEnd,
+            ease: 'none',
+            duration: 10
+        }, 0);
+
+        // Fade out title screen quickly on scroll start
+        tl.to('#title-screen', { opacity: 0, duration: 0.5 }, 0);
+
+        // Slide Transitions Sequence
+        sections.forEach((section, index) => {
+            const startTime = (index / sections.length) * 9;
+            const duration = 0.8;
+
+            tl.fromTo(section, 
+                { opacity: 0, y: 60, pointerEvents: 'none' },
+                { opacity: 1, y: 0, pointerEvents: 'auto', duration: duration, ease: 'power2.out' },
+                startTime
+            );
+
+            if (index < sections.length - 1) {
+                tl.to(section, 
+                    { opacity: 0, y: -60, pointerEvents: 'none', duration: duration, ease: 'power2.in' },
+                    startTime + duration + 0.4
+                );
+            }
+        });
+
+        // --- Render Loop ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Flicker corridor lights
+            corridorLights.forEach(item => {
+                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.3;
+            });
+
+            // Animate Racks / LEDs
+            objects.forEach(obj => {
+                if (obj.ledMat) {
+                    obj.ledMat.opacity = 0.5 + Math.sin(elapsedTime * 4 + obj.ledPulse) * 0.4;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- Resize Handler ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
