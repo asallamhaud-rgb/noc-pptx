@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KNOCK KNOCK // MAINFRAME</title>
+    <title>NOC NOC // MAINFRAME</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -215,7 +215,7 @@
 
     <!-- MAIN TITLE SCREEN -->
     <div id="title-screen">
-        <h1 class="main-title">KNOCK<br>KNOCK</h1>
+        <h1 class="main-title">NOC<br>NOC</h1>
         <div class="author-credit">Made by Asala Hassan Bait Mhaud</div>
         <div class="scroll-hint">
             <span>// SCROLL TO DESCEND //</span>
@@ -681,15 +681,11 @@
             }
         }, 0);
 
-
-        // --- BRAND NEW SCROLL MATH TO GUARANTEE ZERO OVERLAPPING ---
         sections.forEach((section, index) => {
-            // Divide the scroll track into absolute 10% blocks.
             const start = index * 10;
             const end = start + 10;
 
             if (index === numSections - 1) {
-                // Last slide (Slide 10): Operates only from 90% to 100% of the scroll track
                 gsap.fromTo(section, 
                     { opacity: 0, y: 60 },
                     {
@@ -699,13 +695,12 @@
                         scrollTrigger: {
                             trigger: '#scroll-track',
                             start: `${start}% top`, 
-                            end: `${start + 4}% top`, // Fully visible by 94%, holds until 100%
+                            end: `${start + 4}% top`,
                             scrub: true,
                         }
                     }
                 );
             } else {
-                // All other slides (1-9): Strictly fade in, hold, and completely vanish within their 10% block
                 const sectionTl = gsap.timeline({
                     scrollTrigger: {
                         trigger: '#scroll-track',
@@ -715,13 +710,11 @@
                     }
                 });
 
-                // E.g., For Slide 9: Fades in (80-82%), Holds (82-88%), Fades out fully to opacity 0 (88-90%)
                 sectionTl.fromTo(section, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.2, ease: "none" })
                          .to(section, { opacity: 1, y: 0, duration: 0.6 }) 
                          .to(section, { opacity: 0, y: -60, duration: 0.2, ease: "none" }); 
             }
         });
-
 
         let mouseX = 0;
         let mouseY = 0;
