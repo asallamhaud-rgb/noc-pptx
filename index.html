@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOC NOC // MAINFRAME</title>
@@ -204,8 +202,7 @@
             .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
         }
     </style>
-</head>
-<body>
+</head><body>
 
     <!-- BOOT SEQUENCE SCREEN -->
     <div id="boot-screen">
@@ -498,6 +495,7 @@
             delay += 600 + Math.random() * 400; 
         });
 
+
         // --- THREE.JS & GSAP LOGIC ---
         gsap.registerPlugin(ScrollTrigger);
 
@@ -599,115 +597,6 @@
                 mesh: mesh, wireMesh: wireMesh, led: led, ledMat: ledMat,
                 rotSpeed: { x: 0, y: 0, z: 0 },
                 floatSpeed: 0, floatOffset: 0, baseY: y,
-                isServer: true, ledPulse: Math.random() * Math.PI
+                isServer: true, ledPulse: Math.random() * Math.PI 
             });
         }
-
-        // Generate Corridor Environment
-        for (let z = 0; z > CONFIG.cameraZEnd - 50; z -= 12) {
-            createServerRack(z, -CONFIG.corridorWidth / 2 + 2, -6, 3.5);
-            createServerRack(z, CONFIG.corridorWidth / 2 - 2, -6, 3.5);
-            if (Math.random() > 0.4) {
-                createServerRack(z + 6, -CONFIG.corridorWidth / 2 + 2, 6, 3.0);
-                createServerRack(z + 6, CONFIG.corridorWidth / 2 - 2, 6, 3.0);
-            }
-        }
-
-        // Floor and Ceiling Grids
-        const floorGeo = new THREE.PlaneGeometry(CONFIG.corridorWidth, Math.abs(CONFIG.cameraZEnd) + 100, 20, 100);
-        const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
-        floorMesh.rotation.x = -Math.PI / 2;
-        floorMesh.position.set(0, -12, CONFIG.cameraZEnd / 2);
-        floorMesh.receiveShadow = true;
-        scene.add(floorMesh);
-
-        const ceilingMesh = new THREE.Mesh(floorGeo, materials.floor);
-        ceilingMesh.rotation.x = Math.PI / 2;
-        ceilingMesh.position.set(0, 12, CONFIG.cameraZEnd / 2);
-        scene.add(ceilingMesh);
-
-        // --- GSAP Scroll Animation Setup ---
-        const sections = document.querySelectorAll('.ui-section');
-        const depthReadout = document.getElementById('depth-readout');
-        const slideReadout = document.getElementById('slide-readout');
-        const progressFill = document.getElementById('progress-fill');
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: '#scroll-track',
-                start: 'top top',
-                end: 'bottom bottom',
-                scrub: CONFIG.scrubValue,
-                onUpdate: (self) => {
-                    const progress = self.progress;
-                    const currentDepth = (progress * Math.abs(CONFIG.cameraZEnd)).toFixed(2);
-                    depthReadout.textContent = currentDepth + 'm';
-                    progressFill.style.width = (progress * 100) + '%';
-
-                    const currentSlide = Math.min(10, Math.floor(progress * 10) + 1);
-                    slideReadout.textContent = (currentSlide < 10 ? '0' : '') + currentSlide + '/10';
-                }
-            }
-        });
-
-        // Camera Path Animation
-        tl.to(camera.position, {
-            z: CONFIG.cameraZEnd,
-            ease: 'none',
-            duration: 10
-        }, 0);
-
-        // Fade out title screen quickly on scroll start
-        tl.to('#title-screen', { opacity: 0, duration: 0.5 }, 0);
-
-        // Slide Transitions Sequence
-        sections.forEach((section, index) => {
-            const startTime = (index / sections.length) * 9;
-            const duration = 0.8;
-
-            tl.fromTo(section, 
-                { opacity: 0, y: 60, pointerEvents: 'none' },
-                { opacity: 1, y: 0, pointerEvents: 'auto', duration: duration, ease: 'power2.out' },
-                startTime
-            );
-
-            if (index < sections.length - 1) {
-                tl.to(section, 
-                    { opacity: 0, y: -60, pointerEvents: 'none', duration: duration, ease: 'power2.in' },
-                    startTime + duration + 0.4
-                );
-            }
-        });
-
-        // --- Render Loop ---
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-
-            // Flicker corridor lights
-            corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.3;
-            });
-
-            // Animate Racks / LEDs
-            objects.forEach(obj => {
-                if (obj.ledMat) {
-                    obj.ledMat.opacity = 0.5 + Math.sin(elapsedTime * 4 + obj.ledPulse) * 0.4;
-                }
-            });
-
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // --- Resize Handler ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
-</body>
-</html>
