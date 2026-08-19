@@ -1,5 +1,3 @@
-Here is the complete, fully updated code with **Slide 5** updated to feature the **Transport & IP** network breakdown, topologies, and main network layers, while maintaining the smooth animations and interactive environment:
-
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -624,173 +622,139 @@ Here is the complete, fully updated code with **Slide 5** updated to feature the
                 y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.7;
             }
 
-            const scale = 1 + Math.random() * 2.5;
-            const type = Math.random();
-
-            if (type < 0.4) {
-                createServerRack(z, x, y, scale);
-            } else if (type < 0.7) {
-                const geo = new THREE.BoxGeometry(scale, scale, scale);
-                const mat = Math.random() > 0.6 ? materials.serverSoftPink : (Math.random() > 0.5 ? materials.serverMagenta : materials.serverPink);
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(x, y, z);
-                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                objectGroup.add(mesh);
-
-                const wireGeo = new THREE.EdgesGeometry(geo);
-                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xc71585, transparent: true, opacity: 0.4 }));
-                wireLine.position.copy(mesh.position);
-                wireLine.rotation.copy(mesh.rotation);
-                objectGroup.add(wireLine);
-
-                objects.push({
-                    mesh: mesh, wireLine: wireLine,
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.02, y: (Math.random() - 0.5) * 0.02, z: (Math.random() - 0.5) * 0.02 },
-                    floatSpeed: (Math.random() - 0.5) * 0.01, floatOffset: Math.random() * Math.PI * 2, baseY: y
-                });
+            if (Math.random() > 0.3) {
+                createServerRack(z, x, y, 1.2 + Math.random() * 2);
             } else {
-                const geo = new THREE.TorusKnotGeometry(scale * 0.5, scale * 0.15, 64, 8);
-                const mat = Math.random() > 0.5 ? materials.serverPink : materials.serverMagenta;
+                const type = Math.random();
+                let geo;
+                const scale = 0.5 + Math.random() * 2;
+                if (type < 0.33) geo = new THREE.BoxGeometry(scale, scale, scale);
+                else if (type < 0.66) geo = new THREE.SphereGeometry(scale * 0.6, 12, 12);
+                else geo = new THREE.OctahedronGeometry(scale * 0.7);
+
+                const matOpts = [materials.serverSoftPink, materials.serverPink, materials.serverMagenta];
+                const mat = matOpts[Math.floor(Math.random() * matOpts.length)];
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(x, y, z);
-                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 objectGroup.add(mesh);
 
+                const wireMesh = new THREE.Mesh(geo, materials.wireframe);
+                wireMesh.position.copy(mesh.position);
+                wireMesh.scale.multiplyScalar(1.05);
+                objectGroup.add(wireMesh);
+
                 objects.push({
-                    mesh: mesh,
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.01, y: (Math.random() - 0.5) * 0.03, z: (Math.random() - 0.5) * 0.01 },
-                    floatSpeed: (Math.random() - 0.5) * 0.005, floatOffset: Math.random() * Math.PI * 2, baseY: y
+                    mesh: mesh, wireMesh: wireMesh,
+                    rotSpeed: { x: (Math.random() - 0.5) * 0.02, y: (Math.random() - 0.5) * 0.02, z: (Math.random() - 0.5) * 0.02 },
+                    floatSpeed: 1 + Math.random() * 3,
+                    floatOffset: Math.random() * Math.PI * 2,
+                    baseY: y,
+                    isServer: false
                 });
             }
         }
 
-        const sections = document.querySelectorAll('.ui-section');
-        const numSections = sections.length;
-        
-        let pathPoints = [];
-        for (let i = 0; i < numSections; i++) {
-            const progress = i / (numSections - 1);
-            const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
-            const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
-            const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
-            pathPoints.push(new THREE.Vector3(x, y, z));
-        }
-
-        const curve = new THREE.CatmullRomCurve3(pathPoints);
-        curve.curveType = 'centripetal';
-
-        // Mouse Parallax Trackers
-        let mouseX = 0, mouseY = 0;
-        let targetMouseX = 0, targetMouseY = 0;
-        window.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-            targetMouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        });
-
-        // Bind Camera to Scroll & Mouse Parallax
-        const scrollObject = { progress: 0 };
-        let currentBasePos = new THREE.Vector3();
-        let currentLookAt = new THREE.Vector3();
-
-        gsap.to(scrollObject, {
-            progress: 1,
-            ease: "none",
+        // GSAP Scroll Animation
+        const totalDistance = Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart);
+        const tl = gsap.timeline({
             scrollTrigger: {
-                trigger: "#scroll-track",
-                start: "top top",
-                end: "bottom bottom",
+                trigger: '#scroll-track',
+                start: 'top top',
+                end: 'bottom bottom',
                 scrub: CONFIG.scrubValue,
                 onUpdate: (self) => {
-                    const p = self.progress;
-                    currentBasePos.copy(curve.getPoint(p));
-                    currentLookAt.copy(curve.getPoint(Math.min(p + 0.01, 1)));
-
-                    const currentDepth = (p * Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart)).toFixed(2);
-                    document.getElementById('depth-readout').textContent = currentDepth + 'm';
-                    document.getElementById('progress-fill').style.width = (p * 100) + '%';
+                    const currentZ = camera.position.z;
+                    const distanceTraveled = Math.abs(CONFIG.cameraZStart - currentZ);
+                    const progress = Math.min(Math.max(distanceTraveled / totalDistance, 0), 1);
                     
-                    const activeSlide = Math.min(Math.floor(p * numSections) + 1, numSections);
-                    document.getElementById('slide-readout').textContent = String(activeSlide).padStart(2, '0') + '/' + String(numSections).padStart(2, '0');
+                    // Update status bar
+                    const depthMeters = (distanceTraveled * 3.5).toFixed(2);
+                    document.getElementById('depth-readout').textContent = depthMeters + 'm';
+                    document.getElementById('progress-fill').style.width = (progress * 100) + '%';
+                    
+                    const slideNum = Math.min(Math.floor(progress * 10) + 1, 10);
+                    document.getElementById('slide-readout').textContent = (slideNum < 10 ? '0' + slideNum : slideNum) + '/10';
                 }
             }
         });
 
-        // Fade out initial title screen immediately on scroll start
-        ScrollTrigger.create({
-            trigger: "#scroll-track",
-            start: "top top",
-            end: "5% top",
-            scrub: true,
-            onUpdate: (self) => {
-                titleScreen.style.opacity = (1 - self.progress * 20);
+        tl.to(camera.position, {
+            z: CONFIG.cameraZEnd,
+            ease: "none",
+            duration: 10
+        });
+
+        // Connect UI sections to scroll positions
+        const sections = document.querySelectorAll('.ui-section');
+        sections.forEach((section, index) => {
+            const startProgress = index / 10;
+            const endProgress = (index + 1) / 10;
+            
+            gsap.fromTo(section, 
+                { opacity: 0, y: 60, pointerEvents: 'none' },
+                {
+                    opacity: 1,
+                    y: 0,
+                    pointerEvents: 'auto',
+                    scrollTrigger: {
+                        trigger: '#scroll-track',
+                        start: `${startProgress * 100}% top`,
+                        end: `${endProgress * 100}% top`,
+                        scrub: true,
+                        toggleActions: "play reverse play reverse"
+                    }
+                }
+            );
+
+            // Fade out near end of section
+            if (index < 9) {
+                gsap.to(section, {
+                    opacity: 0,
+                    y: -60,
+                    pointerEvents: 'none',
+                    scrollTrigger: {
+                        trigger: '#scroll-track',
+                        start: `${(endProgress - 0.02) * 100}% top`,
+                        end: `${endProgress * 100}% top`,
+                        scrub: true
+                    }
+                });
             }
         });
 
-        // Bind Sections visibility
-        sections.forEach((section, index) => {
-            const startP = index / numSections;
-            const endP = (index + 1) / numSections;
-            
-            ScrollTrigger.create({
-                trigger: "#scroll-track",
-                start: `${startP * 100}% top`,
-                end: `${endP * 100}% top`,
-                scrub: true,
-                onEnter: () => gsap.to(section, { opacity: 1, y: 0, duration: 0.4 }),
-                onLeave: () => gsap.to(section, { opacity: 0, y: -50, duration: 0.4 }),
-                onEnterBack: () => gsap.to(section, { opacity: 1, y: 0, duration: 0.4 }),
-                onLeaveBack: () => gsap.to(section, { opacity: 0, y: 50, duration: 0.4 })
-            });
-        });
-
-        // Animation Loop with Smooth Mouse Parallax Interpolation
+        // Animation Loop
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
+            const elapsedTime = clock.getElapsedTime();
 
-            // Smoothly interpolate mouse movement
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
-
-            // Apply camera position with mouse offset
-            if (currentBasePos.lengthSq() > 0) {
-                camera.position.x = currentBasePos.x + mouseX * 2.5;
-                camera.position.y = currentBasePos.y - mouseY * 2.5;
-                camera.position.z = currentBasePos.z;
-
-                let adjustedLookAt = currentLookAt.clone();
-                adjustedLookAt.x += mouseX * 1.5;
-                adjustedLookAt.y -= mouseY * 1.5;
-                camera.lookAt(adjustedLookAt);
-            }
-
-            objects.forEach((obj) => {
-                if (obj.mesh) {
-                    obj.mesh.rotation.x += obj.rotSpeed.x;
-                    obj.mesh.rotation.y += obj.rotSpeed.y;
-                    obj.mesh.rotation.z += obj.rotSpeed.z;
-                }
-                if (obj.wireMesh) obj.wireMesh.rotation.copy(obj.mesh.rotation);
-                if (obj.wireLine) obj.wireLine.rotation.copy(obj.mesh.rotation);
-                if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.5 + Math.sin(time * 4 + obj.ledPulse) * 0.4;
-                }
+            // Flicker corridor lights
+            corridorLights.forEach(item => {
+                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.3;
             });
 
-            corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.3;
+            // Animate scene objects
+            objects.forEach(obj => {
+                if (!obj.isServer) {
+                    obj.mesh.rotation.x += obj.rotSpeed.x;
+                    obj.mesh.rotation.y += obj.rotSpeed.y;
+                    obj.wireMesh.rotation.copy(obj.mesh.rotation);
+
+                    obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * obj.floatSpeed + obj.floatOffset) * 0.8;
+                    obj.wireMesh.position.copy(obj.mesh.position);
+                } else {
+                    obj.ledPulse += 0.05;
+                    obj.ledMat.opacity = 0.5 + Math.sin(obj.ledPulse) * 0.4;
+                }
             });
 
             renderer.render(scene, camera);
         }
         animate();
 
-        // Resize Listener
+        // Window Resize Handling
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
