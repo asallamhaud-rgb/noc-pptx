@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOC NOC // MAINFRAME</title>
@@ -131,15 +133,16 @@
             letter-spacing: 0.15em; margin-bottom: 20px; display: block;
         }
         .sys-header {
-            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800;
+            font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
             color: var(--primary); text-transform: uppercase;
             letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 18px; font-weight: 500; 
-            line-height: 1.8; max-width: 750px;
+            color: var(--text-main); font-size: 16px; font-weight: 500; 
+            line-height: 1.7; max-width: 850px;
         }
+        .sys-desc strong { color: var(--primary); font-weight: 800; }
         
         .status-bar {
             position: fixed; bottom: 0; left: 0;
@@ -201,7 +204,8 @@
             .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
         }
     </style>
-</head><body>
+</head>
+<body>
 
     <!-- BOOT SEQUENCE SCREEN -->
     <div id="boot-screen">
@@ -240,14 +244,18 @@
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">01 // INITIALIZATION</span>
+                    <span class="win-title">01 // INTRODUCTION TO THE NOC</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">SYSTEM ENTRY // STAGE_01</span>
-                    <h1 class="sys-header">THE<br><span class="dim">THRESHOLD</span></h1>
-                    <p class="sys-desc">Welcome to the descent. The structural void has been flooded with high-saturation pigment. No pure whites, no washed-out highlights—just pure geometric depth.</p>
+                    <span class="sys-id">THE 24/7 COMMAND CENTER</span>
+                    <h1 class="sys-header">THE NOC:<br><span class="dim">HEARTBEAT OF OUR NETWORK</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 15px;"><strong>> WHAT IS THE NOC?</strong><br>Think of it as the ultimate control room for the entire network that never sleeps—operating 24/7.</p>
+                        <p style="margin-bottom: 15px;"><strong>> WHAT DOES IT DO?</strong><br>It keeps a constant eye on everything happening across the network to catch problems instantly, often fixing them before customers even notice.</p>
+                        <p><strong>> WHY IS IT IMPORTANT?</strong><br>Without it, we wouldn't have a centralized way to track outages, manage traffic, and keep millions of people connected around the clock.</p>
+                    </div>
                 </div>
             </div>
         </div>
