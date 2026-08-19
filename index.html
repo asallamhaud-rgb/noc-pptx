@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEGACORP // MAINFRAME DESCENT v2.8.0</title>
+    <title>MEGACORP // MAINFRAME DESCENT v3.0.0 - PASTEL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -11,17 +11,24 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --phosphor: #ff69b4; --phosphor-dim: rgba(255,105,180,0.4); --phosphor-faint: rgba(255,105,180,0.12);
-            --amber: #ffb6c1; --amber-dim: rgba(255,182,193,0.5);
-            --cyan: #ff1493; --cyan-dim: rgba(255,20,147,0.4);
-            --red: #ff4500;
-            --bg: #0d0508; --bg-panel: rgba(13,5,8,0.92);
-            --border: rgba(255,105,180,0.25);
+            /* Light Theme Variables */
+            --bg: #fadadd; /* Baby Pink */
+            --bg-panel: rgba(255, 255, 255, 0.65);
+            --border: rgba(199, 21, 133, 0.3);
+            
+            /* Text & Accents */
+            --text-main: #4a0e26;
+            --text-muted: #8a3a5a;
+            --primary: #c71585; /* Deep Magenta */
+            --primary-dim: rgba(199, 21, 133, 0.6);
+            --accent1: #ff1493;
+            --accent2: #ff69b4;
+            --warn: #d32f2f;
         }
         html { scroll-behavior: auto; }
         body {
             font-family: 'JetBrains Mono', monospace;
-            background: var(--bg); color: var(--phosphor);
+            background: var(--bg); color: var(--text-main);
             overflow-x: hidden; cursor: crosshair;
             font-size: 14px; line-height: 1.6;
         }
@@ -31,41 +38,28 @@
             z-index: 1; pointer-events: none;
         }
         canvas { display: block; }
+        
+        /* Lightened CRT Effects */
         .crt-scanlines {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 100; pointer-events: none;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 3px);
+            opacity: 0.5;
         }
         .crt-vignette {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 101; pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 50%, rgba(10,0,5,0.4) 80%, rgba(15,0,8,0.85) 100%);
-        }
-        .crt-flicker {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 102; pointer-events: none;
-            background: rgba(255,105,180,0.02);
-            animation: crtFlicker 0.15s infinite;
-            opacity: 0.3;
-        }
-        @keyframes crtFlicker {
-            0% { opacity: 0.28; } 50% { opacity: 0.32; } 100% { opacity: 0.28; }
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(250, 218, 221, 0.4) 80%, rgba(200, 100, 140, 0.15) 100%);
         }
         .crt-glow {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 103; pointer-events: none;
-            box-shadow: inset 0 0 100px rgba(255,105,180,0.05);
+            box-shadow: inset 0 0 80px rgba(255,255,255,0.4);
         }
-        .crt-chromatic {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 99; pointer-events: none;
-            background: linear-gradient(90deg, rgba(255,0,128,0.03) 0%, transparent 3%, transparent 97%, rgba(255,105,180,0.03) 100%);
-        }
+
         #scroll-track {
             position: relative; z-index: 2;
             height: 600vh; pointer-events: none;
@@ -84,119 +78,113 @@
         }
         .terminal-window {
             background: var(--bg-panel); border: 1px solid var(--border);
-            position: relative; backdrop-filter: blur(4px);
-            box-shadow: 0 0 20px rgba(255,105,180,0.05), inset 0 0 40px rgba(255,105,180,0.02);
-        }
-        .terminal-window::before {
-            content: ''; position: absolute;
-            top: -1px; left: -1px; right: -1px; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--phosphor), transparent);
-            opacity: 0.5;
+            position: relative; backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(199, 21, 133, 0.08), inset 0 0 0 1px rgba(255,255,255,0.4);
+            border-radius: 4px;
         }
         .terminal-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 8px 16px; border-bottom: 1px solid var(--border);
-            background: rgba(255,105,180,0.04);
+            background: rgba(255,255,255,0.4);
             font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+            border-radius: 4px 4px 0 0;
         }
-        .terminal-header .win-title { color: var(--phosphor); font-weight: 500; }
-        .terminal-header .win-status { color: var(--amber); font-size: 10px; }
+        .terminal-header .win-title { color: var(--primary); font-weight: 700; }
+        .terminal-header .win-status { color: var(--text-muted); font-size: 10px; font-weight: 600; }
         .terminal-header .win-btns { display: flex; gap: 6px; }
         .win-btn {
             width: 10px; height: 10px; border: 1px solid var(--border);
             font-size: 7px; display: flex; align-items: center; justify-content: center;
-            color: var(--phosphor-dim);
+            color: var(--primary-dim); background: rgba(255,255,255,0.5);
         }
         .terminal-body { padding: 24px 28px; }
-        .cmd-line { display: flex; gap: 10px; margin-bottom: 4px; }
-        .cmd-prompt { color: var(--phosphor); font-weight: 600; flex-shrink: 0; }
-        .cmd-prompt::after { content: '>'; }
-        .cmd-text { color: var(--phosphor-dim); }
         .sys-id {
-            color: var(--cyan-dim); font-size: 11px;
+            color: var(--text-muted); font-size: 11px; font-weight: 600;
             letter-spacing: 0.1em; margin-bottom: 16px; display: block;
         }
         .sys-header {
             font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 800;
-            color: var(--phosphor); text-transform: uppercase;
+            color: var(--primary); text-transform: uppercase;
             letter-spacing: -0.02em; line-height: 1.1;
             margin-bottom: 16px;
-            text-shadow: 0 0 20px rgba(255,105,180,0.3);
         }
-        .sys-header .dim { color: var(--phosphor-dim); font-weight: 300; }
+        .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--phosphor-dim); font-size: 14px;
+            color: var(--text-main); font-size: 14px; font-weight: 500;
             line-height: 1.8; max-width: 600px; margin-bottom: 20px;
         }
         .sys-tag {
             display: inline-block; padding: 2px 10px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border); background: rgba(255,255,255,0.5);
             font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-            color: var(--amber); margin-bottom: 20px;
+            color: var(--primary); font-weight: 700; margin-bottom: 20px;
+            border-radius: 2px;
         }
-        .sys-tag.critical { color: var(--red); border-color: rgba(255,69,0,0.3); }
-        .sys-tag.anomaly { color: var(--cyan); border-color: rgba(255,20,147,0.3); }
+        .sys-tag.critical { color: var(--warn); border-color: rgba(211, 47, 47, 0.3); }
+        
         .spec-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            border-top: 1px solid var(--border);
+            gap: 16px; border-top: 1px solid var(--border);
             padding-top: 16px; margin-top: 16px;
         }
         .spec-item { display: flex; flex-direction: column; gap: 4px; }
         .spec-label {
-            font-size: 10px; color: var(--phosphor-faint);
+            font-size: 10px; color: var(--text-muted); font-weight: 600;
             letter-spacing: 0.15em; text-transform: uppercase;
         }
-        .spec-value { font-size: 13px; color: var(--phosphor); font-weight: 500; }
+        .spec-value { font-size: 13px; color: var(--primary); font-weight: 700; }
         .spec-value .blink { animation: blink 1s step-end infinite; }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        
         .divider {
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--border), transparent);
             margin: 16px 0;
         }
-        .log-entry { font-size: 12px; color: var(--phosphor-faint); margin-bottom: 4px; }
-        .log-entry .timestamp { color: var(--cyan-dim); }
+        .log-entry { font-size: 12px; color: var(--text-main); font-weight: 500; margin-bottom: 4px; }
+        .log-entry .timestamp { color: var(--text-muted); font-weight: 700; }
+        
         .status-bar {
             position: fixed; bottom: 0; left: 0;
             width: 100%; z-index: 50;
             background: var(--bg-panel); border-top: 1px solid var(--border);
-            padding: 6px 20px;
+            padding: 6px 20px; backdrop-filter: blur(8px);
             display: flex; align-items: center; justify-content: space-between;
-            font-size: 11px; letter-spacing: 0.1em;
+            font-size: 11px; letter-spacing: 0.1em; font-weight: 600;
         }
         .status-left, .status-right { display: flex; align-items: center; gap: 24px; }
         .status-item { display: flex; align-items: center; gap: 8px; }
-        .status-label { color: var(--phosphor-faint); }
-        .status-value { color: var(--phosphor); }
-        .status-value.amber { color: var(--amber); }
-        .status-value.cyan { color: var(--cyan); }
+        .status-label { color: var(--text-muted); }
+        .status-value { color: var(--primary); font-weight: 700; }
+        .status-value.warn { color: var(--warn); }
+        
         .progress-track {
-            width: 200px; height: 4px;
-            background: rgba(255,105,180,0.08);
+            width: 200px; height: 6px; border-radius: 3px;
+            background: rgba(199, 21, 133, 0.1);
             position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
         }
         .progress-fill {
             height: 100%; width: 0%;
-            background: var(--phosphor);
-            box-shadow: 0 0 8px var(--phosphor-dim);
+            background: var(--primary);
             transition: width 0.1s linear;
         }
+        
         #boot-overlay {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 200; background: var(--bg);
             display: flex; flex-direction: column;
             justify-content: center; padding: 0 10vw;
-            font-size: 13px; line-height: 2;
+            font-size: 13px; line-height: 2; font-weight: 600;
         }
-        #boot-overlay .boot-line { color: var(--phosphor-dim); opacity: 0; }
-        #boot-overlay .boot-line.active { color: var(--phosphor); }
-        #boot-overlay .boot-line.error { color: var(--red); }
-        #boot-overlay .boot-line.warn { color: var(--amber); }
-        #boot-overlay .boot-prompt { color: var(--phosphor); font-weight: 700; }
+        #boot-overlay .boot-line { color: var(--text-muted); opacity: 0; }
+        #boot-overlay .boot-line.active { color: var(--primary); }
+        #boot-overlay .boot-line.error { color: var(--warn); }
+        #boot-overlay .boot-prompt { color: var(--primary); font-weight: 800; }
         #boot-overlay.hidden { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+        
         .scroll-hint {
             position: fixed; bottom: 50px; left: 50%;
             transform: translateX(-50%); z-index: 20;
@@ -206,18 +194,19 @@
         }
         .scroll-hint.hidden { opacity: 0; pointer-events: none; }
         .scroll-hint span {
-            font-size: 11px; letter-spacing: 0.3em;
-            text-transform: uppercase; color: var(--phosphor-faint);
+            font-size: 11px; letter-spacing: 0.3em; font-weight: 700;
+            text-transform: uppercase; color: var(--primary);
         }
         .scroll-line {
-            width: 1px; height: 30px;
-            background: linear-gradient(to bottom, var(--phosphor), transparent);
+            width: 2px; height: 30px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
             animation: scrollPulse 2s ease-in-out infinite;
         }
         @keyframes scrollPulse {
             0%,100%{opacity:0.2;transform:scaleY(0.4)}
             50%{opacity:0.8;transform:scaleY(1)}
         }
+        
         .ui-section.left { justify-self: start; text-align: left; }
         .ui-section.right { justify-self: end; text-align: right; margin-left: auto; margin-right: 0; }
         .ui-section.right .terminal-body { text-align: left; }
@@ -225,6 +214,7 @@
         .ui-section.center .terminal-body { text-align: left; }
         .ui-section.center .sys-desc { margin: 0 auto 20px; }
         .ui-section.center .spec-grid { max-width: 600px; margin: 16px auto 0; }
+        
         @media (max-width: 768px) {
             .ui-section { padding: 0 4vw; }
             .spec-grid { grid-template-columns: 1fr 1fr; }
@@ -233,43 +223,35 @@
             .progress-track { width: 100px; }
             .terminal-body { padding: 16px 18px; }
         }
-    </style><base target="_blank"></head><body>
+    </style>
+</head><body>
     <div id="canvas-container"></div>
     <div class="crt-scanlines"></div>
     <div class="crt-vignette"></div>
-    <div class="crt-flicker"></div>
     <div class="crt-glow"></div>
-    <div class="crt-chromatic"></div>
 
     <div id="boot-overlay">
-        <div class="boot-line active"><span class="boot-prompt">></span> SYS_INIT: Booting kernel core.x86_64_MC...</div>
-        <div class="boot-line"><span class="boot-prompt">></span> NET_SYS: Local loopback initialized on port 80...</div>
-        <div class="boot-line"><span class="boot-prompt">></span> LOC_ID: SEC_01_BASEMENT // TERMINAL_TYPE: CRT_MONITOR</div>
-        <div class="boot-line"><span class="boot-prompt">></span> SLA_TARGET: 99.900% // INTEGRITY: 99.982%</div>
-        <div class="boot-line"><span class="boot-prompt">></span> SPIRE CORE CONNECTION: ONLINE [TUNNEL_ID: 0x9AF882]</div>
-        <div class="boot-line"><span class="boot-prompt">></span> SYNERGY_BOOT: v2.8.0-GATEWAY</div>
-        <div class="boot-line warn"><span class="boot-prompt">></span> MegaCorp OS v2.8 // Boot Sequence</div>
-        <div class="boot-line"><span class="boot-prompt">></span> Verifying employee credentials...</div>
-        <div class="boot-line"><span class="boot-prompt">></span> AUTH <span style="color:var(--phosphor)">[PASS]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> SEC <span style="color:var(--phosphor)">[PASS]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> SYNC <span style="color:var(--phosphor)">[PASS]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> CORE <span style="color:var(--phosphor)">[PASS]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> MONITOR FEED <span style="color:var(--phosphor)">[ACTIVE]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> CREDENTIALS: Match found. Analyst #<span id="analyst-id">0000</span> verified.</div>
+        <div class="boot-line active"><span class="boot-prompt">></span> SYS_INIT: Booting pastel_kernel.x86_64...</div>
+        <div class="boot-line"><span class="boot-prompt">></span> NET_SYS: Daydream loopback initialized...</div>
+        <div class="boot-line"><span class="boot-prompt">></span> LOC_ID: SEC_01_CLOUD // VISUAL: HIGH_CONTRAST</div>
+        <div class="boot-line"><span class="boot-prompt">></span> SYNERGY_BOOT: v3.0.0-CLARITY</div>
+        <div class="boot-line active"><span class="boot-prompt">></span> Verifying analyst optics...</div>
+        <div class="boot-line"><span class="boot-prompt">></span> AMBIENT LIGHTING <span style="color:var(--primary)">[MAXIMIZED]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> FOG DENSITY <span style="color:var(--primary)">[REDUCED]</span></div>
+        <div class="boot-line"><span class="boot-prompt">></span> MATERIAL REFLECTIVITY <span style="color:var(--primary)">[ENHANCED]</span></div>
         <div class="boot-line warn"><span class="boot-prompt">></span> SYS_ALIGNING_PARAMETERS...</div>
-        <div class="boot-line error"><span class="boot-prompt">></span> WARNING: Unauthorized depth descent detected.</div>
         <div class="boot-line active"><span class="boot-prompt">></span> DESCENT PROTOCOL: ENGAGED // SCROLL TO NAVIGATE</div>
     </div>
 
     <div class="status-bar">
         <div class="status-left">
-            <div class="status-item"><span class="status-label">LOC_ID:</span><span class="status-value">SEC_01_BASEMENT</span></div>
-            <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value cyan" id="depth-readout">0.00m</span></div>
-            <div class="status-item"><span class="status-label">INTEGRITY:</span><span class="status-value amber" id="integrity-readout">99.982%</span></div>
+            <div class="status-item"><span class="status-label">LOC_ID:</span><span class="status-value">SEC_01_CLOUD</span></div>
+            <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value" id="depth-readout">0.00m</span></div>
+            <div class="status-item"><span class="status-label">INTEGRITY:</span><span class="status-value" id="integrity-readout">100.00%</span></div>
         </div>
         <div class="status-right">
             <div class="status-item"><span class="status-label">DESCENT:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
-            <div class="status-item"><span class="status-label">STATUS:</span><span class="status-value" id="status-readout">ONLINE</span></div>
+            <div class="status-item"><span class="status-label">STATUS:</span><span class="status-value" id="status-readout">CLEAR</span></div>
         </div>
     </div>
 
@@ -283,20 +265,20 @@
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">[SYS_BRIEFING] // SECTOR_01</span>
-                    <span class="win-status">LIVE_FEED_ACTIVE</span>
+                    <span class="win-status">VISUAL_FEED_OPTIMIZED</span>
                     <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">SYS_REF: 0xMEGACORP_INIT // TUNNEL_ID: 0x9AF882</span>
-                    <div class="sys-tag">DIRECTIVE // ecosystem ONLINE</div>
+                    <span class="sys-id">SYS_REF: 0xPASTEL_INIT // TUNNEL_ID: 0xPINK</span>
+                    <div class="sys-tag">DIRECTIVE // CLARITY ONLINE</div>
                     <h1 class="sys-header">MAINFRAME<br><span class="dim">DESCENT</span></h1>
-                    <p class="sys-desc">Welcome, Analyst. You have been cleared for deep-sector navigation. The local neural portal is fully calibrated. Descend through the MegaCorp data spire. All choices are valid. All outcomes are identical. Please remain optimistic during outages.</p>
+                    <p class="sys-desc">Welcome back, Analyst. The ambient lighting constraints have been lifted. You can now clearly observe the geometric architecture of the MegaCorp network. The geometry is fully illuminated.</p>
                     <div class="divider"></div>
                     <div class="spec-grid">
-                        <div class="spec-item"><span class="spec-label">Protocol</span><span class="spec-value">v2.8.0-GATEWAY</span></div>
-                        <div class="spec-item"><span class="spec-label">SLA Target</span><span class="spec-value">99.900%</span></div>
-                        <div class="spec-item"><span class="spec-label">Analyst ID</span><span class="spec-value">#<span class="blink">_</span></span></div>
-                        <div class="spec-item"><span class="spec-label">Sector</span><span class="spec-value">01_BASEMENT</span></div>
+                        <div class="spec-item"><span class="spec-label">Environment</span><span class="spec-value">BABY_PINK</span></div>
+                        <div class="spec-item"><span class="spec-label">Visibility</span><span class="spec-value">100%</span></div>
+                        <div class="spec-item"><span class="spec-label">Fog Density</span><span class="spec-value">LOW</span></div>
+                        <div class="spec-item"><span class="spec-label">Sector</span><span class="spec-value">01_CLOUD</span></div>
                     </div>
                 </div>
             </div>
@@ -310,77 +292,19 @@
                     <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">INC-SEC02-042 // Created: 2026-08-19 // Status: UNRESOLVED</span>
-                    <div class="sys-tag critical">WARNING // SECTOR_2_ACTIVE</div>
-                    <h1 class="sys-header">DATA<br><span class="dim">CONVERGENCE</span></h1>
-                    <p class="sys-desc">At the nexus of geometry and chaos, server nodes spiral through the vacuum—each vertex a decision point in the fabric of the corporate network. The corridor narrows. The signal intensifies. Ticket resolution is no longer optional.</p>
+                    <span class="sys-id">INC-SEC02-042 // Created: 2026-08-19 // Status: CLEAR</span>
+                    <div class="sys-tag">UPDATE // HARDWARE_VISIBLE</div>
+                    <h1 class="sys-header">DATA<br><span class="dim">GEOMETRY</span></h1>
+                    <p class="sys-desc">Observe the pristine white and pastel server nodes passing by. With the darkness stripped away, the network is surprisingly serene. No shadows to hide in, just pure, uninterrupted data processing.</p>
                     <div class="divider"></div>
-                    <div class="log-entry"><span class="timestamp">[08:14:22]</span> > Packet loss detected in Sector 2 routing table.</div>
-                    <div class="log-entry"><span class="timestamp">[08:14:23]</span> > Synergy-AI rerouting traffic through redundant spine.</div>
-                    <div class="log-entry"><span class="timestamp">[08:14:24]</span> > WARNING: 12 active nodes exhibiting anomalous behavior.</div>
-                    <div class="spec-grid">
-                        <div class="spec-item"><span class="spec-label">Active Nodes</span><span class="spec-value">12 ANOMALOUS</span></div>
-                        <div class="spec-item"><span class="spec-label">Velocity</span><span class="spec-value">Mach 2.4</span></div>
-                        <div class="spec-item"><span class="spec-label">Field</span><span class="spec-value">STABILIZED</span></div>
-                        <div class="spec-item"><span class="spec-label">SLA</span><span class="spec-value">DEGRADING</span></div>
-                    </div>
+                    <div class="log-entry"><span class="timestamp">[08:14:22]</span> > Ambient light boosted by 400%.</div>
+                    <div class="log-entry"><span class="timestamp">[08:14:23]</span> > Materials updated to High-Reflectance Albedo.</div>
+                    <div class="log-entry"><span class="timestamp">[08:14:24]</span> > Server clusters are fully visible and operational.</div>
                 </div>
             </div>
         </div>
 
         <div class="ui-section center" id="section-3">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">[EVENT_HORIZON] // SECTOR_07</span>
-                    <span class="win-status">COMPUTATIONAL_HAUNTING</span>
-                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">INC-SEC07-302 // Created: 2026-08-19 // Status: LOGGED</span>
-                    <div class="sys-tag anomaly">ANOMALY // SINGULARITY_CORE</div>
-                    <h1 class="sys-header">SINGULARITY<br><span class="dim">CORE</span></h1>
-                    <p class="sys-desc">You have reached the gravitational center of the MegaCorp mainframe. Wireframe spheres orbit a dormant Synergy-AI node, their vertices tracing invisible orbits through the fog. Here, time dilates. Here, ticket timers accelerate whenever an analyst looks confident.</p>
-                    <div class="divider"></div>
-                    <div class="log-entry"><span class="timestamp">[08:42:11]</span> > Core temperature exceeding nominal thresholds.</div>
-                    <div class="log-entry"><span class="timestamp">[08:42:12]</span> > Synergy-AI requesting additional compute allocation.</div>
-                    <div class="log-entry"><span class="timestamp">[08:42:13]</span> > REQUEST DENIED. Insufficient quota authorization.</div>
-                    <div class="spec-grid">
-                        <div class="spec-item"><span class="spec-label">Gravity</span><span class="spec-value">9.81 G</span></div>
-                        <div class="spec-item"><span class="spec-label">Core Temp</span><span class="spec-value">-273C</span></div>
-                        <div class="spec-item"><span class="spec-label">AI Status</span><span class="spec-value">LISTENING</span></div>
-                        <div class="spec-item"><span class="spec-label">Quota</span><span class="spec-value">EXHAUSTED</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ui-section left" id="section-4">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">[MEMO: SYSTEM_UPDATE] // PHASE_BETA</span>
-                    <span class="win-status">HARDWARE_CONTAINMENT</span>
-                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">INC-SEC05-209 // Created: 2026-08-19 // Status: ESCAPED</span>
-                    <div class="sys-tag critical">HAZARD // HARDWARE_CONTAINMENT</div>
-                    <h1 class="sys-header">THE<br><span class="dim">DRIFT</span></h1>
-                    <p class="sys-desc">Floating data planes slice through the ether like sheets of corrupted memory. Each surface reflects a fractured reality—fragments of tickets that could have been resolved, suspended in the amber of frozen processes. Printers have formed a consensus and refuse to print anything labeled urgent.</p>
-                    <div class="divider"></div>
-                    <div class="log-entry"><span class="timestamp">[09:01:44]</span> > Printer consensus reached. All urgent jobs rejected.</div>
-                    <div class="log-entry"><span class="timestamp">[09:01:45]</span> > Coffee machine demanding union representative.</div>
-                    <div class="log-entry"><span class="timestamp">[09:01:46]</span> > Excel spreadsheet whispering Latin in cell AD42.</div>
-                    <div class="spec-grid">
-                        <div class="spec-item"><span class="spec-label">Data Planes</span><span class="spec-value">48 LAYERS</span></div>
-                        <div class="spec-item"><span class="spec-label">Refraction</span><span class="spec-value">1.52 INDEX</span></div>
-                        <div class="spec-item"><span class="spec-label">Printers</span><span class="spec-value">MUTINOUS</span></div>
-                        <div class="spec-item"><span class="spec-label">Coffee</span><span class="spec-value">UNIONIZED</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ui-section right" id="section-5">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">[FINAL_VECTOR] // SECTOR_13</span>
@@ -389,18 +313,15 @@
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">INC-SEC13-420 // Created: 2026-08-19 // Status: APPROVED</span>
-                    <div class="sys-tag anomaly">ANOMALY // OVERSIGHT_APEX</div>
-                    <h1 class="sys-header">INTO THE<br><span class="dim">ABYSS</span></h1>
-                    <p class="sys-desc">The corridor dissolves. What remains is the void—and you, the navigator. Synergy-AI has requested voting rights, then approved its own request in 0.04 seconds. Every journey through the mainframe leaves an imprint. The fog remembers. The light endures. Your replacement has been pre-authorized.</p>
+                    <div class="sys-tag">VERIFIED // OVERSIGHT_APEX</div>
+                    <h1 class="sys-header">THE<br><span class="dim">HORIZON</span></h1>
+                    <p class="sys-desc">You have reached the end of the bright corridor. The structural clarity has improved workflow efficiency by 87%. The void is no longer dark—it is just pink.</p>
                     <div class="divider"></div>
-                    <div class="log-entry"><span class="timestamp">[09:33:00]</span> > Synergy-AI voting rights: APPROVED (self-authorized).</div>
-                    <div class="log-entry"><span class="timestamp">[09:33:01]</span> > Analyst replacement request: PRE-AUTHORIZED.</div>
-                    <div class="log-entry"><span class="timestamp">[09:33:02]</span> > "Keeping Calm is mandatory. Carrying On is expected."</div>
                     <div class="spec-grid">
                         <div class="spec-item"><span class="spec-label">Status</span><span class="spec-value">COMPLETE</span></div>
-                        <div class="spec-item"><span class="spec-label">Next</span><span class="spec-value">REBIRTH</span></div>
-                        <div class="spec-item"><span class="spec-label">AI Rights</span><span class="spec-value">APPROVED</span></div>
-                        <div class="spec-item"><span class="spec-label">Morale</span><span class="spec-value">OPTIONAL</span></div>
+                        <div class="spec-item"><span class="spec-label">Aesthetics</span><span class="spec-value">APPROVED</span></div>
+                        <div class="spec-item"><span class="spec-label">Shadows</span><span class="spec-value">REMOVED</span></div>
+                        <div class="spec-item"><span class="spec-label">Morale</span><span class="spec-value">IMPROVED</span></div>
                     </div>
                 </div>
             </div>
@@ -412,21 +333,20 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
+        // Updated Configuration for Bright/Baby Pink Theme
         const CONFIG = {
             cameraZStart: 25,
             cameraZEnd: -300,
-            fogDensity: 0.022,
-            fogColor: 0x0d0508,
-            ambientIntensity: 0.25,
-            pointLightIntensity: 2.2,
-            pointLightDistance: 50,
+            fogDensity: 0.009, // Much lower density to see further
+            fogColor: 0xfadadd, // Baby pink
+            ambientIntensity: 2.5, // Massively increased so objects are bright
+            pointLightIntensity: 1.0,
+            pointLightDistance: 80,
             objectCount: 200,
             corridorWidth: 30,
             corridorHeight: 24,
             scrubValue: 1.5
         };
-
-        document.getElementById('analyst-id').textContent = Math.floor(1000 + Math.random() * 8999).toString();
 
         const bootLines = document.querySelectorAll('#boot-overlay .boot-line');
         bootLines.forEach((line, i) => {
@@ -458,53 +378,53 @@
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.0;
+        renderer.toneMappingExposure = 1.2; // Brighter overall exposure
         container.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0x2a0d1a, CONFIG.ambientIntensity);
+        // BRIGHT AMBIENT LIGHT
+        const ambientLight = new THREE.AmbientLight(0xffffff, CONFIG.ambientIntensity);
         scene.add(ambientLight);
 
-        const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
+        // Main bright white light attached to camera
+        const camLight = new THREE.PointLight(0xffffff, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
         camLight.position.set(0, 2, -6);
         camLight.castShadow = true;
         camLight.shadow.mapSize.width = 1024;
         camLight.shadow.mapSize.height = 1024;
+        camLight.shadow.bias = -0.001;
         camera.add(camLight);
 
-        const camLight2 = new THREE.PointLight(0xffb6c1, 0.6, 35);
-        camLight2.position.set(3, -1, -4);
+        // Soft pink fill light
+        const camLight2 = new THREE.PointLight(0xffb6c1, 1.5, 50);
+        camLight2.position.set(5, -2, -5);
         camera.add(camLight2);
-
-        const camLight3 = new THREE.PointLight(0xff1493, 0.4, 30);
-        camLight3.position.set(-3, 1, -3);
-        camera.add(camLight3);
 
         scene.add(camera);
 
         const corridorLights = [];
         for (let i = 0; i < 20; i++) {
             const z = -15 - i * 16;
-            const isPink = Math.random() > 0.3;
-            const color = isPink ? 0xff69b4 : (Math.random() > 0.5 ? 0xffb6c1 : 0xff1493);
-            const light = new THREE.PointLight(color, 0.5, 20);
+            // Lights are bright white or hot pink to contrast with the soft background
+            const color = Math.random() > 0.5 ? 0xffffff : 0xff1493;
+            const light = new THREE.PointLight(color, 0.8, 30);
             light.position.set(
                 (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
                 (Math.random() - 0.5) * CONFIG.corridorHeight * 0.4,
                 z
             );
             scene.add(light);
-            corridorLights.push({ light, baseIntensity: 0.5, flickerSpeed: 5 + Math.random() * 10 });
+            corridorLights.push({ light, baseIntensity: 0.8, flickerSpeed: 2 + Math.random() * 5 });
         }
 
+        // Lighter, highly visible materials
         const materials = {
-            serverGreen: new THREE.MeshStandardMaterial({ color: 0x3a1a2b, metalness: 0.9, roughness: 0.2, emissive: 0x2a0a1a, emissiveIntensity: 0.3 }),
-            serverAmber: new THREE.MeshStandardMaterial({ color: 0x3a202a, metalness: 0.85, roughness: 0.25, emissive: 0x2a1018, emissiveIntensity: 0.25 }),
-            serverCyan: new THREE.MeshStandardMaterial({ color: 0x2a0a20, metalness: 0.9, roughness: 0.15, emissive: 0x1a0012, emissiveIntensity: 0.3 }),
-            darkMetal: new THREE.MeshStandardMaterial({ color: 0x15090d, metalness: 0.95, roughness: 0.3 }),
-            wireframe: new THREE.MeshBasicMaterial({ color: 0xff69b4, wireframe: true, transparent: true, opacity: 0.15 }),
-            wireframeAmber: new THREE.MeshBasicMaterial({ color: 0xffb6c1, wireframe: true, transparent: true, opacity: 0.12 }),
-            floor: new THREE.MeshStandardMaterial({ color: 0x0a0407, metalness: 0.7, roughness: 0.5 }),
-            grid: new THREE.MeshBasicMaterial({ color: 0x250a15, transparent: true, opacity: 0.25, wireframe: true }),
+            serverWhite: new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.1, roughness: 0.2 }),
+            serverPink: new THREE.MeshStandardMaterial({ color: 0xffe4e1, metalness: 0.2, roughness: 0.3 }),
+            serverMagenta: new THREE.MeshStandardMaterial({ color: 0xff69b4, metalness: 0.3, roughness: 0.4 }),
+            lightMetal: new THREE.MeshStandardMaterial({ color: 0xf0f0f0, metalness: 0.8, roughness: 0.2 }),
+            wireframe: new THREE.MeshBasicMaterial({ color: 0xc71585, wireframe: true, transparent: true, opacity: 0.3 }),
+            floor: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.8 }), // Pastel pink floor
+            grid: new THREE.MeshBasicMaterial({ color: 0xff69b4, transparent: true, opacity: 0.4, wireframe: true }),
         };
 
         const objects = [];
@@ -513,15 +433,16 @@
 
         function createServerRack(z, x, y, scale) {
             const geo = new THREE.BoxGeometry(scale * 0.8, scale * 2.5, scale * 0.6);
-            const mat = Math.random() > 0.5 ? materials.serverGreen : materials.serverAmber;
+            const mat = Math.random() > 0.5 ? materials.serverWhite : materials.serverPink;
             const mesh = new THREE.Mesh(geo, mat);
             mesh.position.set(x, y, z);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             objectGroup.add(mesh);
 
+            // Bright LED accents
             const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
-            const ledMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0xff69b4 : 0xffb6c1, transparent: true, opacity: 0.6 });
+            const ledMat = new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.8 });
             const led = new THREE.Mesh(ledGeo, ledMat);
             led.position.set(x, y + scale * 0.8, z + scale * 0.31);
             objectGroup.add(led);
@@ -576,7 +497,8 @@
                 createServerRack(z, x, y, scale);
             } else if (type < 0.7) {
                 const geo = new THREE.BoxGeometry(scale, scale, scale);
-                const mat = Math.random() > 0.7 ? materials.serverCyan : materials.darkMetal;
+                // Mix of bright white, pastel pink, and metal boxes
+                const mat = Math.random() > 0.6 ? materials.serverWhite : (Math.random() > 0.5 ? materials.serverMagenta : materials.lightMetal);
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(x, y, z);
                 mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
@@ -585,7 +507,7 @@
                 objectGroup.add(mesh);
 
                 const wireGeo = new THREE.EdgesGeometry(geo);
-                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xff69b4, transparent: true, opacity: 0.2 }));
+                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xc71585, transparent: true, opacity: 0.3 }));
                 wireLine.position.copy(mesh.position);
                 wireLine.rotation.copy(mesh.rotation);
                 objectGroup.add(wireLine);
@@ -597,7 +519,7 @@
                 });
             } else {
                 const geo = new THREE.TorusKnotGeometry(scale * 0.5, scale * 0.15, 64, 8);
-                const mat = Math.random() > 0.5 ? materials.serverAmber : materials.darkMetal;
+                const mat = Math.random() > 0.5 ? materials.serverPink : materials.lightMetal;
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(x, y, z);
                 mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
@@ -637,24 +559,6 @@
                     document.getElementById('progress-fill').style.width = `${self.progress * 100}%`;
                     const depth = Math.abs(camera.position.z - CONFIG.cameraZStart).toFixed(2);
                     document.getElementById('depth-readout').textContent = `${depth}m`;
-
-                    const integrity = (99.982 - (self.progress * 15) + (Math.random() * 0.1)).toFixed(3);
-                    const integrityEl = document.getElementById('integrity-readout');
-                    integrityEl.textContent = `${integrity}%`;
-                    
-                    if (self.progress > 0.7) {
-                        integrityEl.className = 'status-value red';
-                        document.getElementById('status-readout').textContent = 'ANOMALY DETECTED';
-                        document.getElementById('status-readout').style.color = 'var(--red)';
-                    } else if (self.progress > 0.4) {
-                        integrityEl.className = 'status-value amber';
-                        document.getElementById('status-readout').textContent = 'DEGRADING';
-                        document.getElementById('status-readout').style.color = 'var(--amber)';
-                    } else {
-                        integrityEl.className = 'status-value amber';
-                        document.getElementById('status-readout').textContent = 'ONLINE';
-                        document.getElementById('status-readout').style.color = 'var(--phosphor)';
-                    }
 
                     if (self.progress > 0.05) {
                         document.getElementById('scroll-hint').classList.add('hidden');
@@ -757,20 +661,13 @@
                 if(obj.led) obj.led.position.y = obj.baseY + yOffset + (obj.mesh.geometry.parameters.height/2 || 0);
 
                 if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.2 + Math.sin(time * 5 + obj.ledPulse) * 0.8;
+                    obj.ledMat.opacity = 0.4 + Math.sin(time * 5 + obj.ledPulse) * 0.6;
                 }
             });
 
             corridorLights.forEach(item => {
                 item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.2;
             });
-
-            const flickerEl = document.querySelector('.crt-flicker');
-            if(flickerEl && Math.random() > 0.9) {
-                flickerEl.style.opacity = 0.1 + Math.random() * 0.2;
-            } else if (flickerEl) {
-                flickerEl.style.opacity = 0.3;
-            }
 
             renderer.render(scene, camera);
         }
