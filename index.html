@@ -137,8 +137,8 @@
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 16px; font-weight: 500; 
-            line-height: 1.7; max-width: 850px;
+            color: var(--text-main); font-size: 15px; font-weight: 500; 
+            line-height: 1.6; max-width: 850px;
         }
         .sys-desc strong { color: var(--primary); font-weight: 800; }
         
@@ -261,19 +261,24 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">02 // TRANSPORT</span>
+                    <span class="win-title">02 // TEAMS & DOMAIN ROADMAP</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">MOVING THE NETWORK TRAFFIC</span>
-                    <h1 class="sys-header">THE<br><span class="dim">INFRASTRUCTURE</span></h1>
+                    <span class="sys-id">OUR OPERATIONAL STRUCTURE AT A GLANCE</span>
+                    <h1 class="sys-header">INSIDE THE NOC:<br><span class="dim">TEAMS & DOMAINS</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Transmission carries traffic between network locations and domains. Consists of topology, technologies, links, ports, cards, interfaces, and cross-site connectivity.</p>
-                        <p style="margin-bottom: 10px;"><strong>> VSAT (Very Small Aperture Terminal)</strong><br>Satellite-based communication useful for remote difficulty. Flow:<br>
-                        `Site` &#10142; `VSAT` &#10142; `Satellite` &#10142; `Hub/Gateway` &#10142; `Network`</p>
-                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS</strong><br>Alarm monitoring, calls, emails, ticket creation, escalations, first-level troubleshooting, Work Order (WO) dispatching, Change Request (CR) handling, Problem Management.</p>
-                        <p><strong>> DEVICES</strong><br>[TRANSPORT DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 12px;"><strong>> TEAMS & SUPPORT</strong><br>
+                        • <strong>Front Office:</strong> The 24/7 first line of defense watching alarms and taking initial actions.<br>
+                        • <strong>Back Office:</strong> Engineering specialists, shift leads, managers, and quality teams handling deep fixes.<br>
+                        • <strong>Service Desk:</strong> The primary point of contact managing tickets and requests.<br>
+                        • <strong>iNOC:</strong> Manages international gateways and cross-border traffic.</p>
+                        <p><strong>> CORE NETWORK DOMAINS (ROADMAP PREVIEW)</strong><br>
+                        • <strong>Transport:</strong> Transmission & IP<br>
+                        • <strong>Mobile:</strong> Core, SOC, & RAN<br>
+                        • <strong>Fixed Access:</strong> Fiber & Broadband<br>
+                        • <strong>Datacom:</strong> MPLS and data connectivity</p>
                     </div>
                 </div>
             </div>
@@ -283,18 +288,19 @@
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">03 // RAN</span>
+                    <span class="win-title">03 // INCIDENT CLASSIFICATION</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">CONNECTING MOBILE USERS</span>
-                    <h1 class="sys-header">RADIO ACCESS<br><span class="dim">NETWORK</span></h1>
+                    <span class="sys-id">HOW WE CATEGORIZE & PRIORITIZE NETWORK ISSUES</span>
+                    <h1 class="sys-header">INCIDENT<br><span class="dim">CLASSIFICATION</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Provides the radio connection between users and the telecommunications network.<br>Flow: `Mobile User` &#10142; `Radio Site` &#10142; `RAN` &#10142; `Transport` &#10142; `Core Network`</p>
-                        <p style="margin-bottom: 10px;"><strong>> EVOLUTION</strong><br>Higher capacity, rates, lower latency from 2G &#10142; 3G &#10142; 4G &#10142; 5G. Roles of ERAN / HRAN.</p>
-                        <p style="margin-bottom: 10px;"><strong>> EQUIPMENT</strong><br>[RAN DEVICES — TO BE ADDED]</p>
-                        <p><strong>> OPERATIONS</strong><br>Monitoring, alarm/call/email triage, escalation, L1 troubleshooting, WO dispatch, closure, Problem Management.</p>
+                        <p style="margin-bottom: 10px;"><strong>> EMERGENCY (P1):</strong> Complete outages or severe disruptions affecting critical infrastructure and massive user pools; demands non-stop immediate action.</p>
+                        <p style="margin-bottom: 10px;"><strong>> CRITICAL (P2):</strong> High-impact service degradations or major core system faults that severely affect operations requiring swift engineering response.</p>
+                        <p style="margin-bottom: 10px;"><strong>> MAJOR (P3):</strong> Situations that may result in emergencies/critical; major problems or disturbances that require immediate action.</p>
+                        <p style="margin-bottom: 10px;"><strong>> MINOR (P4):</strong> Faults that do not disturb traffic or cause any loss of service, handled through standard tracking workflows.</p>
+                        <p><strong>> WARNING (P5):</strong> Pre-failure alerts, threshold notifications, or early indicators with little to no immediate user impact, managed through routine follow-ups.</p>
                     </div>
                 </div>
             </div>
@@ -597,234 +603,86 @@
                 mesh: mesh, wireMesh: wireMesh, led: led, ledMat: ledMat,
                 rotSpeed: { x: 0, y: 0, z: 0 },
                 floatSpeed: 0, floatOffset: 0, baseY: y,
-                isServer: true, ledPulse: Math.random() * Math.PI * 2
+                isServer: true, ledPulse: Math.random() * Math.PI
             });
         }
 
-        const floorGeo = new THREE.PlaneGeometry(100, Math.abs(CONFIG.cameraZEnd) + 100);
+        for (let i = 0; i < CONFIG.objectCount; i++) {
+            const z = - (i / CONFIG.objectCount) * 450 - 5;
+            const side = Math.random() > 0.5 ? 1 : -1;
+            const x = side * (CONFIG.corridorWidth * 0.5 + Math.random() * 8);
+            const y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.6;
+            createServerRack(z, x, y, 2.5 + Math.random() * 2);
+        }
+
+        const floorGeo = new THREE.PlaneGeometry(CONFIG.corridorWidth * 1.5, 500, 20, 100);
         const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
         floorMesh.rotation.x = -Math.PI / 2;
-        floorMesh.position.y = -12;
-        floorMesh.position.z = CONFIG.cameraZEnd / 2;
+        floorMesh.position.set(0, -CONFIG.corridorHeight * 0.4, -230);
         floorMesh.receiveShadow = true;
         scene.add(floorMesh);
 
-        const gridMesh = new THREE.Mesh(floorGeo, materials.grid);
-        gridMesh.rotation.x = -Math.PI / 2;
-        gridMesh.position.y = -11.9;
-        gridMesh.position.z = CONFIG.cameraZEnd / 2;
-        scene.add(gridMesh);
+        const floorGridMesh = new THREE.Mesh(floorGeo, materials.grid);
+        floorGridMesh.rotation.x = -Math.PI / 2;
+        floorGridMesh.position.set(0, -CONFIG.corridorHeight * 0.4 + 0.05, -230);
+        scene.add(floorGridMesh);
 
-        for (let i = 0; i < CONFIG.objectCount; i++) {
-            const z = CONFIG.cameraZStart - 10 - (Math.random() * (Math.abs(CONFIG.cameraZEnd) + 40));
-            const margin = 2;
-            const hw = CONFIG.corridorWidth / 2 - margin;
-            const hh = CONFIG.corridorHeight / 2 - margin;
+        const ceilingMesh = new THREE.Mesh(floorGeo, materials.grid);
+        ceilingMesh.rotation.x = Math.PI / 2;
+        ceilingMesh.position.set(0, CONFIG.corridorHeight * 0.4, -230);
+        scene.add(ceilingMesh);
 
-            let x, y;
-            if (Math.random() > 0.4) {
-                x = Math.random() > 0.5 ? hw : -hw;
-                x += (Math.random() - 0.5) * 4;
-                y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.8;
-            } else {
-                x = (Math.random() - 0.5) * CONFIG.corridorWidth * 0.7;
-                y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.7;
-            }
+        const sections = gsap.utils.toArray('.ui-section');
+        const totalSlides = sections.length;
 
-            const scale = 1 + Math.random() * 2.5;
-            const type = Math.random();
+        sections.forEach((section, index) => {
+            const progressStart = index / totalSlides;
+            const progressEnd = (index + 1) / totalSlides;
 
-            if (type < 0.4) {
-                createServerRack(z, x, y, scale);
-            } else if (type < 0.7) {
-                const geo = new THREE.BoxGeometry(scale, scale, scale);
-                const mat = Math.random() > 0.6 ? materials.serverSoftPink : (Math.random() > 0.5 ? materials.serverMagenta : materials.serverPink);
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(x, y, z);
-                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                objectGroup.add(mesh);
+            ScrollTrigger.create({
+                trigger: '#scroll-track',
+                start: `${progressStart * 100}% top`,
+                end: `${progressEnd * 100}% top`,
+                scrub: CONFIG.scrubValue,
+                onEnter: () => animateSection(section, true),
+                onLeaveBack: () => animateSection(section, false),
+                onEnterBack: () => animateSection(section, true),
+                onLeave: () => animateSection(section, false)
+            });
+        });
 
-                const wireGeo = new THREE.EdgesGeometry(geo);
-                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xc71585, transparent: true, opacity: 0.4 }));
-                wireLine.position.copy(mesh.position);
-                wireLine.rotation.copy(mesh.rotation);
-                objectGroup.add(wireLine);
-
-                objects.push({
-                    mesh: mesh, wireLine: wireLine,
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.02, y: (Math.random() - 0.5) * 0.02, z: (Math.random() - 0.5) * 0.02 },
-                    floatSpeed: (Math.random() - 0.5) * 0.01, floatOffset: Math.random() * Math.PI * 2, baseY: y
-                });
-            } else {
-                const geo = new THREE.TorusKnotGeometry(scale * 0.5, scale * 0.15, 64, 8);
-                const mat = Math.random() > 0.5 ? materials.serverPink : materials.serverMagenta;
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(x, y, z);
-                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                objectGroup.add(mesh);
-
-                objects.push({
-                    mesh: mesh,
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.01, y: (Math.random() - 0.5) * 0.03, z: (Math.random() - 0.5) * 0.01 },
-                    floatSpeed: (Math.random() - 0.5) * 0.005, floatOffset: Math.random() * Math.PI * 2, baseY: y
-                });
-            }
+        function animateSection(section, show) {
+            gsap.to(section, {
+                opacity: show ? 1 : 0,
+                y: show ? 0 : 60,
+                duration: 0.6,
+                ease: "power2.out",
+                overwrite: "auto"
+            });
         }
 
-        const sections = document.querySelectorAll('.ui-section');
-        const numSections = sections.length;
-        
-        let pathPoints = [];
-        for (let i = 0; i < numSections; i++) {
-            const progress = i / (numSections - 1);
-            const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
-            
-            const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
-            const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
-            
-            pathPoints.push(new THREE.Vector3(x, y, z));
-        }
-        
-        const curve = new THREE.CatmullRomCurve3(pathPoints);
-
-        const tl = gsap.timeline({
+        const mainTL = gsap.timeline({
             scrollTrigger: {
                 trigger: '#scroll-track',
                 start: 'top top',
                 end: 'bottom bottom',
                 scrub: CONFIG.scrubValue,
-                onUpdate: (self) => {
-                    document.getElementById('progress-fill').style.width = `${self.progress * 100}%`;
-                    
-                    const depth = Math.abs(camera.position.z - CONFIG.cameraZStart).toFixed(2);
+                onUpdate: self => {
+                    const p = self.progress;
+                    document.getElementById('progress-fill').style.width = `${p * 100}%`;
+                    const depth = (p * 450).toFixed(2);
                     document.getElementById('depth-readout').textContent = `${depth}m`;
-
-                    const currentSlide = Math.min(10, Math.max(1, Math.ceil(self.progress * 10)));
-                    document.getElementById('slide-readout').textContent = `${currentSlide.toString().padStart(2, '0')}/10`;
-
-                    if (self.progress > 0.01) {
-                        titleScreen.style.opacity = '0';
-                        titleScreen.style.pointerEvents = 'none';
-                    } else if (bootScreen.style.display === 'none') {
-                        titleScreen.style.opacity = '1';
-                        titleScreen.style.pointerEvents = 'auto';
-                    }
+                    const currentSlide = Math.min(totalSlides, Math.floor(p * totalSlides) + 1);
+                    document.getElementById('slide-readout').textContent = `0${currentSlide}/${totalSlides}`;
                 }
             }
         });
 
-        tl.to(camera.position, {
+        mainTL.to(camera.position, {
+            z: CONFIG.cameraZEnd,
             ease: "none",
-            duration: 1,
-            onUpdate: function() {
-                const time = this.progress();
-                const point = curve.getPointAt(time);
-                camera.position.copy(point);
-
-                const lookAheadTime = Math.min(1, time + 0.03);
-                const lookAheadPoint = curve.getPointAt(lookAheadTime);
-                const dx = lookAheadPoint.x - point.x;
-                camera.rotation.z = gsap.utils.interpolate(camera.rotation.z, dx * -0.1, 0.1);
-                
-                const targetPoint = curve.getPointAt(Math.min(1, time + 0.06));
-                camera.rotation.x = gsap.utils.interpolate(camera.rotation.x, (targetPoint.y - point.y) * 0.02, 0.1);
-                camera.rotation.y = gsap.utils.interpolate(camera.rotation.y, (targetPoint.x - point.x) * 0.05, 0.1);
-            }
+            duration: 1
         }, 0);
-
-        sections.forEach((section, index) => {
-            const start = index * 10;
-            const end = start + 10;
-
-            if (index === numSections - 1) {
-                gsap.fromTo(section, 
-                    { opacity: 0, y: 60 },
-                    {
-                        opacity: 1, 
-                        y: 0,
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: '#scroll-track',
-                            start: `${start}% top`, 
-                            end: `${start + 4}% top`,
-                            scrub: true,
-                        }
-                    }
-                );
-            } else {
-                const sectionTl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '#scroll-track',
-                        start: `${start}% top`,
-                        end: `${end}% top`,
-                        scrub: true,
-                    }
-                });
-
-                sectionTl.fromTo(section, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.2, ease: "none" })
-                         .to(section, { opacity: 1, y: 0, duration: 0.6 }) 
-                         .to(section, { opacity: 0, y: -60, duration: 0.2, ease: "none" }); 
-            }
-        });
-
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX - windowHalfX) * 0.001;
-            mouseY = (event.clientY - windowHalfY) * 0.001;
-        });
-
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
-
-            targetX = mouseX * 0.5;
-            targetY = mouseY * 0.5;
-            
-            camera.rotation.y += (targetX - (camera.rotation.y - (camera.userData.baseRotY || 0))) * 0.05;
-            camera.rotation.x += (targetY - (camera.rotation.x - (camera.userData.baseRotX || 0))) * 0.05;
-
-            objects.forEach(obj => {
-                if (obj.mesh) {
-                    obj.mesh.rotation.x += obj.rotSpeed.x;
-                    obj.mesh.rotation.y += obj.rotSpeed.y;
-                    obj.mesh.rotation.z += obj.rotSpeed.z;
-                }
-                if (obj.wireMesh) {
-                    obj.wireMesh.rotation.copy(obj.mesh.rotation);
-                }
-                if (obj.wireLine) {
-                    obj.wireLine.rotation.copy(obj.mesh.rotation);
-                }
-
-                const yOffset = Math.sin(time * 2 + obj.floatOffset) * obj.floatSpeed * 50;
-                if(obj.mesh) obj.mesh.position.y = obj.baseY + yOffset;
-                if(obj.wireMesh) obj.wireMesh.position.y = obj.baseY + yOffset;
-                if(obj.wireLine) obj.wireLine.position.y = obj.baseY + yOffset;
-                if(obj.led) obj.led.position.y = obj.baseY + yOffset + (obj.mesh.geometry.parameters.height/2 || 0);
-
-                if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.5 + Math.sin(time * 4 + obj.ledPulse) * 0.5;
-                }
-            });
-
-            corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.2;
-            });
-
-            renderer.render(scene, camera);
-        }
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -832,7 +690,23 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            corridorLights.forEach(item => {
+                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.3;
+            });
+
+            objects.forEach(obj => {
+                if (obj.ledMat) {
+                    obj.ledMat.opacity = 0.5 + Math.sin(elapsedTime * 4 + obj.ledPulse) * 0.4;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
         animate();
     </script>
-</body>
-</html>
+</body></html>
