@@ -81,6 +81,7 @@
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             transition: opacity 0.8s ease; opacity: 0; 
+            pointer-events: none;
         }
         .main-title {
             font-size: clamp(5rem, 12vw, 10rem);
@@ -659,8 +660,19 @@
         const curve = new THREE.CatmullRomCurve3(pathPoints);
         curve.curveType = 'centripetal';
 
-        // Bind Camera to Scroll
+        // Mouse Parallax Trackers
+        let mouseX = 0, mouseY = 0;
+        let targetMouseX = 0, targetMouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+            targetMouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+        });
+
+        // Bind Camera to Scroll & Mouse Parallax
         const scrollObject = { progress: 0 };
+        let currentBasePos = new THREE.Vector3();
+        let currentLookAt = new THREE.Vector3();
+
         gsap.to(scrollObject, {
             progress: 1,
             ease: "none",
@@ -671,11 +683,8 @@
                 scrub: CONFIG.scrubValue,
                 onUpdate: (self) => {
                     const p = self.progress;
-                    const point = curve.getPoint(p);
-                    camera.position.copy(point);
-                    
-                    const lookAtPoint = curve.getPoint(Math.min(p + 0.01, 1));
-                    camera.lookAt(lookAtPoint);
+                    currentBasePos.copy(curve.getPoint(p));
+                    currentLookAt.copy(curve.getPoint(Math.min(p + 0.01, 1)));
 
                     const currentDepth = (p * Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart)).toFixed(2);
                     document.getElementById('depth-readout').textContent = currentDepth + 'm';
@@ -704,11 +713,27 @@
             });
         });
 
-        // Animation Loop
+        // Animation Loop with Smooth Mouse Parallax Interpolation
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
+
+            // Smoothly interpolate mouse movement
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // Apply camera position with mouse offset
+            if (currentBasePos.lengthSq() > 0) {
+                camera.position.x = currentBasePos.x + mouseX * 2.5;
+                camera.position.y = currentBasePos.y - mouseY * 2.5;
+                camera.position.z = currentBasePos.z;
+
+                let adjustedLookAt = currentLookAt.clone();
+                adjustedLookAt.x += mouseX * 1.5;
+                adjustedLookAt.y -= mouseY * 1.5;
+                camera.lookAt(adjustedLookAt);
+            }
 
             objects.forEach((obj) => {
                 if (obj.mesh) {
