@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -622,9 +623,15 @@
                 y = Math.random() > 0.5 ? hh : -hh;
                 y += (Math.random() - 0.5) * 2;
                 
-                const geo = Math.random() > 0.5 
-                    ? new THREE.BoxGeometry(2, 2, 2) 
-                    : new THREE.OctahedronGeometry(1.5);
+                const randType = Math.random();
+                let geo;
+                if (randType > 0.6) {
+                    geo = new THREE.TorusKnotGeometry(1.2, 0.4, 64, 16);
+                } else if (randType > 0.3) {
+                    geo = new THREE.BoxGeometry(2, 2, 2);
+                } else {
+                    geo = new THREE.OctahedronGeometry(1.5);
+                }
                 const mat = Math.random() > 0.5 ? materials.serverMagenta : materials.wireframe;
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(x, y, z);
@@ -742,3 +749,5 @@
     </script>
 </body>
 </html>
+
+```
