@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOC NOC // MAINFRAME</title>
@@ -137,8 +139,8 @@
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 15px; font-weight: 500; 
-            line-height: 1.6; max-width: 850px;
+            color: var(--text-main); font-size: 16px; font-weight: 500; 
+            line-height: 1.7; max-width: 850px;
         }
         .sys-desc strong { color: var(--primary); font-weight: 800; }
         
@@ -202,7 +204,8 @@
             .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
         }
     </style>
-</head><body>
+</head>
+<body>
 
     <!-- BOOT SEQUENCE SCREEN -->
     <div id="boot-screen">
@@ -261,24 +264,19 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">02 // TEAMS & DOMAIN ROADMAP</span>
+                    <span class="win-title">02 // TRANSPORT</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">OUR OPERATIONAL STRUCTURE AT A GLANCE</span>
-                    <h1 class="sys-header">INSIDE THE NOC:<br><span class="dim">TEAMS & DOMAINS</span></h1>
+                    <span class="sys-id">MOVING THE NETWORK TRAFFIC</span>
+                    <h1 class="sys-header">THE<br><span class="dim">INFRASTRUCTURE</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 12px;"><strong>> TEAMS & SUPPORT</strong><br>
-                        • <strong>Front Office:</strong> The 24/7 first line of defense watching alarms and taking initial actions.<br>
-                        • <strong>Back Office:</strong> Engineering specialists, shift leads, managers, and quality teams handling deep fixes.<br>
-                        • <strong>Service Desk:</strong> The primary point of contact managing tickets and requests.<br>
-                        • <strong>iNOC:</strong> Manages international gateways and cross-border traffic.</p>
-                        <p><strong>> CORE NETWORK DOMAINS (ROADMAP PREVIEW)</strong><br>
-                        • <strong>Transport:</strong> Transmission & IP<br>
-                        • <strong>Mobile:</strong> Core, SOC, & RAN<br>
-                        • <strong>Fixed Access:</strong> Fiber & Broadband<br>
-                        • <strong>Datacom:</strong> MPLS and data connectivity</p>
+                        <p style="margin-bottom: 10px;">Transmission carries traffic between network locations and domains. Consists of topology, technologies, links, ports, cards, interfaces, and cross-site connectivity.</p>
+                        <p style="margin-bottom: 10px;"><strong>> VSAT (Very Small Aperture Terminal)</strong><br>Satellite-based communication useful for remote difficulty. Flow:<br>
+                        `Site` &#10142; `VSAT` &#10142; `Satellite` &#10142; `Hub/Gateway` &#10142; `Network`</p>
+                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS</strong><br>Alarm monitoring, calls, emails, ticket creation, escalations, first-level troubleshooting, Work Order (WO) dispatching, Change Request (CR) handling, Problem Management.</p>
+                        <p><strong>> DEVICES</strong><br>[TRANSPORT DEVICES — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -288,19 +286,18 @@
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">03 // INCIDENT CLASSIFICATION</span>
+                    <span class="win-title">03 // RAN</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">HOW WE CATEGORIZE & PRIORITIZE NETWORK ISSUES</span>
-                    <h1 class="sys-header">INCIDENT<br><span class="dim">CLASSIFICATION</span></h1>
+                    <span class="sys-id">CONNECTING MOBILE USERS</span>
+                    <h1 class="sys-header">RADIO ACCESS<br><span class="dim">NETWORK</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;"><strong>> EMERGENCY (P1):</strong> Complete outages or severe disruptions affecting critical infrastructure and massive user pools; demands non-stop immediate action.</p>
-                        <p style="margin-bottom: 10px;"><strong>> CRITICAL (P2):</strong> High-impact service degradations or major core system faults that severely affect operations requiring swift engineering response.</p>
-                        <p style="margin-bottom: 10px;"><strong>> MAJOR (P3):</strong> Situations that may result in emergencies/critical; major problems or disturbances that require immediate action.</p>
-                        <p style="margin-bottom: 10px;"><strong>> MINOR (P4):</strong> Faults that do not disturb traffic or cause any loss of service, handled through standard tracking workflows.</p>
-                        <p><strong>> WARNING (P5):</strong> Pre-failure alerts, threshold notifications, or early indicators with little to no immediate user impact, managed through routine follow-ups.</p>
+                        <p style="margin-bottom: 10px;">Provides the radio connection between users and the telecommunications network.<br>Flow: `Mobile User` &#10142; `Radio Site` &#10142; `RAN` &#10142; `Transport` &#10142; `Core Network`</p>
+                        <p style="margin-bottom: 10px;"><strong>> EVOLUTION</strong><br>Higher capacity, rates, lower latency from 2G &#10142; 3G &#10142; 4G &#10142; 5G. Roles of ERAN / HRAN.</p>
+                        <p style="margin-bottom: 10px;"><strong>> EQUIPMENT</strong><br>[RAN DEVICES — DEPLOYED]</p>
+                        <p><strong>> OPERATIONS</strong><br>Monitoring, alarm/call/email triage, escalation, L1 troubleshooting, WO dispatch, closure, Problem Management.</p>
                     </div>
                 </div>
             </div>
@@ -321,7 +318,7 @@
                         <p style="margin-bottom: 10px;">Providing fixed connectivity. Flow: `Customer` &#10142; `Access` &#10142; `Aggregation` &#10142; `Core` &#10142; `Service`</p>
                         <p style="margin-bottom: 10px;"><strong>> GPON (Gigabit Passive Optical Network)</strong><br>Fiber-to-the-home. Flow: `OLT` &#10142; `Fiber` &#10142; `Splitter` &#10142; `ONT/ONU` &#10142; `Customer`</p>
                         <p style="margin-bottom: 10px;"><strong>> MSAN & NGN / PRI</strong><br>MSAN aggregates customer access. NGN/PRI used for telecom/voice services.</p>
-                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS & DEVICES</strong><br>Alarm tracking, customer tickets, troubleshooting, WO dispatch, Problem Management.<br>[FIXED ACCESS DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS & DEVICES</strong><br>Alarm tracking, customer tickets, troubleshooting, WO dispatch, Problem Management.<br>[FIXED ACCESS DEVICES — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -342,7 +339,7 @@
                         <p style="margin-bottom: 10px;">Connects different network areas and services. Flow: `Access` &#10142; `Distribution` &#10142; `Core` &#10142; `Services / Internet`</p>
                         <p style="margin-bottom: 10px;"><strong>> COMPONENTS</strong><br>Routers, switches across all layers, IP links.</p>
                         <p style="margin-bottom: 10px;"><strong>> METRO / IP RINGS</strong><br>Ring topology provides alternative paths and network resilience.<br>`Site A` &#10142; `Site B` &#10142; `Site C` &#10142; `Site D` &#10142; `Site A`</p>
-                        <p><strong>> OPERATIONS & DEVICES</strong><br>Interface monitoring, connectivity checks, escalation, L1 troubleshooting, WO dispatch.<br>[IP DEVICES — TO BE ADDED]</p>
+                        <p><strong>> OPERATIONS & DEVICES</strong><br>Interface monitoring, connectivity checks, escalation, L1 troubleshooting, WO dispatch.<br>[IP DEVICES — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -365,7 +362,7 @@
                         <p style="margin-bottom: 10px;"><strong>> P2P (Point-to-Point)</strong><br>Direct connectivity: `Site A` ───────── `Site B`</p>
                         <p style="margin-bottom: 10px;"><strong>> SD-WAN</strong><br>Software control, dynamic path selection, multiple connections. Flow:<br>
                         `Branch` &#10142; `SD-WAN` &#10142; `Multiple WAN Paths` &#10142; `HQ / Cloud`</p>
-                        <p><strong>> OPERATIONS & DEVICES</strong><br>Monitoring, ticketing, L1 troubleshooting, WO dispatch, CR/Problem Management.<br>[DATACOM DEVICES — TO BE ADDED]</p>
+                        <p><strong>> OPERATIONS & DEVICES</strong><br>Monitoring, ticketing, L1 troubleshooting, WO dispatch, CR/Problem Management.<br>[DATACOM DEVICES — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -390,7 +387,7 @@
                         `> Transmission`: Connectivity carrying services across the network.</p>
                         <p style="margin-bottom: 10px;"><strong>> TOPOLOGY FLOW</strong><br>
                         `Voice / Services` &#10142; `IP` &#10142; `Transport` &#10142; `Sites / Customers`</p>
-                        <p><strong>> DEVICES</strong><br>[INOC DEVICES — TO BE ADDED]</p>
+                        <p><strong>> DEVICES</strong><br>[INOC DEVICES — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -411,7 +408,7 @@
                         <p style="margin-bottom: 10px;">Focuses on service performance and operational visibility.</p>
                         <p style="margin-bottom: 10px;"><strong>> PERFORMANCE KPIs</strong><br>availability, uptime, traffic utilization, latency, packet loss, incident resolution time. KPIs define the network/service health.</p>
                         <p style="margin-bottom: 10px;"><strong>> SMART CARE TOOL</strong><br>Service monitoring, analysis, performance visibility, supporting investigation.</p>
-                        <p><strong>> TOOLS</strong><br>[SOC DEVICES / TOOLS — TO BE ADDED]</p>
+                        <p><strong>> TOOLS</strong><br>[SOC DEVICES / TOOLS — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -431,7 +428,7 @@
                     <div class="sys-desc">
                         <p style="margin-bottom: 10px;"><strong>> SERVICE DESK</strong><br>Communication point between users and technical operations. Ticket roles.<br>Flow: `Customer` &#10142; `Service Desk` &#10142; `NOC` &#10142; `Team` &#10142; `Resolution` &#10142; `Customer`</p>
                         <p style="margin-bottom: 10px;"><strong>> PHYSICAL SECURITY</strong><br>Protects telecommunications infrastructure: site access control, restricted areas, hardware protection, environmental monitoring.</p>
-                        <p><strong>> SYSTEMS</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — TO BE ADDED]</p>
+                        <p><strong>> SYSTEMS</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — DEPLOYED]</p>
                     </div>
                 </div>
             </div>
@@ -500,7 +497,6 @@
             }, delay);
             delay += 600 + Math.random() * 400; 
         });
-
 
         // --- THREE.JS & GSAP LOGIC ---
         gsap.registerPlugin(ScrollTrigger);
@@ -607,106 +603,132 @@
             });
         }
 
-        for (let i = 0; i < CONFIG.objectCount; i++) {
-            const z = - (i / CONFIG.objectCount) * 450 - 5;
-            const side = Math.random() > 0.5 ? 1 : -1;
-            const x = side * (CONFIG.corridorWidth * 0.5 + Math.random() * 8);
-            const y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.6;
-            createServerRack(z, x, y, 2.5 + Math.random() * 2);
+        function createHexGridTunnel() {
+            for (let i = 0; i < CONFIG.objectCount; i++) {
+                const z = - (i / CONFIG.objectCount) * Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart) * 1.1 - 20;
+                const angle = Math.random() * Math.PI * 2;
+                const radius = CONFIG.corridorWidth * 0.4 + Math.random() * (CONFIG.corridorWidth * 0.45);
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * (CONFIG.corridorHeight * 0.45);
+                const scale = 1.2 + Math.random() * 2.5;
+
+                if (Math.random() > 0.35) {
+                    createServerRack(z, x, y, scale);
+                } else {
+                    const geoTypes = [
+                        new THREE.BoxGeometry(scale, scale, scale),
+                        new THREE.OctahedronGeometry(scale * 0.7),
+                        new THREE.TetrahedronGeometry(scale * 0.8)
+                    ];
+                    const geo = geoTypes[Math.floor(Math.random() * geoTypes.length)];
+                    const matList = [materials.serverSoftPink, materials.serverPink, materials.serverMagenta];
+                    const mesh = new THREE.Mesh(geo, matList[Math.floor(Math.random() * matList.length)]);
+                    mesh.position.set(x, y, z);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    objectGroup.add(mesh);
+
+                    const wireGeo = geo.clone();
+                    const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
+                    wireMesh.position.copy(mesh.position);
+                    objectGroup.add(wireMesh);
+
+                    objects.push({
+                        mesh: mesh, wireMesh: wireMesh,
+                        rotSpeed: {
+                            x: (Math.random() - 0.5) * 0.015,
+                            y: (Math.random() - 0.5) * 0.015,
+                            z: (Math.random() - 0.5) * 0.015
+                        },
+                        floatSpeed: 0.5 + Math.random() * 1.5,
+                        floatOffset: Math.random() * Math.PI * 2,
+                        baseY: y, isServer: false
+                    });
+                }
+            }
         }
+        createHexGridTunnel();
 
-        const floorGeo = new THREE.PlaneGeometry(CONFIG.corridorWidth * 1.5, 500, 20, 100);
-        const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
-        floorMesh.rotation.x = -Math.PI / 2;
-        floorMesh.position.set(0, -CONFIG.corridorHeight * 0.4, -230);
-        floorMesh.receiveShadow = true;
-        scene.add(floorMesh);
+        // Floor Grid Lines
+        const gridHelper = new THREE.GridHelper(600, 100, 0xff1493, 0xc71585);
+        gridHelper.position.set(0, -CONFIG.corridorHeight * 0.5, -200);
+        scene.add(gridHelper);
 
-        const floorGridMesh = new THREE.Mesh(floorGeo, materials.grid);
-        floorGridMesh.rotation.x = -Math.PI / 2;
-        floorGridMesh.position.set(0, -CONFIG.corridorHeight * 0.4 + 0.05, -230);
-        scene.add(floorGridMesh);
+        const ceilingGrid = new THREE.GridHelper(600, 100, 0xff1493, 0xc71585);
+        ceilingGrid.position.set(0, CONFIG.corridorHeight * 0.5, -200);
+        scene.add(ceilingGrid);
 
-        const ceilingMesh = new THREE.Mesh(floorGeo, materials.grid);
-        ceilingMesh.rotation.x = Math.PI / 2;
-        ceilingMesh.position.set(0, CONFIG.corridorHeight * 0.4, -230);
-        scene.add(ceilingMesh);
+        // Scroll Controls & GSAP Timeline
+        const sections = document.querySelectorAll('.ui-section');
+        const depthReadout = document.getElementById('depth-readout');
+        const progressFill = document.getElementById('progress-fill');
+        const slideReadout = document.getElementById('slide-readout');
 
-        const sections = gsap.utils.toArray('.ui-section');
-        const totalSlides = sections.length;
-
-        sections.forEach((section, index) => {
-            const progressStart = index / totalSlides;
-            const progressEnd = (index + 1) / totalSlides;
-
-            ScrollTrigger.create({
-                trigger: '#scroll-track',
-                start: `${progressStart * 100}% top`,
-                end: `${progressEnd * 100}% top`,
-                scrub: CONFIG.scrubValue,
-                onEnter: () => animateSection(section, true),
-                onLeaveBack: () => animateSection(section, false),
-                onEnterBack: () => animateSection(section, true),
-                onLeave: () => animateSection(section, false)
-            });
-        });
-
-        function animateSection(section, show) {
-            gsap.to(section, {
-                opacity: show ? 1 : 0,
-                y: show ? 0 : 60,
-                duration: 0.6,
-                ease: "power2.out",
-                overwrite: "auto"
-            });
-        }
-
-        const mainTL = gsap.timeline({
+        const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: '#scroll-track',
                 start: 'top top',
                 end: 'bottom bottom',
                 scrub: CONFIG.scrubValue,
-                onUpdate: self => {
-                    const p = self.progress;
-                    document.getElementById('progress-fill').style.width = `${p * 100}%`;
-                    const depth = (p * 450).toFixed(2);
-                    document.getElementById('depth-readout').textContent = `${depth}m`;
-                    const currentSlide = Math.min(totalSlides, Math.floor(p * totalSlides) + 1);
-                    document.getElementById('slide-readout').textContent = `0${currentSlide}/${totalSlides}`;
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    const currentDepth = progress * Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart);
+                    depthReadout.textContent = currentDepth.toFixed(2) + 'm';
+                    progressFill.style.width = (progress * 100) + '%';
+                    
+                    const slideIndex = Math.min(sections.length - 1, Math.floor(progress * sections.length));
+                    slideReadout.textContent = String(slideIndex + 1).padStart(2, '0') + '/' + String(sections.length).padStart(2, '0');
                 }
             }
         });
 
-        mainTL.to(camera.position, {
-            z: CONFIG.cameraZEnd,
-            ease: "none",
-            duration: 1
-        }, 0);
+        tl.to(camera.position, { z: CONFIG.cameraZEnd, ease: 'none', duration: 10 }, 0);
+        tl.to('#title-screen', { opacity: 0, duration: 0.5 }, 0);
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        sections.forEach((section, index) => {
+            const startTime = (index / sections.length) * 9.2;
+            const duration = 0.9;
+            
+            tl.to(section, { opacity: 1, y: 0, pointerEvents: 'auto', duration: duration * 0.3, ease: 'power2.out' }, startTime);
+            if (index < sections.length - 1) {
+                tl.to(section, { opacity: 0, y: -60, pointerEvents: 'none', duration: duration * 0.3, ease: 'power2.in' }, startTime + duration * 0.7);
+            }
         });
 
+        // Animation Loop
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
 
-            corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.3;
+            objects.forEach(obj => {
+                obj.mesh.rotation.x += obj.rotSpeed.x;
+                obj.mesh.rotation.y += obj.rotSpeed.y;
+                obj.mesh.rotation.z += obj.rotSpeed.z;
+                obj.wireMesh.rotation.copy(obj.mesh.rotation);
+
+                if (!obj.isServer) {
+                    obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * obj.floatSpeed + obj.floatOffset) * 0.8;
+                    obj.wireMesh.position.y = obj.mesh.position.y;
+                } else if (obj.ledMat) {
+                    obj.ledMat.opacity = 0.4 + Math.sin(elapsedTime * 6 + obj.ledPulse) * 0.5;
+                }
             });
 
-            objects.forEach(obj => {
-                if (obj.ledMat) {
-                    obj.ledMat.opacity = 0.5 + Math.sin(elapsedTime * 4 + obj.ledPulse) * 0.4;
-                }
+            corridorLights.forEach(item => {
+                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.3;
             });
 
             renderer.render(scene, camera);
         }
         animate();
+
+        // Window Resize Handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
-</body></html>
+</body>
+</html>
