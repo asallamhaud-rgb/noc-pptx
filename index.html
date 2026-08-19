@@ -361,7 +361,7 @@
             </div>
         </div>
 
-        <!-- Slide 6 (Updated Content) -->
+        <!-- Slide 6 (Updated Content Only) -->
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
@@ -373,7 +373,7 @@
                     <span class="sys-id">WIRELESS DOMAIN // STAGE_06</span>
                     <h1 class="sys-header" style="font-size: clamp(1.3rem, 2.2vw, 1.8rem); margin-bottom: 12px;">MOBILE NETWORK:<br><span class="dim">RADIO ACCESS NETWORK (RAN)</span></h1>
                     <div class="sys-desc" style="font-size: 12.5px; line-height: 1.45;">
-                        <p style="margin-bottom: 8px;"><strong>> RAN:</strong> Connects user devices to the mobile core network through radio access infrastructure.</p>
+                        <p style="margin-bottom: 8px;"><strong>> RAN:</strong> Connects user devices to the mobile core network through the radio access network.</p>
                         
                         <p style="margin-bottom: 4px;"><strong>> NETWORK ARCHITECTURE FLOW:</strong></p>
                         <div style="margin-bottom: 10px; background: rgba(255,182,193,0.05); padding: 8px 12px; border-left: 2px solid var(--primary); font-size: 11.5px; line-height: 1.5;">
@@ -705,7 +705,7 @@
             }
         }
 
-        // --- SCROLL TIMELINE (15,000vh ScrollTrack) ---
+        // --- SCROLL TIMELINE ---
         const totalSections = 10;
         const timeline = gsap.timeline({
             scrollTrigger: {
@@ -727,26 +727,22 @@
             }
         });
 
-        // Camera Flight Through Corridor
         timeline.to(camera.position, {
             z: CONFIG.cameraZEnd,
             ease: "none",
             duration: 1
         }, 0);
 
-        // Title Screen Fade Out early on scroll
         timeline.to(titleScreen, {
             opacity: 0,
             duration: 0.05
         }, 0);
 
-        // Stagger UI Sections Across Scroll Progress
         const uiSections = document.querySelectorAll('.ui-section');
         uiSections.forEach((section, i) => {
             const startTime = (i / totalSections) + 0.02;
             const peakTime = startTime + (0.8 / totalSections);
 
-            // Fade In & Slide Up
             timeline.to(section, {
                 opacity: 1,
                 y: 0,
@@ -755,7 +751,6 @@
                 ease: "power2.out"
             }, startTime);
 
-            // Fade Out & Slide Down as you scroll past
             if (i < uiSections.length - 1) {
                 timeline.to(section, {
                     opacity: 0,
@@ -774,7 +769,6 @@
             const delta = clock.getDelta();
             const time = clock.getElapsedTime();
 
-            // Rotate floating objects & pulse server LEDs
             objects.forEach(obj => {
                 if (obj.isServer) {
                     obj.ledPulse += delta * 4;
@@ -789,7 +783,6 @@
                 }
             });
 
-            // Flicker corridor point lights dynamically
             corridorLights.forEach(item => {
                 item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.3;
             });
@@ -798,7 +791,6 @@
         }
         animate();
 
-        // --- WINDOW RESIZE HANDLER ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
