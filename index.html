@@ -264,14 +264,25 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">02 // ARCHITECTURE</span>
+                    <span class="win-title">02 // TEAMS & DOMAINS</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">NETWORK TOPOLOGY // STAGE_02</span>
-                    <h1 class="sys-header">SERVER<br><span class="dim">SPINES</span></h1>
-                    <p class="sys-desc">Floating monolithic forms drift past. We have engineered the ambient environment to reflect soft magentas and deep rose tones, completely eliminating the synthetic glare.</p>
+                    <span class="sys-id">OUR OPERATIONAL STRUCTURE // STAGE_02</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 15px;">INSIDE THE NOC:<br><span class="dim">TEAMS & NETWORK DOMAINS</span></h1>
+                    <div class="sys-desc" style="font-size: 15px; line-height: 1.6;">
+                        <p style="margin-bottom: 10px;"><strong>> TEAMS & SUPPORT</strong></p>
+                        <p style="margin-bottom: 6px;">• <strong>Front Office:</strong> The 24/7 first line of defense watching alarms and taking initial actions.</p>
+                        <p style="margin-bottom: 6px;">• <strong>Back Office:</strong> Engineering specialists, shift leads, managers, and quality teams handling deep fixes.</p>
+                        <p style="margin-bottom: 6px;">• <strong>Service Desk:</strong> The primary point of contact managing tickets and requests.</p>
+                        <p style="margin-bottom: 12px;">• <strong>iNOC:</strong> Manages international gateways and cross-border traffic.</p>
+                        <p style="margin-bottom: 10px;"><strong>> CORE NETWORK DOMAINS (ROADMAP)</strong></p>
+                        <p style="margin-bottom: 4px;">• <strong>Transport:</strong> Transmission & IP</p>
+                        <p style="margin-bottom: 4px;">• <strong>Mobile:</strong> Core, SOC, & RAN</p>
+                        <p style="margin-bottom: 4px;">• <strong>Fixed Access:</strong> Fiber & Broadband</p>
+                        <p style="margin-bottom: 0;">• <strong>Datacom:</strong> MPLS and data connectivity.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -670,90 +681,52 @@
             }
         });
 
-        tl.to(camera.position, {
+        const camDummy = { t: 0 };
+        tl.to(camDummy, {
+            t: 1,
             ease: "none",
-            duration: 1,
-            onUpdate: function() {
-                const time = this.progress();
-                const point = curve.getPointAt(time);
-                camera.position.copy(point);
-
-                const lookAheadTime = Math.min(1, time + 0.03);
-                const lookAheadPoint = curve.getPointAt(lookAheadTime);
-                const dx = lookAheadPoint.x - point.x;
-                camera.rotation.z = gsap.utils.interpolate(camera.rotation.z, dx * -0.1, 0.1);
+            onUpdate: () => {
+                const pos = curve.getPoint(camDummy.t);
+                camera.position.copy(pos);
                 
-                const targetPoint = curve.getPointAt(Math.min(1, time + 0.06));
-                camera.rotation.x = gsap.utils.interpolate(camera.rotation.x, (targetPoint.y - point.y) * 0.02, 0.1);
-                camera.rotation.y = gsap.utils.interpolate(camera.rotation.y, (targetPoint.x - point.x) * 0.05, 0.1);
+                const lookAhead = Math.min(1, camDummy.t + 0.01);
+                const lookPos = curve.getPoint(lookAhead);
+                camera.lookAt(lookPos);
             }
         }, 0);
 
         sections.forEach((section, index) => {
-            const start = index * 10;
-            const end = start + 10;
+            const startProgress = Math.max(0, (index / numSections) - 0.06);
+            const peakProgress = index / numSections;
+            const endProgress = Math.min(1, (index / numSections) + 0.06);
 
-            if (index === numSections - 1) {
-                gsap.fromTo(section, 
-                    { opacity: 0, y: 60 },
-                    {
-                        opacity: 1, 
-                        y: 0,
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: '#scroll-track',
-                            start: `${start}% top`, 
-                            end: `${start + 4}% top`,
-                            scrub: true,
-                        }
-                    }
+            tl.fromTo(section, 
+                { opacity: 0, y: 50, pointerEvents: 'none' },
+                { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.03, ease: "power2.out" },
+                startProgress
+            );
+
+            if (index < numSections - 1) {
+                tl.to(section,
+                    { opacity: 0, y: -50, pointerEvents: 'none', duration: 0.03, ease: "power2.in" },
+                    peakProgress + 0.02
                 );
-            } else {
-                const sectionTl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '#scroll-track',
-                        start: `${start}% top`,
-                        end: `${end}% top`,
-                        scrub: true,
-                    }
-                });
-
-                sectionTl.fromTo(section, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.2, ease: "none" })
-                         .to(section, { opacity: 1, y: 0, duration: 0.6 }) 
-                         .to(section, { opacity: 0, y: -60, duration: 0.2, ease: "none" }); 
             }
         });
 
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX - windowHalfX) * 0.001;
-            mouseY = (event.clientY - windowHalfY) * 0.001;
-        });
-
+        // --- ANIMATION LOOP ---
         const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
 
-            targetX = mouseX * 0.5;
-            targetY = mouseY * 0.5;
-            
-            camera.rotation.y += (targetX - (camera.rotation.y - (camera.userData.baseRotY || 0))) * 0.05;
-            camera.rotation.x += (targetY - (camera.rotation.x - (camera.userData.baseRotX || 0))) * 0.05;
+            const elapsedTime = clock.getElapsedTime();
 
             objects.forEach(obj => {
-                if (obj.mesh) {
-                    obj.mesh.rotation.x += obj.rotSpeed.x;
-                    obj.mesh.rotation.y += obj.rotSpeed.y;
-                    obj.mesh.rotation.z += obj.rotSpeed.z;
-                }
+                obj.mesh.rotation.x += obj.rotSpeed.x;
+                obj.mesh.rotation.y += obj.rotSpeed.y;
+                obj.mesh.rotation.z += obj.rotSpeed.z;
+
                 if (obj.wireMesh) {
                     obj.wireMesh.rotation.copy(obj.mesh.rotation);
                 }
@@ -761,31 +734,37 @@
                     obj.wireLine.rotation.copy(obj.mesh.rotation);
                 }
 
-                const yOffset = Math.sin(time * 2 + obj.floatOffset) * obj.floatSpeed * 50;
-                if(obj.mesh) obj.mesh.position.y = obj.baseY + yOffset;
-                if(obj.wireMesh) obj.wireMesh.position.y = obj.baseY + yOffset;
-                if(obj.wireLine) obj.wireLine.position.y = obj.baseY + yOffset;
-                if(obj.led) obj.led.position.y = obj.baseY + yOffset + (obj.mesh.geometry.parameters.height/2 || 0);
+                if (obj.floatSpeed !== 0) {
+                    obj.mesh.position.y = obj.baseY + Math.sin(elapsedTime * obj.floatSpeed * 20 + obj.floatOffset) * 0.5;
+                    if (obj.wireMesh) obj.wireMesh.position.y = obj.mesh.position.y;
+                    if (obj.wireLine) obj.wireLine.position.y = obj.mesh.position.y;
+                    if (obj.isServer && obj.led) {
+                        obj.led.position.y = obj.mesh.position.y + 0.8 * (obj.mesh.geometry.parameters ? obj.mesh.geometry.parameters.height / 2.5 : 1);
+                    }
+                }
 
                 if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.5 + Math.sin(time * 4 + obj.ledPulse) * 0.5;
+                    obj.ledPulse += 0.05;
+                    obj.ledMat.opacity = 0.5 + Math.sin(obj.ledPulse) * 0.4;
                 }
             });
 
             corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.2;
+                item.light.intensity = item.baseIntensity + Math.sin(elapsedTime * item.flickerSpeed) * 0.2;
             });
 
             renderer.render(scene, camera);
         }
 
+        animate();
+
+        // --- WINDOW RESIZE ---
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        animate();
     </script>
 </body>
 </html>
