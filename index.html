@@ -78,7 +78,7 @@
             z-index: 200; background: transparent;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            transition: opacity 0.8s ease; opacity: 0; /* Hidden initially until boot finishes */
+            transition: opacity 0.8s ease; opacity: 0; 
         }
         .main-title {
             font-size: clamp(5rem, 12vw, 10rem);
@@ -100,7 +100,7 @@
         }
         .ui-section {
             position: absolute; width: 100%;
-            max-width: 1000px; /* Increased Slide Size */
+            max-width: 1000px; 
             padding: 0 4vw;
             opacity: 0; transform: translateY(60px);
             pointer-events: none;
@@ -125,19 +125,19 @@
             width: 14px; height: 14px; border: 1px solid var(--border);
             border-radius: 50%; background: var(--primary-dim);
         }
-        .terminal-body { padding: 40px 48px; } /* Increased Padding */
+        .terminal-body { padding: 40px 48px; }
         .sys-id {
             color: var(--text-muted); font-size: 13px; font-weight: 700;
             letter-spacing: 0.15em; margin-bottom: 20px; display: block;
         }
         .sys-header {
-            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; /* Increased Header Size */
+            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800;
             color: var(--primary); text-transform: uppercase;
             letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 18px; font-weight: 500; /* Increased Font Size */
+            color: var(--text-main); font-size: 18px; font-weight: 500; 
             line-height: 1.8; max-width: 750px;
         }
         
@@ -234,7 +234,7 @@
         </div>
     </div>
 
-    <!-- 10 SLIDES (Enlarged) -->
+    <!-- 10 SLIDES -->
     <div class="ui-layer">
         <!-- Slide 1 -->
         <div class="ui-section left">
@@ -431,7 +431,7 @@
                             ease: "power2.inOut",
                             onComplete: () => {
                                 bootScreen.style.display = 'none';
-                                titleScreen.style.opacity = '1'; // Reveal title screen
+                                titleScreen.style.opacity = '1'; 
                             }
                         });
                     }, 1200);
@@ -628,8 +628,6 @@
             const progress = i / (numSections - 1);
             const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
             
-            // --- STRAIGHTENED PATH ---
-            // Reduced the multiplier from 0.18 to 0.02 to make it almost entirely straight
             const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
             const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
             
@@ -683,36 +681,47 @@
             }
         }, 0);
 
-        sections.forEach((section, index) => {
-            const startProgress = Math.max(0, (index / (numSections - 1)) - 0.08);
-            const endProgress = Math.min(1, (index / (numSections - 1)) + 0.08);
-            const startRatio = startProgress * 100;
-            const endRatio = endProgress * 100;
 
-            gsap.to(section, {
-                scrollTrigger: {
-                    trigger: '#scroll-track',
-                    start: `${startRatio}% top`,
-                    end: `${endRatio}% top`,
-                    scrub: 0.5,
-                },
-                opacity: 1,
-                y: 0,
-                ease: "power2.out",
-            });
-            
-            gsap.to(section, {
-                scrollTrigger: {
-                    trigger: '#scroll-track',
-                    start: `${(index / (numSections - 1)) * 100 + 6}% top`,
-                    end: `${Math.min(100, (index / (numSections - 1)) * 100 + 15)}% top`,
-                    scrub: 0.5,
-                },
-                opacity: 0,
-                y: -60,
-                ease: "power2.in",
-            });
+        // --- BRAND NEW SCROLL MATH TO GUARANTEE ZERO OVERLAPPING ---
+        sections.forEach((section, index) => {
+            // Divide the scroll track into absolute 10% blocks.
+            const start = index * 10;
+            const end = start + 10;
+
+            if (index === numSections - 1) {
+                // Last slide (Slide 10): Operates only from 90% to 100% of the scroll track
+                gsap.fromTo(section, 
+                    { opacity: 0, y: 60 },
+                    {
+                        opacity: 1, 
+                        y: 0,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: '#scroll-track',
+                            start: `${start}% top`, 
+                            end: `${start + 4}% top`, // Fully visible by 94%, holds until 100%
+                            scrub: true,
+                        }
+                    }
+                );
+            } else {
+                // All other slides (1-9): Strictly fade in, hold, and completely vanish within their 10% block
+                const sectionTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '#scroll-track',
+                        start: `${start}% top`,
+                        end: `${end}% top`,
+                        scrub: true,
+                    }
+                });
+
+                // E.g., For Slide 9: Fades in (80-82%), Holds (82-88%), Fades out fully to opacity 0 (88-90%)
+                sectionTl.fromTo(section, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.2, ease: "none" })
+                         .to(section, { opacity: 1, y: 0, duration: 0.6 }) 
+                         .to(section, { opacity: 0, y: -60, duration: 0.2, ease: "none" }); 
+            }
         });
+
 
         let mouseX = 0;
         let mouseY = 0;
