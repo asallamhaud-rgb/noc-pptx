@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOC NOC // MAINFRAME</title>
@@ -204,8 +202,7 @@
             .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
         }
     </style>
-</head>
-<body>
+</head><body>
 
     <!-- BOOT SEQUENCE SCREEN -->
     <div id="boot-screen">
@@ -264,14 +261,20 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">02 // ARCHITECTURE</span>
+                    <span class="win-title">02 // TRANSPORT</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">NETWORK TOPOLOGY // STAGE_02</span>
-                    <h1 class="sys-header">SERVER<br><span class="dim">SPINES</span></h1>
-                    <p class="sys-desc">Floating monolithic forms drift past. We have engineered the ambient environment to reflect soft magentas and deep rose tones, completely eliminating the synthetic glare.</p>
+                    <span class="sys-id">MOVING THE NETWORK TRAFFIC</span>
+                    <h1 class="sys-header">THE<br><span class="dim">INFRASTRUCTURE</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Transmission carries traffic between network locations and domains. Consists of topology, technologies, links, ports, cards, interfaces, and cross-site connectivity.</p>
+                        <p style="margin-bottom: 10px;"><strong>> VSAT (Very Small Aperture Terminal)</strong><br>Satellite-based communication useful for remote difficulty. Flow:<br>
+                        `Site` &#10142; `VSAT` &#10142; `Satellite` &#10142; `Hub/Gateway` &#10142; `Network`</p>
+                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS</strong><br>Alarm monitoring, calls, emails, ticket creation, escalations, first-level troubleshooting, Work Order (WO) dispatching, Change Request (CR) handling, Problem Management.</p>
+                        <p><strong>> DEVICES</strong><br>[TRANSPORT DEVICES — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -280,14 +283,19 @@
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">03 // PROTOCOLS</span>
+                    <span class="win-title">03 // RAN</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">DATA FLOW // STAGE_03</span>
-                    <h1 class="sys-header">SIGNAL<br><span class="dim">ROUTING</span></h1>
-                    <p class="sys-desc">Information traverses the network in elegant loops. The camera path mathematically calculates spline tension to ensure your journey through the clusters remains perfectly smooth.</p>
+                    <span class="sys-id">CONNECTING MOBILE USERS</span>
+                    <h1 class="sys-header">RADIO ACCESS<br><span class="dim">NETWORK</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Provides the radio connection between users and the telecommunications network.<br>Flow: `Mobile User` &#10142; `Radio Site` &#10142; `RAN` &#10142; `Transport` &#10142; `Core Network`</p>
+                        <p style="margin-bottom: 10px;"><strong>> EVOLUTION</strong><br>Higher capacity, rates, lower latency from 2G &#10142; 3G &#10142; 4G &#10142; 5G. Roles of ERAN / HRAN.</p>
+                        <p style="margin-bottom: 10px;"><strong>> EQUIPMENT</strong><br>[RAN DEVICES — TO BE ADDED]</p>
+                        <p><strong>> OPERATIONS</strong><br>Monitoring, alarm/call/email triage, escalation, L1 troubleshooting, WO dispatch, closure, Problem Management.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -296,14 +304,19 @@
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">04 // RENDERING</span>
+                    <span class="win-title">04 // FIXED ACCESS</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">GRAPHICS ENGINE // STAGE_04</span>
-                    <h1 class="sys-header">VERTEX<br><span class="dim">SHADERS</span></h1>
-                    <p class="sys-desc">Every polygon you see is illuminated by carefully positioned point lights. By casting warm, vivid hues, the geometry retains volume without losing its pastel aesthetic.</p>
+                    <span class="sys-id">CONNECTING FIXED CUSTOMERS</span>
+                    <h1 class="sys-header">WIRELINE<br><span class="dim">CONNECTIVITY</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Providing fixed connectivity. Flow: `Customer` &#10142; `Access` &#10142; `Aggregation` &#10142; `Core` &#10142; `Service`</p>
+                        <p style="margin-bottom: 10px;"><strong>> GPON (Gigabit Passive Optical Network)</strong><br>Fiber-to-the-home. Flow: `OLT` &#10142; `Fiber` &#10142; `Splitter` &#10142; `ONT/ONU` &#10142; `Customer`</p>
+                        <p style="margin-bottom: 10px;"><strong>> MSAN & NGN / PRI</strong><br>MSAN aggregates customer access. NGN/PRI used for telecom/voice services.</p>
+                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS & DEVICES</strong><br>Alarm tracking, customer tickets, troubleshooting, WO dispatch, Problem Management.<br>[FIXED ACCESS DEVICES — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -312,14 +325,19 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">05 // TELEMETRY</span>
+                    <span class="win-title">05 // IP</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">SYSTEM METRICS // STAGE_05</span>
-                    <h1 class="sys-header">CORE<br><span class="dim">STABILITY</span></h1>
-                    <p class="sys-desc">Halfway through the descent. The structural integrity of the UI elements remains locked. Frosted panels ensure perfect contrast against the dynamic background.</p>
+                    <span class="sys-id">THE CORE OF CONNECTIVITY</span>
+                    <h1 class="sys-header">ROUTING AND<br><span class="dim">SWITCHING</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Connects different network areas and services. Flow: `Access` &#10142; `Distribution` &#10142; `Core` &#10142; `Services / Internet`</p>
+                        <p style="margin-bottom: 10px;"><strong>> COMPONENTS</strong><br>Routers, switches across all layers, IP links.</p>
+                        <p style="margin-bottom: 10px;"><strong>> METRO / IP RINGS</strong><br>Ring topology provides alternative paths and network resilience.<br>`Site A` &#10142; `Site B` &#10142; `Site C` &#10142; `Site D` &#10142; `Site A`</p>
+                        <p><strong>> OPERATIONS & DEVICES</strong><br>Interface monitoring, connectivity checks, escalation, L1 troubleshooting, WO dispatch.<br>[IP DEVICES — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -328,14 +346,21 @@
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">06 // FREQUENCY</span>
+                    <span class="win-title">06 // DATACOM</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">WAVEFORM SYNC // STAGE_06</span>
-                    <h1 class="sys-header">RESONANCE<br><span class="dim">TUNING</span></h1>
-                    <p class="sys-desc">Oscillating elements synchronize with the scroll velocity. The deeper you go, the more the visual density adapts to your pacing.</p>
+                    <span class="sys-id">DELIVERING DATA SERVICES</span>
+                    <h1 class="sys-header">ENTERPRISE<br><span class="dim">CONNECTIVITY</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Responsible for data connectivity and related services.</p>
+                        <p style="margin-bottom: 10px;"><strong>> MPLS & ILL</strong><br>MPLS efficient forwarding for VPNs. ILL dedicated internet.</p>
+                        <p style="margin-bottom: 10px;"><strong>> P2P (Point-to-Point)</strong><br>Direct connectivity: `Site A` ───────── `Site B`</p>
+                        <p style="margin-bottom: 10px;"><strong>> SD-WAN</strong><br>Software control, dynamic path selection, multiple connections. Flow:<br>
+                        `Branch` &#10142; `SD-WAN` &#10142; `Multiple WAN Paths` &#10142; `HQ / Cloud`</p>
+                        <p><strong>> OPERATIONS & DEVICES</strong><br>Monitoring, ticketing, L1 troubleshooting, WO dispatch, CR/Problem Management.<br>[DATACOM DEVICES — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -344,14 +369,23 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">07 // LOGISTICS</span>
+                    <span class="win-title">07 // INOC</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">ASSET MANAGEMENT // STAGE_07</span>
-                    <h1 class="sys-header">SPATIAL<br><span class="dim">LAYOUT</span></h1>
-                    <p class="sys-desc">The arrangement of servers follows procedural logic, scattering nodes across the z-axis to create a continuously evolving corridor of technology.</p>
+                    <span class="sys-id">BRINGING NETWORK SERVICES TOGETHER</span>
+                    <h1 class="sys-header">INTEGRATED<br><span class="dim">OPERATIONS CENTER</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Interacts with different technical domains.</p>
+                        <p style="margin-bottom: 10px;"><strong>> INTERACTIONS</strong><br>
+                        `> Voice`: Service monitoring and control.<br>
+                        `> IP`: Connectivity and routing infrastructure.<br>
+                        `> Transmission`: Connectivity carrying services across the network.</p>
+                        <p style="margin-bottom: 10px;"><strong>> TOPOLOGY FLOW</strong><br>
+                        `Voice / Services` &#10142; `IP` &#10142; `Transport` &#10142; `Sites / Customers`</p>
+                        <p><strong>> DEVICES</strong><br>[INOC DEVICES — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -360,14 +394,19 @@
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">08 // TRANSMISSION</span>
+                    <span class="win-title">08 // SOC</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">UPLINK STATUS // STAGE_08</span>
-                    <h1 class="sys-header">DATA<br><span class="dim">BURST</span></h1>
-                    <p class="sys-desc">Packets of light pulse through the infrastructure. Each wireframe cube operates as a temporary cache, holding fragments of color before releasing them.</p>
+                    <span class="sys-id">PERFORMANCE & SERVICE MONITORING</span>
+                    <h1 class="sys-header">SERVICE<br><span class="dim">OPERATIONS CENTER</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">Focuses on service performance and operational visibility.</p>
+                        <p style="margin-bottom: 10px;"><strong>> PERFORMANCE KPIs</strong><br>availability, uptime, traffic utilization, latency, packet loss, incident resolution time. KPIs define the network/service health.</p>
+                        <p style="margin-bottom: 10px;"><strong>> SMART CARE TOOL</strong><br>Service monitoring, analysis, performance visibility, supporting investigation.</p>
+                        <p><strong>> TOOLS</strong><br>[SOC DEVICES / TOOLS — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -376,14 +415,18 @@
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">09 // APEX</span>
+                    <span class="win-title">09 // SERVICE DESK & SECURITY</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">APPROACHING TERMINUS // STAGE_09</span>
-                    <h1 class="sys-header">THE<br><span class="dim">HORIZON</span></h1>
-                    <p class="sys-desc">You are nearing the end of the calculated spline path. The environment maintains its lush pink hue, undisturbed by artificial shadows.</p>
+                    <span class="sys-id">STAGE_09</span>
+                    <h1 class="sys-header">FRONT OFFICE &<br><span class="dim">INFRASTRUCTURE PROTECTION</span></h1>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;"><strong>> SERVICE DESK</strong><br>Communication point between users and technical operations. Ticket roles.<br>Flow: `Customer` &#10142; `Service Desk` &#10142; `NOC` &#10142; `Team` &#10142; `Resolution` &#10142; `Customer`</p>
+                        <p style="margin-bottom: 10px;"><strong>> PHYSICAL SECURITY</strong><br>Protects telecommunications infrastructure: site access control, restricted areas, hardware protection, environmental monitoring.</p>
+                        <p><strong>> SYSTEMS</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — TO BE ADDED]</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -399,7 +442,11 @@
                 <div class="terminal-body">
                     <span class="sys-id">END OF LINE // STAGE_10</span>
                     <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
-                    <p class="sys-desc">All ten data points have been successfully processed. The system will now idle in this state indefinitely. Thank you for viewing.</p>
+                    <div class="sys-desc">
+                        <p style="margin-bottom: 10px;">`Customer` &#10142; `SD` &#10142; `NOC` &#10142; `Alarm/Monitoring` &#10142; `Identify Domain` &#10142; `L1 Troublshoot` &#10142; `Escalate` &#10142; `Resolv` &#10142; `Close` &#10142; `Problem Mgt`</p>
+                        <p style="margin-bottom: 10px;"><strong>> CORE TAKEAWAY</strong><br>Every domain has a different role, but they work together to keep the network and services running.</p>
+                        <p style="color: var(--text-muted); font-size: 14px;">Transport Devices | RAN Devices | Fixed Access Devices | IP Devices | Datacom Devices | INOC Devices | SOC Tools</p>
+                    </div>
                 </div>
             </div>
         </div>
