@@ -11,26 +11,41 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            /* True Pink Theme - No White Cast */
-            --bg: #ffb6c1; /* Richer Baby Pink */
-            --bg-panel: rgba(255, 192, 203, 0.7); /* Pink frosted glass */
-            --border: rgba(199, 21, 133, 0.4);
-            
-            /* Text & Accents */
+            --bg: #ffb6c1; 
+            --bg-panel: rgba(255, 192, 203, 0.75); 
+            --border: rgba(199, 21, 133, 0.5);
             --text-main: #5a1836;
             --text-muted: #9e476e;
-            --primary: #c71585; /* Deep Magenta */
+            --primary: #c71585; 
             --primary-dim: rgba(199, 21, 133, 0.6);
             --accent1: #ff1493;
-            --warn: #d32f2f;
         }
         html { scroll-behavior: auto; }
         body {
             font-family: 'JetBrains Mono', monospace;
             background: var(--bg); color: var(--text-main);
             overflow-x: hidden; cursor: crosshair;
-            font-size: 14px; line-height: 1.6;
+            font-size: 16px; line-height: 1.6;
         }
+        
+        /* Boot Sequence Screen */
+        #boot-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--bg); z-index: 300;
+            display: flex; flex-direction: column;
+            padding: 50px; font-weight: 600;
+            color: var(--primary); font-size: 18px;
+            pointer-events: none;
+        }
+        .boot-line { margin-bottom: 8px; opacity: 0; }
+        .cursor {
+            display: inline-block; width: 12px; height: 20px;
+            background-color: var(--primary); margin-left: 5px;
+            vertical-align: middle; animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
         #canvas-container {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -54,29 +69,27 @@
 
         #scroll-track {
             position: relative; z-index: 2;
-            height: 1500vh; /* Extended for 10 slides */
-            pointer-events: none;
+            height: 1500vh; pointer-events: none;
         }
         
-        /* Title Screen Overlay */
         #title-screen {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: 200; background: var(--bg);
+            z-index: 200; background: transparent;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            transition: opacity 0.8s ease;
+            transition: opacity 0.8s ease; opacity: 0; /* Hidden initially until boot finishes */
         }
         .main-title {
-            font-size: clamp(5rem, 12vw, 9rem);
+            font-size: clamp(5rem, 12vw, 10rem);
             color: var(--primary); text-align: center;
             line-height: 0.9; letter-spacing: -0.05em;
             font-weight: 800; text-shadow: 0 10px 30px rgba(199, 21, 133, 0.15);
         }
         .author-credit {
-            position: absolute; bottom: 40px; right: 50px;
-            font-size: 14px; color: var(--text-muted);
-            font-weight: 600; letter-spacing: 0.05em;
+            position: absolute; bottom: 50px; right: 60px;
+            font-size: 16px; color: var(--primary);
+            font-weight: 700; letter-spacing: 0.05em;
         }
         
         .ui-layer {
@@ -87,69 +100,65 @@
         }
         .ui-section {
             position: absolute; width: 100%;
-            max-width: 850px; padding: 0 5vw;
+            max-width: 1000px; /* Increased Slide Size */
+            padding: 0 4vw;
             opacity: 0; transform: translateY(60px);
             pointer-events: none;
         }
         .terminal-window {
-            background: var(--bg-panel); border: 1px solid var(--border);
+            background: var(--bg-panel); border: 2px solid var(--border);
             position: relative; backdrop-filter: blur(16px);
-            box-shadow: 0 8px 32px rgba(199, 21, 133, 0.12), inset 0 0 0 1px rgba(255,255,255,0.2);
-            border-radius: 6px;
+            box-shadow: 0 12px 40px rgba(199, 21, 133, 0.15), inset 0 0 0 1px rgba(255,255,255,0.3);
+            border-radius: 8px;
         }
         .terminal-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 18px; border-bottom: 1px solid var(--border);
-            background: rgba(255, 182, 193, 0.6);
-            font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-            border-radius: 6px 6px 0 0;
+            padding: 14px 24px; border-bottom: 2px solid var(--border);
+            background: rgba(255, 182, 193, 0.8);
+            font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
+            border-radius: 8px 8px 0 0;
         }
-        .terminal-header .win-title { color: var(--primary); font-weight: 700; }
-        .terminal-header .win-status { color: var(--text-muted); font-size: 10px; font-weight: 600; }
-        .terminal-header .win-btns { display: flex; gap: 6px; }
+        .terminal-header .win-title { color: var(--primary); font-weight: 800; }
+        .terminal-header .win-status { color: var(--text-muted); font-size: 11px; font-weight: 700; }
+        .terminal-header .win-btns { display: flex; gap: 8px; }
         .win-btn {
-            width: 12px; height: 12px; border: 1px solid var(--border);
+            width: 14px; height: 14px; border: 1px solid var(--border);
             border-radius: 50%; background: var(--primary-dim);
         }
-        .terminal-body { padding: 28px 32px; }
+        .terminal-body { padding: 40px 48px; } /* Increased Padding */
         .sys-id {
-            color: var(--text-muted); font-size: 11px; font-weight: 600;
-            letter-spacing: 0.1em; margin-bottom: 16px; display: block;
+            color: var(--text-muted); font-size: 13px; font-weight: 700;
+            letter-spacing: 0.15em; margin-bottom: 20px; display: block;
         }
         .sys-header {
-            font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;
+            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; /* Increased Header Size */
             color: var(--primary); text-transform: uppercase;
-            letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 16px;
+            letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 15px; font-weight: 500;
-            line-height: 1.8; max-width: 600px;
-        }
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border), transparent);
-            margin: 20px 0;
+            color: var(--text-main); font-size: 18px; font-weight: 500; /* Increased Font Size */
+            line-height: 1.8; max-width: 750px;
         }
         
         .status-bar {
             position: fixed; bottom: 0; left: 0;
             width: 100%; z-index: 50;
-            background: var(--bg-panel); border-top: 1px solid var(--border);
-            padding: 8px 24px; backdrop-filter: blur(12px);
+            background: var(--bg-panel); border-top: 2px solid var(--border);
+            padding: 12px 32px; backdrop-filter: blur(12px);
             display: flex; align-items: center; justify-content: space-between;
-            font-size: 11px; letter-spacing: 0.1em; font-weight: 600;
+            font-size: 13px; letter-spacing: 0.1em; font-weight: 700;
         }
-        .status-left, .status-right { display: flex; align-items: center; gap: 24px; }
-        .status-item { display: flex; align-items: center; gap: 8px; }
+        .status-left, .status-right { display: flex; align-items: center; gap: 30px; }
+        .status-item { display: flex; align-items: center; gap: 10px; }
         .status-label { color: var(--text-muted); }
-        .status-value { color: var(--primary); font-weight: 700; }
+        .status-value { color: var(--primary); font-weight: 800; }
         
         .progress-track {
-            width: 250px; height: 6px; border-radius: 3px;
-            background: rgba(199, 21, 133, 0.15);
+            width: 300px; height: 8px; border-radius: 4px;
+            background: rgba(199, 21, 133, 0.2);
             position: relative; overflow: hidden;
-            border: 1px solid rgba(199, 21, 133, 0.3);
+            border: 1px solid rgba(199, 21, 133, 0.4);
         }
         .progress-fill {
             height: 100%; width: 0%;
@@ -158,17 +167,17 @@
         }
         
         .scroll-hint {
-            position: absolute; bottom: 80px; left: 50%;
+            position: absolute; bottom: 100px; left: 50%;
             transform: translateX(-50%); z-index: 20;
             display: flex; flex-direction: column;
-            align-items: center; gap: 12px;
+            align-items: center; gap: 15px;
         }
         .scroll-hint span {
-            font-size: 12px; letter-spacing: 0.3em; font-weight: 700;
+            font-size: 14px; letter-spacing: 0.3em; font-weight: 800;
             text-transform: uppercase; color: var(--primary);
         }
         .scroll-line {
-            width: 2px; height: 40px;
+            width: 2px; height: 50px;
             background: linear-gradient(to bottom, var(--primary), transparent);
             animation: scrollPulse 2s ease-in-out infinite;
         }
@@ -184,14 +193,22 @@
         .ui-section.center .terminal-body { text-align: left; }
         
         @media (max-width: 768px) {
-            .ui-section { padding: 0 5vw; margin: 0 !important; max-width: 100%; }
-            .status-bar { font-size: 9px; padding: 6px 10px; }
+            .ui-section { padding: 0 5vw; max-width: 100%; }
+            .terminal-body { padding: 25px; }
+            .status-bar { font-size: 10px; padding: 10px; }
             .status-left, .status-right { gap: 12px; }
-            .progress-track { width: 100px; }
-            .author-credit { bottom: 20px; right: 20px; font-size: 12px; }
+            .progress-track { width: 120px; }
+            .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
         }
     </style>
 </head><body>
+
+    <!-- BOOT SEQUENCE SCREEN -->
+    <div id="boot-screen">
+        <div id="boot-text-container"></div>
+        <div><span class="cursor"></span></div>
+    </div>
+
     <div id="canvas-container"></div>
     <div class="crt-scanlines"></div>
     <div class="crt-vignette"></div>
@@ -217,7 +234,7 @@
         </div>
     </div>
 
-    <!-- 10 SLIDES -->
+    <!-- 10 SLIDES (Enlarged) -->
     <div class="ui-layer">
         <!-- Slide 1 -->
         <div class="ui-section left">
@@ -383,15 +400,56 @@
     <div id="scroll-track"></div>
 
     <script>
+        // --- BOOT SEQUENCE LOGIC ---
+        const bootContainer = document.getElementById('boot-text-container');
+        const bootScreen = document.getElementById('boot-screen');
+        const titleScreen = document.getElementById('title-screen');
+        
+        const bootLines = [
+            "INITIALIZING SYSTEM...",
+            "ESTABLISHING SECURE CONNECTION...",
+            "VERIFYING CREDENTIALS...",
+            "REQUESTING ACCESS...",
+            "PERMISSION GRANTED.",
+            "LOADING MAINFRAME..."
+        ];
+
+        let delay = 300;
+        bootLines.forEach((line, index) => {
+            setTimeout(() => {
+                const p = document.createElement('div');
+                p.className = 'boot-line';
+                p.textContent = '> ' + line;
+                bootContainer.appendChild(p);
+                gsap.to(p, { opacity: 1, duration: 0.2 });
+
+                if (index === bootLines.length - 1) {
+                    setTimeout(() => {
+                        gsap.to(bootScreen, { 
+                            opacity: 0, 
+                            duration: 0.8, 
+                            ease: "power2.inOut",
+                            onComplete: () => {
+                                bootScreen.style.display = 'none';
+                                titleScreen.style.opacity = '1'; // Reveal title screen
+                            }
+                        });
+                    }, 1200);
+                }
+            }, delay);
+            delay += 600 + Math.random() * 400; 
+        });
+
+
+        // --- THREE.JS & GSAP LOGIC ---
         gsap.registerPlugin(ScrollTrigger);
 
-        // Updated Configuration for True Pink (No White)
         const CONFIG = {
             cameraZStart: 25,
-            cameraZEnd: -450, // Longer corridor for 10 slides
+            cameraZEnd: -450, 
             fogDensity: 0.007, 
-            fogColor: 0xffb6c1, // Pure baby pink
-            ambientIntensity: 2.2, // Pink ambient light intensity
+            fogColor: 0xffb6c1, 
+            ambientIntensity: 2.2, 
             pointLightIntensity: 1.5,
             pointLightDistance: 100,
             objectCount: 350,
@@ -417,11 +475,9 @@
         renderer.toneMappingExposure = 1.1; 
         container.appendChild(renderer.domElement);
 
-        // PINK AMBIENT LIGHT (Replaces White)
         const ambientLight = new THREE.AmbientLight(0xffa6c9, CONFIG.ambientIntensity);
         scene.add(ambientLight);
 
-        // Main camera light is Hot Pink/Magenta instead of White
         const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
         camLight.position.set(0, 2, -6);
         camLight.castShadow = true;
@@ -433,13 +489,11 @@
         const camLight2 = new THREE.PointLight(0xff1493, 1.2, 50);
         camLight2.position.set(5, -2, -5);
         camera.add(camLight2);
-
         scene.add(camera);
 
         const corridorLights = [];
         for (let i = 0; i < 30; i++) {
             const z = -15 - i * 15;
-            // Lights are purely pink tones
             const color = Math.random() > 0.5 ? 0xffb6c1 : 0xff1493;
             const light = new THREE.PointLight(color, 0.9, 35);
             light.position.set(
@@ -451,7 +505,6 @@
             corridorLights.push({ light, baseIntensity: 0.9, flickerSpeed: 2 + Math.random() * 5 });
         }
 
-        // Materials modified to have NO pure white, replacing with soft pink bases
         const materials = {
             serverSoftPink: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.3 }),
             serverPink: new THREE.MeshStandardMaterial({ color: 0xffb6c1, metalness: 0.2, roughness: 0.4 }),
@@ -574,8 +627,12 @@
         for (let i = 0; i < numSections; i++) {
             const progress = i / (numSections - 1);
             const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
-            const x = Math.sin(progress * Math.PI * 5) * (CONFIG.corridorWidth * 0.18);
-            const y = Math.cos(progress * Math.PI * 4) * (CONFIG.corridorHeight * 0.18);
+            
+            // --- STRAIGHTENED PATH ---
+            // Reduced the multiplier from 0.18 to 0.02 to make it almost entirely straight
+            const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
+            const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
+            
             pathPoints.push(new THREE.Vector3(x, y, z));
         }
         
@@ -588,23 +645,18 @@
                 end: 'bottom bottom',
                 scrub: CONFIG.scrubValue,
                 onUpdate: (self) => {
-                    // Progress Bar
                     document.getElementById('progress-fill').style.width = `${self.progress * 100}%`;
                     
-                    // Depth Readout
                     const depth = Math.abs(camera.position.z - CONFIG.cameraZStart).toFixed(2);
                     document.getElementById('depth-readout').textContent = `${depth}m`;
 
-                    // Slide Counter Logic
                     const currentSlide = Math.min(10, Math.max(1, Math.ceil(self.progress * 10)));
                     document.getElementById('slide-readout').textContent = `${currentSlide.toString().padStart(2, '0')}/10`;
 
-                    // Title Screen Fade Out
-                    const titleScreen = document.getElementById('title-screen');
                     if (self.progress > 0.01) {
                         titleScreen.style.opacity = '0';
                         titleScreen.style.pointerEvents = 'none';
-                    } else {
+                    } else if (bootScreen.style.display === 'none') {
                         titleScreen.style.opacity = '1';
                         titleScreen.style.pointerEvents = 'auto';
                     }
