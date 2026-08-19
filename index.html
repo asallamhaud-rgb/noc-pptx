@@ -1,774 +1,735 @@
-My apologies, let's fix that right away. Two things broke from the previous version: the boot screen didn't dismiss itself properly, and the interactive mouse-look capability (where moving the mouse shifts your perspective smoothly) was removed.
-
-Here is the fully corrected code with the boot sequence auto-hiding correctly and the smooth mouse-look parallax re-integrated into the Three.js loop:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOC NOC // MAINFRAME</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg: #ffb6c1; 
-            --bg-panel: rgba(255, 192, 203, 0.75); 
-            --border: rgba(199, 21, 133, 0.5);
-            --text-main: #5a1836;
-            --text-muted: #9e476e;
-            --primary: #c71585; 
-            --primary-dim: rgba(199, 21, 133, 0.6);
-            --accent1: #ff1493;
-        }
-        html { scroll-behavior: auto; }
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--bg); color: var(--text-main);
-            overflow-x: hidden; cursor: crosshair;
-            font-size: 16px; line-height: 1.6;
-        }
-        
-        /* Boot Sequence Screen */
-        #boot-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: var(--bg); z-index: 300;
-            display: flex; flex-direction: column;
-            padding: 50px; font-weight: 600;
-            color: var(--primary); font-size: 18px;
-            pointer-events: none;
-        }
-        .boot-line { margin-bottom: 8px; opacity: 0; }
-        .cursor {
-            display: inline-block; width: 12px; height: 20px;
-            background-color: var(--primary); margin-left: 5px;
-            vertical-align: middle; animation: blink 1s step-end infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omantel NOC — Interactive 3D Presentation</title>
 
-        #canvas-container {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 1; pointer-events: none;
-        }
-        canvas { display: block; }
-        
-        .crt-scanlines {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 100; pointer-events: none;
-            background: repeating-linear-gradient(0deg, rgba(199, 21, 133, 0.05), rgba(199, 21, 133, 0.05) 1px, transparent 1px, transparent 3px);
-            opacity: 0.8;
-        }
-        .crt-vignette {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 101; pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 182, 193, 0.5) 80%, rgba(199, 21, 133, 0.2) 100%);
-        }
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        #scroll-track {
-            position: relative; z-index: 2;
-            height: 1500vh; pointer-events: none;
-        }
-        
-        #title-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 200; background: transparent;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transition: opacity 0.8s ease; opacity: 0; 
-            pointer-events: none;
-        }
-        .main-title {
-            font-size: clamp(5rem, 12vw, 10rem);
-            color: var(--primary); text-align: center;
-            line-height: 0.9; letter-spacing: -0.05em;
-            font-weight: 800; text-shadow: 0 10px 30px rgba(199, 21, 133, 0.15);
-        }
-        .author-credit {
-            position: absolute; bottom: 50px; right: 60px;
-            font-size: 16px; color: var(--primary);
-            font-weight: 700; letter-spacing: 0.05em;
-        }
-        
-        .ui-layer {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100vh;
-            z-index: 10; pointer-events: none;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .ui-section {
-            position: absolute; width: 100%;
-            max-width: 1000px; 
-            padding: 0 4vw;
-            opacity: 0; transform: translateY(60px);
-            pointer-events: none;
-        }
-        .terminal-window {
-            background: var(--bg-panel); border: 2px solid var(--border);
-            position: relative; backdrop-filter: blur(16px);
-            box-shadow: 0 12px 40px rgba(199, 21, 133, 0.15), inset 0 0 0 1px rgba(255,255,255,0.3);
-            border-radius: 8px;
-        }
-        .terminal-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 24px; border-bottom: 2px solid var(--border);
-            background: rgba(255, 182, 193, 0.8);
-            font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase;
-            border-radius: 8px 8px 0 0;
-        }
-        .terminal-header .win-title { color: var(--primary); font-weight: 800; }
-        .terminal-header .win-status { color: var(--text-muted); font-size: 11px; font-weight: 700; }
-        .terminal-header .win-btns { display: flex; gap: 8px; }
-        .win-btn {
-            width: 14px; height: 14px; border: 1px solid var(--border);
-            border-radius: 50%; background: var(--primary-dim);
-        }
-        .terminal-body { padding: 40px 48px; }
-        .sys-id {
-            color: var(--text-muted); font-size: 13px; font-weight: 700;
-            letter-spacing: 0.15em; margin-bottom: 20px; display: block;
-        }
-        .sys-header {
-            font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
-            color: var(--primary); text-transform: uppercase;
-            letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
-        }
-        .sys-header .dim { color: var(--text-muted); font-weight: 300; }
-        .sys-desc {
-            color: var(--text-main); font-size: 16px; font-weight: 500; 
-            line-height: 1.7; max-width: 850px;
-        }
-        .sys-desc strong { color: var(--primary); font-weight: 800; }
-        
-        .status-bar {
-            position: fixed; bottom: 0; left: 0;
-            width: 100%; z-index: 50;
-            background: var(--bg-panel); border-top: 2px solid var(--border);
-            padding: 12px 32px; backdrop-filter: blur(12px);
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 13px; letter-spacing: 0.1em; font-weight: 700;
-        }
-        .status-left, .status-right { display: flex; align-items: center; gap: 30px; }
-        .status-item { display: flex; align-items: center; gap: 10px; }
-        .status-label { color: var(--text-muted); }
-        .status-value { color: var(--primary); font-weight: 800; }
-        
-        .progress-track {
-            width: 300px; height: 8px; border-radius: 4px;
-            background: rgba(199, 21, 133, 0.2);
-            position: relative; overflow: hidden;
-            border: 1px solid rgba(199, 21, 133, 0.4);
-        }
-        .progress-fill {
-            height: 100%; width: 0%;
-            background: var(--primary);
-            transition: width 0.1s linear;
-        }
-        
-        .scroll-hint {
-            position: absolute; bottom: 100px; left: 50%;
-            transform: translateX(-50%); z-index: 20;
-            display: flex; flex-direction: column;
-            align-items: center; gap: 15px;
-        }
-        .scroll-hint span {
-            font-size: 14px; letter-spacing: 0.3em; font-weight: 800;
-            text-transform: uppercase; color: var(--primary);
-        }
-        .scroll-line {
-            width: 2px; height: 50px;
-            background: linear-gradient(to bottom, var(--primary), transparent);
-            animation: scrollPulse 2s ease-in-out infinite;
-        }
-        @keyframes scrollPulse {
-            0%,100%{opacity:0.2;transform:scaleY(0.4)}
-            50%{opacity:1;transform:scaleY(1)}
-        }
-        
-        .ui-section.left { justify-self: start; text-align: left; margin-left: 5vw; }
-        .ui-section.right { justify-self: end; text-align: right; margin-right: 5vw; margin-left: auto; }
-        .ui-section.right .terminal-body { text-align: left; }
-        .ui-section.center { justify-self: center; text-align: center; margin: 0 auto; }
-        .ui-section.center .terminal-body { text-align: left; }
-        
-        @media (max-width: 768px) {
-            .ui-section { padding: 0 5vw; max-width: 100%; }
-            .terminal-body { padding: 25px; }
-            .status-bar { font-size: 10px; padding: 10px; }
-            .status-left, .status-right { gap: 12px; }
-            .progress-track { width: 120px; }
-            .author-credit { bottom: 60px; right: 20px; font-size: 14px; }
-        }
-    </style>
+  <!-- React & ReactDOM CDNs -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel Compiler for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- GSAP for Camera & UI Transitions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffccd5;
+      color: #831843;
+      margin: 0;
+      overflow: hidden;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+  </style>
 </head>
-<body>
+<body class="relative min-h-screen bg-[#ffccd5] text-pink-950">
 
-    <!-- BOOT SEQUENCE SCREEN -->
-    <div id="boot-screen">
-        <div id="boot-text-container"></div>
-        <div><span class="cursor"></span></div>
-    </div>
+  <!-- Three.js Background Canvas -->
+  <div id="canvas-container"></div>
 
-    <div id="canvas-container"></div>
-    <div class="crt-scanlines"></div>
-    <div class="crt-vignette"></div>
+  <!-- React Root -->
+  <div id="root" class="relative z-10"></div>
 
-    <!-- MAIN TITLE SCREEN -->
-    <div id="title-screen">
-        <h1 class="main-title">NOC<br>NOC</h1>
-        <div class="author-credit">Made by Asala Hassan Bait Mhaud</div>
-        <div class="scroll-hint">
-            <span>// SCROLL TO DESCEND //</span>
-            <div class="scroll-line"></div>
-        </div>
-    </div>
+  <!-- Three.js + GSAP Pink Wireframe 3D Simulation -->
+  <script>
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0xffccd5, 0.035);
 
-    <div class="status-bar">
-        <div class="status-left">
-            <div class="status-item"><span class="status-label">SYS:</span><span class="status-value">ONLINE</span></div>
-            <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value" id="depth-readout">0.00m</span></div>
-        </div>
-        <div class="status-right">
-            <div class="status-item"><span class="status-label">NAV:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
-            <div class="status-item"><span class="status-label">SLIDE:</span><span class="status-value" id="slide-readout">01/10</span></div>
-        </div>
-    </div>
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 15);
 
-    <!-- 10 SLIDES -->
-    <div class="ui-layer">
-        <!-- Slide 1 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">01 // INTRODUCTION TO THE NOC</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">THE 24/7 COMMAND CENTER</span>
-                    <h1 class="sys-header">THE NOC:<br><span class="dim">HEARTBEAT OF OUR NETWORK</span></h1>
-                    <div class="sys-desc">
-                        <p style="margin-bottom: 15px;"><strong>> WHAT IS THE NOC?</strong><br>Think of it as the ultimate control room for the entire network that never sleeps—operating 24/7.</p>
-                        <p style="margin-bottom: 15px;"><strong>> WHAT DOES IT DO?</strong><br>It keeps a constant eye on everything happening across the network to catch problems instantly, often fixing them before customers even notice.</p>
-                        <p><strong>> WHY IS IT IMPORTANT?</strong><br>Without it, we wouldn't have a centralized way to track outages, manage traffic, and keep millions of people connected around the clock.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
 
-        <!-- Slide 2 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">02 // TEAMS & DOMAINS</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">OUR OPERATIONAL STRUCTURE // STAGE_02</span>
-                    <h1 class="sys-header" style="font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 15px;">INSIDE THE NOC:<br><span class="dim">TEAMS & NETWORK DOMAINS</span></h1>
-                    <div class="sys-desc" style="font-size: 15px; line-height: 1.6;">
-                        <p style="margin-bottom: 10px;"><strong>> TEAMS & SUPPORT</strong></p>
-                        <p style="margin-bottom: 6px;">• <strong>Front Office:</strong> The 24/7 first line of defense watching alarms and taking initial actions.</p>
-                        <p style="margin-bottom: 6px;">• <strong>Back Office:</strong> Engineering specialists, shift leads, managers, and quality teams handling deep fixes.</p>
-                        <p style="margin-bottom: 6px;">• <strong>Service Desk:</strong> The primary point of contact managing tickets and requests.</p>
-                        <p style="margin-bottom: 12px;">• <strong>iNOC:</strong> Manages international gateways and cross-border traffic.</p>
-                        <p style="margin-bottom: 10px;"><strong>> CORE NETWORK DOMAINS (ROADMAP)</strong></p>
-                        <p style="margin-bottom: 4px;">• <strong>Transport:</strong> Transmission & IP</p>
-                        <p style="margin-bottom: 4px;">• <strong>Mobile:</strong> Core, SOC, & RAN</p>
-                        <p style="margin-bottom: 4px;">• <strong>Fixed Access:</strong> Fiber & Broadband</p>
-                        <p style="margin-bottom: 0;">• <strong>Datacom:</strong> MPLS and data connectivity.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffb6c1, 1.8);
+    scene.add(ambientLight);
 
-        <!-- Slide 3 -->
-        <div class="ui-section center">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">03 // INCIDENT CLASSIFICATION</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">OPERATIONS PROTOCOL // STAGE_03</span>
-                    <h1 class="sys-header" style="font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 15px;">INCIDENT CLASSIFICATION:<br><span class="dim">SEVERITY LEVELS</span></h1>
-                    <div class="sys-desc" style="font-size: 14px; line-height: 1.5;">
-                        <p style="margin-bottom: 8px;"><strong>> P1 — Emergency:</strong> Critical outage / massive impact</p>
-                        <p style="margin-bottom: 8px;"><strong>> P2 — Critical:</strong> Severe service degradation</p>
-                        <p style="margin-bottom: 8px;"><strong>> P3 — Major:</strong> Significant issue / immediate action</p>
-                        <p style="margin-bottom: 8px;"><strong>> P4 — Minor:</strong> No traffic or service impact</p>
-                        <p style="margin-bottom: 0;"><strong>> P5 — Warning:</strong> Early indicator / threshold alert</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    const pointLight = new THREE.PointLight(0xdb2777, 2.5, 35);
+    pointLight.position.set(0, 2, 5);
+    scene.add(pointLight);
 
-        <!-- Slide 4 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">04 // RENDERING</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">GRAPHICS ENGINE // STAGE_04</span>
-                    <h1 class="sys-header">VERTEX<br><span class="dim">SHADERS</span></h1>
-                    <p class="sys-desc">Every polygon you see is illuminated by carefully positioned point lights. By casting warm, vivid hues, the geometry retains volume without losing its pastel aesthetic.</p>
-                </div>
-            </div>
-        </div>
+    // Wireframe Racks & Floating Torus Knots
+    const rackGeo = new THREE.BoxGeometry(1.5, 6, 2);
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xdb2777,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.6
+    });
 
-        <!-- Slide 5 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">05 // TELEMETRY</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">SYSTEM METRICS // STAGE_05</span>
-                    <h1 class="sys-header">CORE<br><span class="dim">STABILITY</span></h1>
-                    <p class="sys-desc">Halfway through the descent. The structural integrity of the UI elements remains locked. Frosted panels ensure perfect contrast against the dynamic background.</p>
-                </div>
-            </div>
-        </div>
+    const torusGeo = new THREE.TorusKnotGeometry(0.6, 0.2, 64, 16);
+    const torusMat = new THREE.MeshBasicMaterial({
+      color: 0xf472b6,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
 
-        <!-- Slide 6 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">06 // FREQUENCY</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">WAVEFORM SYNC // STAGE_06</span>
-                    <h1 class="sys-header">RESONANCE<br><span class="dim">TUNING</span></h1>
-                    <p class="sys-desc">Oscillating elements synchronize with the scroll velocity. The deeper you go, the more the visual density adapts to your pacing.</p>
-                </div>
-            </div>
-        </div>
+    const corridorObjects = [];
 
-        <!-- Slide 7 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">07 // LOGISTICS</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">ASSET MANAGEMENT // STAGE_07</span>
-                    <h1 class="sys-header">SPATIAL<br><span class="dim">LAYOUT</span></h1>
-                    <p class="sys-desc">The arrangement of servers follows procedural logic, scattering nodes across the z-axis to create a continuously evolving corridor of technology.</p>
-                </div>
-            </div>
-        </div>
+    for (let i = 0; i < 22; i++) {
+      const zPos = -i * 4 + 10;
 
-        <!-- Slide 8 -->
-        <div class="ui-section center">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">08 // TRANSMISSION</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">UPLINK STATUS // STAGE_08</span>
-                    <h1 class="sys-header">DATA<br><span class="dim">BURST</span></h1>
-                    <p class="sys-desc">Packets of light pulse through the infrastructure. Each wireframe cube operates as a temporary cache, holding fragments of color before releasing them.</p>
-                </div>
-            </div>
-        </div>
+      // Left Rack
+      const leftRack = new THREE.Mesh(rackGeo, wireMat);
+      leftRack.position.set(-4.5, 0, zPos);
+      scene.add(leftRack);
+      corridorObjects.push(leftRack);
 
-        <!-- Slide 9 -->
-        <div class="ui-section left">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">09 // APEX</span>
-                    <span class="win-status">ACTIVE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">APPROACHING TERMINUS // STAGE_09</span>
-                    <h1 class="sys-header">THE<br><span class="dim">HORIZON</span></h1>
-                    <p class="sys-desc">You are nearing the end of the calculated spline path. The environment maintains its lush pink hue, undisturbed by artificial shadows.</p>
-                </div>
-            </div>
-        </div>
+      // Right Rack
+      const rightRack = new THREE.Mesh(rackGeo, wireMat);
+      rightRack.position.set(4.5, 0, zPos);
+      scene.add(rightRack);
+      corridorObjects.push(rightRack);
 
-        <!-- Slide 10 -->
-        <div class="ui-section right">
-            <div class="terminal-window">
-                <div class="terminal-header">
-                    <span class="win-title">10 // CONCLUSION</span>
-                    <span class="win-status">COMPLETE</span>
-                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
-                </div>
-                <div class="terminal-body">
-                    <span class="sys-id">END OF LINE // STAGE_10</span>
-                    <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
-                    <p class="sys-desc">All ten data points have been successfully processed. The system will now idle in this state indefinitely. Thank you for viewing.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+      // Floating Torus Decors
+      if (i % 3 === 0) {
+        const torus = new THREE.Mesh(torusGeo, torusMat);
+        torus.position.set((i % 2 === 0 ? 6 : -6), (Math.random() - 0.5) * 4, zPos);
+        scene.add(torus);
+        corridorObjects.push(torus);
+      }
+    }
 
-    <div id="scroll-track"></div>
+    // Floor Grid Helper (Pink themed)
+    const gridHelper = new THREE.GridHelper(80, 40, 0xbe185d, 0xf472b6);
+    gridHelper.position.y = -3.2;
+    scene.add(gridHelper);
 
-    <script>
-        // --- BOOT SEQUENCE LOGIC ---
-        const bootContainer = document.getElementById('boot-text-container');
-        const bootScreen = document.getElementById('boot-screen');
-        const titleScreen = document.getElementById('title-screen');
-        
-        const bootLines = [
-            "INITIALIZING SYSTEM...",
-            "ESTABLISHING SECURE CONNECTION...",
-            "VERIFYING CREDENTIALS...",
-            "REQUESTING ACCESS...",
-            "PERMISSION GRANTED.",
-            "LOADING MAINFRAME..."
-        ];
+    // Animation Loop
+    function animate() {
+      requestAnimationFrame(animate);
 
-        let delay = 300;
-        bootLines.forEach((line, index) => {
-            setTimeout(() => {
-                const p = document.createElement('div');
-                p.className = 'boot-line';
-                p.textContent = '> ' + line;
-                bootContainer.appendChild(p);
-                gsap.to(p, { opacity: 1, duration: 0.2 });
+      camera.position.z -= 0.018;
+      if (camera.position.z < -30) {
+        camera.position.z = 10;
+      }
 
-                if (index === bootLines.length - 1) {
-                    setTimeout(() => {
-                        gsap.to(bootScreen, { 
-                            opacity: 0, 
-                            duration: 0.8, 
-                            ease: "power2.inOut",
-                            onComplete: () => {
-                                bootScreen.style.display = 'none';
-                                titleScreen.style.opacity = '1'; 
-                            }
-                        });
-                    }, 1200);
-                }
-            }, delay);
-            delay += 600 + Math.random() * 400; 
+      corridorObjects.forEach((obj, idx) => {
+        obj.rotation.x += 0.002;
+        obj.rotation.y += 0.003;
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.animateCameraOnSlideChange = function(slideIndex) {
+      if (typeof gsap !== 'undefined') {
+        gsap.to(camera.position, {
+          x: (slideIndex % 2 === 0 ? 0.6 : -0.6),
+          y: Math.sin(slideIndex) * 0.25,
+          duration: 1.2,
+          ease: "power2.out"
         });
+      }
+    };
 
-        // --- THREE.JS & GSAP LOGIC ---
-        gsap.registerPlugin(ScrollTrigger);
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 
-        const CONFIG = {
-            cameraZStart: 25,
-            cameraZEnd: -450, 
-            fogDensity: 0.007, 
-            fogColor: 0xffb6c1, 
-            ambientIntensity: 2.2, 
-            pointLightIntensity: 1.5,
-            pointLightDistance: 100,
-            objectCount: 350,
-            corridorWidth: 35,
-            corridorHeight: 28,
-            scrubValue: 1.2
+  <!-- React Presentation Component -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const SLIDES = [
+      { id: 1, name: "NOC Overview & Strategy" },
+      { id: 2, name: "Core Network Topology" },
+      { id: 3, name: "Transport & Transmission" },
+      { id: 4, name: "IP & Mobile Core Operations" },
+      { id: 5, name: "Incident & Outage Management" },
+      { id: 6, name: "Power & Infrastructure Monitoring" },
+      { id: 7, name: "Cybersecurity & Field Operations" },
+      { id: 8, name: "Subsea Cable Landing Stations" },
+      { id: 9, name: "Datacom & iNOC" },
+      { id: 10, name: "Future Network Automation" }
+    ];
+
+    const ALL_SLIDES_DATA = {
+      1: {
+        title: "NOC Overview & Strategy",
+        subtitle: "Mission-Critical Telecom Operations & High-Availability Governance",
+        icon: "shield-check",
+        metrics: [
+          { label: "SLA Target", val: "99.999%", sub: "Five-Nines Uptime" },
+          { label: "MTTR Target", val: "< 45m", sub: "Mean Time to Repair" },
+          { label: "Monitored Sites", val: "12,500+", sub: "National Footprint" },
+          { label: "Core Traffic", val: "> 10 Tbps", sub: "Peak Terrestrial/Subsea" }
+        ],
+        pillars: [
+          { title: "24/7/365 Command Center", desc: "Real-time fault isolation, telemetry analytics, and centralized multi-tier incident handling." },
+          { title: "Zero-Trust Operational Model", desc: "Rigorous access control, automated policy enforcement, and audit-compliant change controls." },
+          { title: "Proactive Service Assurance", desc: "Automated synthetic transaction monitoring detecting degradation before user impact." }
+        ]
+      },
+      2: {
+        title: "Core Network Topology",
+        subtitle: "High-Capacity Optical Backbone & Multi-Tier Routing Architecture",
+        icon: "network",
+        leftTitle: "DWDM Super-Core Rings",
+        leftDesc: "Mesh-connected optical rings spanning Muscat, Salalah, Sohar, and Nizwa with redundant optical paths.",
+        leftItems: [
+          { name: "Muscat Central Core", spec: "Mesh 800G Flex-Grid DWDM" },
+          { name: "Dhofar Regional Ring", spec: "Protection Optical Switching (<50ms)" },
+          { name: "Batinah Express Link", spec: "Ultra-Low Latency Fiber Trunk" }
+        ],
+        rightTitle: "IP/MPLS Routing Architecture",
+        rightDesc: "Multi-vendor Provider Edge (PE) and Core (P) routers delivering traffic engineering and QoS enforcement.",
+        rightItems: [
+          { label: "Core Backbone", val: "100G / 400G MPLS Interfaces" },
+          { label: "Route Reflectors", val: "Geographically Redundant Pairs" },
+          { label: "Peering Capacity", val: "Direct BGP Connections to Tier-1 Carriers" }
+        ]
+      },
+      3: {
+        title: "Transport & Transmission",
+        subtitle: "Dense Wavelength Division Multiplexing (DWDM) & Microwave Backhaul",
+        icon: "radio-tower",
+        cards: [
+          {
+            title: "Optical Layer (DWDM / OTN)",
+            items: ["Coherent 400G/800G per Wavelength", "Flex-Grid Reconfigurable Optical Add-Drop Multiplexers (ROADM)", "Automatic Optical Layer Protection (1+1 MSP / SNCP)"]
+          },
+          {
+            title: "Microwave & Backhaul",
+            items: ["High-Capacity E-Band (70/80GHz) Millimeter-Wave Links", "Adaptive Coding and Modulation (ACM) for Weather Resilience", "Hybrid Fiber-Microwave Redundancy for Remote Stations"]
+          },
+          {
+            title: "Network Synchronization",
+            items: ["PTP IEEE 1588v2 Primary Reference Time Clock (PRTC)", "SyncE (Synchronous Ethernet) for 5G Ultra-Low Latency", "Rubidium Atomic Clock Backup at Key Transmission Hubs"]
+          }
+        ]
+      },
+      4: {
+        title: "IP & Mobile Core Operations",
+        subtitle: "5G Standalone (SA), 4G LTE EPC & Multi-Cloud IP Infrastructure",
+        icon: "smartphone",
+        mobileCore: ["5G AMF / UPF Cloud Native Core", "4G MME / SGW / PGW Virtualized Functions", "IMS Subsystem for VoLTE & VoNR Services"],
+        ipServices: ["Carrier-Grade NAT (CGNAT) Pooling", "Anycast Public DNS Resolver Grid", "BGP Peering & Traffic Steering"],
+        kpis: [
+          { name: "5G Call Setup Success", status: "99.98%" },
+          { name: "VoLTE Drop Rate", status: "< 0.08%" },
+          { name: "User Plane Latency", status: "< 8.5ms" }
+        ]
+      },
+      5: {
+        title: "Incident & Outage Management",
+        subtitle: "Automated Alarm Correlation, Ticketing & Major Incident Response",
+        icon: "siren",
+        tiers: [
+          { tier: "Tier 1 — Triage", desc: "Automated ingestion, initial diagnostics, and ticket categorization within 5 minutes." },
+          { tier: "Tier 2 — Domain Specialists", desc: "In-depth protocol troubleshooting, log analysis, and targeted remediation." },
+          { tier: "Tier 3 — Principal & Vendor", desc: "Architectural escalations, vendor R&D bridge calls, and hot-fix deployment." }
+        ],
+        workflow: ["Alarm Ingestion", "AIOps Noise Reduction", "Auto-Ticket Dispatch", "War Room MIM Activation", "RCA & Post-Mortem"]
+      },
+      6: {
+        title: "Power & Infrastructure Monitoring",
+        subtitle: "Environmental Control, Auxiliary Power Systems & Facility Health",
+        icon: "battery-charging",
+        powerSpecs: [
+          { title: "DC Power & Rectifiers", detail: "-48V DC Systems with N+1 High-Efficiency Rectifier Modules and Smart Battery Health Management." },
+          { title: "Precision HVAC Cooling", detail: "N+2 In-Row Precision Air Conditioners with Hot/Cold Aisle Containment and Temperature Telemetry." },
+          { title: "Backup Generators & Fuel", detail: "Automated Mains Failure (AMF) diesel generators with 72-hour onsite fuel sensing and automatic transfer." }
+        ]
+      },
+      7: {
+        title: "Cybersecurity & Field Operations",
+        subtitle: "SOC Integration, DDoS Scrubbing & Emergency Field Response",
+        icon: "truck",
+        cyberItems: ["Tbps-Scale Automated DDoS Mitigation Scrubbing", "BGP Route Leak Protection & RPKI Validation", "Real-Time Intrusion Prevention (IPS/IDS) at IGW Nodes"],
+        fieldItems: ["4 Regional Emergency Dispatch Hubs (Muscat, Dhofar, Batinah, Interior)", "Mobile Optical Fiber Splicing & Emergency Repair Vans", "Drone Fleet for Aerial Tower & Cable Span Inspection"]
+      },
+      8: {
+        title: "Subsea Cable Landing Stations",
+        subtitle: "Oman as a Strategic Global Telecommunications Hub",
+        icon: "anchor",
+        stations: [
+          { name: "Muscat (Seeb)", cables: ["AAE-1", "EIG", "OAC"], status: "Operational" },
+          { name: "Salalah Hub", cables: ["2Africa", "SEA-ME-WE 5", "PEACE"], status: "Operational" },
+          { name: "Sohar Station", cables: ["Regional Gulf Express Links"], status: "Operational" },
+          { name: "Barka Terminal", cables: ["International Terrestrial & Subsea Crossings"], status: "Operational" }
+        ],
+        tech: ["Coherent Optical DSP Telemetry", "Wet-Plant OTDR Cable Monitoring", "Submarine Line Terminal Equipment (SLTE) Health"]
+      },
+      9: {
+        title: "Datacom & iNOC",
+        subtitle: "Enterprise Data Services & International Network Operations Center Infrastructure",
+        datacom: {
+          title: "Datacom",
+          subtitle: "Data connectivity between sites, customers & network services",
+          services: [
+            { code: "ILL", name: "Internet Leased Line", desc: "Dedicated internet connection for a customer/site." },
+            { code: "P2P", name: "Point-to-Point", desc: "Direct connection between two locations." },
+            { code: "SD-WAN", name: "Software-Defined WAN", desc: "Uses MPLS + Internet to connect sites through centrally managed, optimized paths.", benefits: ["Flexibility", "Better traffic management", "Link optimization"] }
+          ],
+          devices: ["Routers", "Switches"]
+        },
+        inoc: {
+          title: "iNOC",
+          subtitle: "Monitors and manages international connectivity and traffic",
+          monitoring: ["Network Weather Map", "iNOC Console", "IGW Network", "Zoi — GGC Monitoring"],
+          architecture: {
+            providersCustomers: ["Zain", "GGC"],
+            core: "MPLS Core",
+            peers: ["Content Providers", "STCs", "IX Peers", "CDNs"]
+          }
+        }
+      },
+      10: {
+        title: "Future Network Automation",
+        subtitle: "AI-Driven Predictive Operations (AIOps) & Autonomous Self-Healing",
+        icon: "cpu",
+        features: [
+          { title: "Predictive Anomaly Detection", desc: "ML models predicting fiber optic degradation and transponder failure up to 72 hours before loss of signal." },
+          { title: "Zero-Touch Provisioning (ZTP)", desc: "Fully automated end-to-end service instantiation for enterprise ILL, SD-WAN, and 5G network slices." },
+          { title: "Intent-Based Routing", desc: "Dynamic real-time traffic re-routing based on latency, jitter, and cost matrices using telemetry feedback." }
+        ]
+      }
+    };
+
+    function App() {
+      const [currentSlide, setCurrentSlide] = useState(1);
+
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+        if (window.animateCameraOnSlideChange) {
+          window.animateCameraOnSlideChange(currentSlide);
+        }
+      }, [currentSlide]);
+
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.key === 'ArrowRight' && currentSlide < SLIDES.length) setCurrentSlide(prev => prev + 1);
+          if (e.key === 'ArrowLeft' && currentSlide > 1) setCurrentSlide(prev => prev - 1);
         };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [currentSlide]);
 
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(CONFIG.fogColor);
-        scene.fog = new THREE.FogExp2(CONFIG.fogColor, CONFIG.fogDensity);
+      const slideData = ALL_SLIDES_DATA[currentSlide];
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
-        camera.position.set(0, 0, CONFIG.cameraZStart);
+      return (
+        <div className="w-full h-screen flex flex-col justify-between selection:bg-pink-500 selection:text-white">
+          
+          {/* Header */}
+          <header className="border-b border-pink-400/30 bg-[#ffccd5]/80 backdrop-blur-md px-6 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-pink-600 animate-pulse" />
+              <span className="font-extrabold tracking-wider text-pink-950 text-sm uppercase font-mono">
+                Omantel NOC <span className="text-pink-600">| Interactive Deck</span>
+              </span>
+            </div>
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.1; 
-        container.appendChild(renderer.domElement);
+            <div className="text-xs font-mono text-pink-800 hidden md:block">
+              Made by Asala Hassan Bait Mhaud
+            </div>
+          </header>
 
-        const ambientLight = new THREE.AmbientLight(0xffa6c9, CONFIG.ambientIntensity);
-        scene.add(ambientLight);
-
-        const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
-        camLight.position.set(0, 2, -6);
-        camLight.castShadow = true;
-        camLight.shadow.mapSize.width = 1024;
-        camLight.shadow.mapSize.height = 1024;
-        camLight.shadow.bias = -0.002;
-        camera.add(camLight);
-
-        const camLight2 = new THREE.PointLight(0xff1493, 1.2, 50);
-        camLight2.position.set(5, -2, -5);
-        camera.add(camLight2);
-        scene.add(camera);
-
-        const corridorLights = [];
-        for (let i = 0; i < 30; i++) {
-            const z = -15 - i * 15;
-            const color = Math.random() > 0.5 ? 0xffb6c1 : 0xff1493;
-            const light = new THREE.PointLight(color, 0.9, 35);
-            light.position.set(
-                (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
-                (Math.random() - 0.5) * CONFIG.corridorHeight * 0.4,
-                z
-            );
-            scene.add(light);
-            corridorLights.push({ light, baseIntensity: 0.9, flickerSpeed: 2 + Math.random() * 5 });
-        }
-
-        const materials = {
-            serverSoftPink: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.3 }),
-            serverPink: new THREE.MeshStandardMaterial({ color: 0xffb6c1, metalness: 0.2, roughness: 0.4 }),
-            serverMagenta: new THREE.MeshStandardMaterial({ color: 0xff69b4, metalness: 0.3, roughness: 0.5 }),
-            wireframe: new THREE.MeshBasicMaterial({ color: 0xc71585, wireframe: true, transparent: true, opacity: 0.35 }),
-            floor: new THREE.MeshStandardMaterial({ color: 0xffc0cb, metalness: 0.1, roughness: 0.8 }),
-            grid: new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.25, wireframe: true }),
-        };
-
-        const objects = [];
-        const objectGroup = new THREE.Group();
-        scene.add(objectGroup);
-
-        function createServerRack(z, x, y, scale) {
-            const geo = new THREE.BoxGeometry(scale * 0.8, scale * 2.5, scale * 0.6);
-            const mat = Math.random() > 0.5 ? materials.serverSoftPink : materials.serverPink;
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, y, z);
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            objectGroup.add(mesh);
-
-            const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
-            const ledMat = new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.9 });
-            const led = new THREE.Mesh(ledGeo, ledMat);
-            led.position.set(x, y + scale * 0.8, z + scale * 0.31);
-            objectGroup.add(led);
-
-            const wireGeo = new THREE.BoxGeometry(scale * 0.85, scale * 2.55, scale * 0.65);
-            const wireMesh = new THREE.Mesh(wireGeo, materials.wireframe);
-            wireMesh.position.copy(mesh.position);
-            objectGroup.add(wireMesh);
-
-            objects.push({
-                mesh: mesh, wireMesh: wireMesh, led: led, ledMat: ledMat,
-                rotSpeed: { x: 0, y: 0, z: 0 },
-                floatSpeed: 0, floatOffset: 0, baseY: y,
-                isServer: true, ledPulse: Math.random() * Math.PI * 2
-            });
-        }
-
-        const floorGeo = new THREE.PlaneGeometry(100, Math.abs(CONFIG.cameraZEnd) + 100);
-        const floorMesh = new THREE.Mesh(floorGeo, materials.floor);
-        floorMesh.rotation.x = -Math.PI / 2;
-        floorMesh.position.y = -12;
-        floorMesh.position.z = CONFIG.cameraZEnd / 2;
-        floorMesh.receiveShadow = true;
-        scene.add(floorMesh);
-
-        const gridMesh = new THREE.Mesh(floorGeo, materials.grid);
-        gridMesh.rotation.x = -Math.PI / 2;
-        gridMesh.position.y = -11.9;
-        gridMesh.position.z = CONFIG.cameraZEnd / 2;
-        scene.add(gridMesh);
-
-        for (let i = 0; i < CONFIG.objectCount; i++) {
-            const z = CONFIG.cameraZStart - 10 - (Math.random() * (Math.abs(CONFIG.cameraZEnd) + 40));
-            const margin = 2;
-            const hw = CONFIG.corridorWidth / 2 - margin;
-            const hh = CONFIG.corridorHeight / 2 - margin;
-
-            let x, y;
-            if (Math.random() > 0.4) {
-                x = Math.random() > 0.5 ? hw : -hw;
-                x += (Math.random() - 0.5) * 4;
-                y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.8;
-            } else {
-                x = (Math.random() - 0.5) * CONFIG.corridorWidth * 0.7;
-                y = (Math.random() - 0.5) * CONFIG.corridorHeight * 0.7;
-            }
-
-            const scale = 1 + Math.random() * 2.5;
-            const type = Math.random();
-
-            if (type < 0.4) {
-                createServerRack(z, x, y, scale);
-            } else if (type < 0.7) {
-                const geo = new THREE.BoxGeometry(scale, scale, scale);
-                const mat = Math.random() > 0.6 ? materials.serverSoftPink : (Math.random() > 0.5 ? materials.serverMagenta : materials.serverPink);
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(x, y, z);
-                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                objectGroup.add(mesh);
-
-                const wireGeo = new THREE.EdgesGeometry(geo);
-                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xc71585, transparent: true, opacity: 0.4 }));
-                wireLine.position.copy(mesh.position);
-                wireLine.rotation.copy(mesh.rotation);
-                objectGroup.add(wireLine);
-
-                objects.push({
-                    mesh: mesh, wireLine: wireLine,
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.02, y: (Math.random() - 0.5) * 0.02, z: (Math.random() - 0.5) * 0.02 },
-                    floatSpeed: (Math.random() - 0.5) * 0.01, floatOffset: Math.random() * Math.PI * 2, baseY: y
-                });
-            } else {
-                const geo = new THREE.TorusKnotGeometry(scale * 0.5, scale * 0.15, 64, 8);
-                const mat = Math.random() > 0.5 ? materials.serverPink : materials.serverMagenta;
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(x, y, z);
-                mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                objectGroup.add(mesh);
-
-                objects.push({
-                    mesh: mesh,
-                    rotSpeed: { x: (Math.random() - 0.5) * 0.01, y: (Math.random() - 0.5) * 0.03, z: (Math.random() - 0.5) * 0.01 },
-                    floatSpeed: (Math.random() - 0.5) * 0.005, floatOffset: Math.random() * Math.PI * 2, baseY: y
-                });
-            }
-        }
-
-        const sections = document.querySelectorAll('.ui-section');
-        const numSections = sections.length;
-        
-        let pathPoints = [];
-        for (let i = 0; i < numSections; i++) {
-            const progress = i / (numSections - 1);
-            const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
-            const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
-            const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
-            pathPoints.push(new THREE.Vector3(x, y, z));
-        }
-
-        const curve = new THREE.CatmullRomCurve3(pathPoints);
-        curve.curveType = 'centripetal';
-
-        // Mouse Parallax Trackers
-        let mouseX = 0, mouseY = 0;
-        let targetMouseX = 0, targetMouseY = 0;
-        window.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-            targetMouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-        });
-
-        // Bind Camera to Scroll & Mouse Parallax
-        const scrollObject = { progress: 0 };
-        let currentBasePos = new THREE.Vector3();
-        let currentLookAt = new THREE.Vector3();
-
-        gsap.to(scrollObject, {
-            progress: 1,
-            ease: "none",
-            scrollTrigger: {
-                trigger: "#scroll-track",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: CONFIG.scrubValue,
-                onUpdate: (self) => {
-                    const p = self.progress;
-                    currentBasePos.copy(curve.getPoint(p));
-                    currentLookAt.copy(curve.getPoint(Math.min(p + 0.01, 1)));
-
-                    const currentDepth = (p * Math.abs(CONFIG.cameraZEnd - CONFIG.cameraZStart)).toFixed(2);
-                    document.getElementById('depth-readout').textContent = currentDepth + 'm';
-                    document.getElementById('progress-fill').style.width = (p * 100) + '%';
-                    
-                    const activeSlide = Math.min(Math.floor(p * numSections) + 1, numSections);
-                    document.getElementById('slide-readout').textContent = String(activeSlide).padStart(2, '0') + '/' + String(numSections).padStart(2, '0');
-                }
-            }
-        });
-
-        // Bind Sections visibility
-        sections.forEach((section, index) => {
-            const startP = index / numSections;
-            const endP = (index + 1) / numSections;
+          {/* Main Workspace */}
+          <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 flex flex-col justify-center">
             
-            ScrollTrigger.create({
-                trigger: "#scroll-track",
-                start: `${startP * 100}% top`,
-                end: `${endP * 100}% top`,
-                scrub: true,
-                onEnter: () => gsap.to(section, { opacity: 1, y: 0, duration: 0.4 }),
-                onLeave: () => gsap.to(section, { opacity: 0, y: -50, duration: 0.4 }),
-                onEnterBack: () => gsap.to(section, { opacity: 1, y: 0, duration: 0.4 }),
-                onLeaveBack: () => gsap.to(section, { opacity: 0, y: 50, duration: 0.4 })
-            });
-        });
+            {currentSlide === 1 ? (
+              /* Title Slide special layout matching the image */
+              <div className="text-center flex flex-col items-center justify-center my-auto">
+                <div className="text-5xl md:text-7xl font-black text-pink-700 tracking-wider uppercase font-mono drop-shadow-sm mb-2">
+                  NOC<br />NOC
+                </div>
+                <div className="text-xs md:text-sm font-mono text-pink-600 tracking-widest uppercase mb-8">
+                  // Scroll to descend //
+                </div>
+                <p className="text-xs font-mono text-pink-800 max-w-md">
+                  Mission-Critical Telecom Operations & High-Availability Governance for Omantel National Backbone.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="border-b border-pink-400/30 pb-4 flex justify-between items-end mb-6">
+                  <div>
+                    <span className="text-xs font-mono tracking-widest text-pink-600 uppercase">
+                      Slide {String(currentSlide).padStart(2, '0')} — Network Operations
+                    </span>
+                    <h1 className="text-2xl md:text-3xl font-black text-pink-950 flex items-center gap-3 mt-1">
+                      <i data-lucide={slideData?.icon || "network"} className="w-7 h-7 text-pink-600"></i>
+                      {slideData?.title}
+                    </h1>
+                  </div>
+                  <p className="text-xs text-pink-800 max-w-md text-right hidden md:block font-mono">
+                    {slideData?.subtitle}
+                  </p>
+                </div>
 
-        // Animation Loop with Smooth Mouse Parallax Interpolation
-        const clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
+                {currentSlide === 2 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
+                      <h2 className="text-lg font-bold text-pink-700 mb-2">{slideData.leftTitle}</h2>
+                      <p className="text-xs text-pink-800 mb-4">{slideData.leftDesc}</p>
+                      <div className="space-y-3">
+                        {slideData.leftItems.map((item, idx) => (
+                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded-lg flex justify-between items-center text-xs">
+                            <span className="font-semibold text-pink-950">{item.name}</span>
+                            <span className="font-mono text-pink-700 bg-pink-100 px-2 py-1 rounded border border-pink-200">{item.spec}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
+                      <h2 className="text-lg font-bold text-pink-700 mb-2">{slideData.rightTitle}</h2>
+                      <p className="text-xs text-pink-800 mb-4">{slideData.rightDesc}</p>
+                      <div className="space-y-3">
+                        {slideData.rightItems.map((item, idx) => (
+                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded-lg flex justify-between items-center text-xs">
+                            <span className="text-pink-800">{item.label}</span>
+                            <span className="font-mono font-bold text-pink-700">{item.val}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-            // Smoothly interpolate mouse movement
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
+                {currentSlide === 3 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {slideData.cards.map((c, idx) => (
+                      <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md flex flex-col justify-between">
+                        <div>
+                          <h2 className="text-base font-bold text-pink-700 mb-4 pb-2 border-b border-pink-300/30">{c.title}</h2>
+                          <ul className="space-y-3">
+                            {c.items.map((item, iIdx) => (
+                              <li key={iIdx} className="text-xs text-pink-900 flex items-start gap-2">
+                                <i data-lucide="check-circle-2" className="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            // Apply camera position with mouse offset
-            if (currentBasePos.lengthSq() > 0) {
-                camera.position.x = currentBasePos.x + mouseX * 2.5;
-                camera.position.y = currentBasePos.y - mouseY * 2.5;
-                camera.position.z = currentBasePos.z;
+                {currentSlide === 4 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
+                      <h2 className="text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider font-mono">5G / 4G Mobile Core</h2>
+                      <div className="space-y-2">
+                        {slideData.mobileCore.map((item, idx) => (
+                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded text-xs text-pink-900">{item}</div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
+                      <h2 className="text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider font-mono">IP Backbone & Services</h2>
+                      <div className="space-y-2">
+                        {slideData.ipServices.map((item, idx) => (
+                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded text-xs text-pink-900">{item}</div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
+                      <h2 className="text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider font-mono">Live KPIs</h2>
+                      <div className="space-y-3">
+                        {slideData.kpis.map((kpi, idx) => (
+                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded flex justify-between items-center text-xs">
+                            <span className="text-pink-800">{kpi.name}</span>
+                            <span className="font-mono font-bold text-pink-700">{kpi.status}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                let adjustedLookAt = currentLookAt.clone();
-                adjustedLookAt.x += mouseX * 1.5;
-                adjustedLookAt.y -= mouseY * 1.5;
-                camera.lookAt(adjustedLookAt);
-            }
+                {currentSlide === 5 && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {slideData.tiers.map((t, idx) => (
+                        <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
+                          <span className="text-xs font-mono font-bold text-pink-700">{t.tier}</span>
+                          <p className="text-xs text-pink-900 mt-2 leading-relaxed">{t.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
+                      <h3 className="text-xs font-mono font-bold text-pink-800 uppercase mb-3">Incident Management Pipeline</h3>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        {slideData.workflow.map((wf, idx) => (
+                          <React.Fragment key={idx}>
+                            <div className="bg-pink-100 border border-pink-300 text-pink-800 font-mono text-xs px-3 py-2 rounded">
+                              {wf}
+                            </div>
+                            {idx < slideData.workflow.length - 1 && (
+                              <i data-lucide="arrow-right" className="w-4 h-4 text-pink-500 hidden md:block"></i>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-            objects.forEach((obj) => {
-                if (obj.mesh) {
-                    obj.mesh.rotation.x += obj.rotSpeed.x;
-                    obj.mesh.rotation.y += obj.rotSpeed.y;
-                    obj.mesh.rotation.z += obj.rotSpeed.z;
-                }
-                if (obj.wireMesh) obj.wireMesh.rotation.copy(obj.mesh.rotation);
-                if (obj.wireLine) obj.wireLine.rotation.copy(obj.mesh.rotation);
-                if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.5 + Math.sin(time * 4 + obj.ledPulse) * 0.4;
-                }
-            });
+                {currentSlide === 6 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {slideData.powerSpecs.map((p, idx) => (
+                      <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
+                        <h2 className="text-base font-bold text-pink-700 mb-3">{p.title}</h2>
+                        <p className="text-xs text-pink-900 leading-relaxed">{p.detail}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            corridorLights.forEach(item => {
-                item.light.intensity = item.baseIntensity + Math.sin(time * item.flickerSpeed) * 0.3;
-            });
+                {currentSlide === 7 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
+                      <h2 className="text-base font-bold text-pink-700 mb-4 pb-2 border-b border-pink-300/30">Cybersecurity Defense</h2>
+                      <ul className="space-y-3">
+                        {slideData.cyberItems.map((item, idx) => (
+                          <li key={idx} className="text-xs text-pink-900 flex items-start gap-2">
+                            <i data-lucide="shield-alert" className="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
+                      <h2 className="text-base font-bold text-pink-700 mb-4 pb-2 border-b border-pink-300/30">Emergency Field Response</h2>
+                      <ul className="space-y-3">
+                        {slideData.fieldItems.map((item, idx) => (
+                          <li key={idx} className="text-xs text-pink-900 flex items-start gap-2">
+                            <i data-lucide="truck" className="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
 
-            renderer.render(scene, camera);
-        }
-        animate();
+                {currentSlide === 8 && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {slideData.stations.map((st, idx) => (
+                        <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-4 backdrop-blur-md">
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-sm font-bold text-pink-950">{st.name}</h3>
+                            <span className="w-2 h-2 rounded-full bg-pink-600 animate-pulse"></span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {st.cables.map((c, cIdx) => (
+                              <span key={cIdx} className="text-[10px] bg-pink-100 text-pink-800 border border-pink-300 px-2 py-0.5 rounded font-mono">
+                                {c}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
+                      <h3 className="text-xs font-mono font-bold text-pink-800 uppercase mb-3">Subsea Optical Diagnostic Suite</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {slideData.tech.map((t, idx) => (
+                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded text-xs text-pink-900 flex items-center gap-2 font-mono">
+                            <i data-lucide="activity" className="w-4 h-4 text-pink-600 shrink-0"></i>
+                            <span>{t}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-        // Resize Listener
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+                {currentSlide === 9 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <section className="bg-white/40 backdrop-blur-xl border border-pink-400/30 rounded-xl p-6 flex flex-col justify-between shadow-lg">
+                      <div>
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="p-3 bg-pink-100 border border-pink-300 rounded-lg text-pink-700">
+                            <i data-lucide="server" className="w-6 h-6"></i>
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold text-pink-950 tracking-wide">{slideData.datacom.title}</h2>
+                            <p className="text-xs text-pink-800">{slideData.datacom.subtitle}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-3 my-4">
+                          {slideData.datacom.services.map((svc, idx) => (
+                            <div key={idx} className="bg-white/60 border border-pink-300/40 rounded-lg p-3.5">
+                              <div className="flex items-center gap-2.5 mb-1">
+                                <span className="px-2 py-0.5 text-xs font-mono font-bold bg-pink-100 text-pink-800 border border-pink-300 rounded">
+                                  {svc.code}
+                                </span>
+                                <span className="text-sm font-semibold text-pink-950">{svc.name}</span>
+                              </div>
+                              <p className="text-xs text-pink-800 pl-1">{svc.desc}</p>
+                              {svc.benefits && (
+                                <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-pink-200">
+                                  <span className="text-[10px] text-pink-700 font-mono font-bold uppercase mr-1">Benefits:</span>
+                                  {svc.benefits.map((b, bIdx) => (
+                                    <span key={bIdx} className="text-[10px] bg-pink-100 text-pink-800 border border-pink-200 px-2 py-0.5 rounded">
+                                      • {b}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="pt-4 border-t border-pink-300/30 flex items-center justify-between text-xs">
+                        <span className="text-pink-800 font-medium">Devices:</span>
+                        <div className="flex gap-2">
+                          {slideData.datacom.devices.map((device, dIdx) => (
+                            <span key={dIdx} className="px-3 py-1 bg-pink-100 text-pink-900 rounded font-mono text-xs font-bold border border-pink-300">
+                              {device}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="bg-white/40 backdrop-blur-xl border border-pink-400/30 rounded-xl p-6 flex flex-col justify-between shadow-lg">
+                      <div>
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="p-3 bg-pink-100 border border-pink-300 rounded-lg text-pink-700">
+                            <i data-lucide="globe" className="w-6 h-6"></i>
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold text-pink-950 tracking-wide">{slideData.inoc.title}</h2>
+                            <p className="text-xs text-pink-800">{slideData.inoc.subtitle}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-4 my-4">
+                          <div className="bg-white/60 border border-pink-300/40 rounded-lg p-3.5">
+                            <div className="flex items-center gap-2 mb-2 text-pink-700">
+                              <i data-lucide="activity" className="w-4 h-4"></i>
+                              <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Monitoring</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {slideData.inoc.monitoring.map((mItem, idx) => (
+                                <div key={idx} className="bg-white/80 border border-pink-200 rounded p-2 text-xs text-pink-900 flex items-center gap-2 font-mono">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-pink-600 animate-ping" />
+                                  <span className="truncate">{mItem}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="pt-4 border-t border-pink-300/30 flex items-center justify-between text-xs">
+                        <span className="text-pink-800 font-medium">Operational Status:</span>
+                        <span className="px-3 py-1 bg-pink-100 text-pink-800 rounded font-mono text-xs font-bold border border-pink-300">
+                          Active Sync
+                        </span>
+                      </div>
+                    </section>
+                  </div>
+                )}
+
+                {currentSlide === 10 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {slideData.features.map((f, idx) => (
+                      <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
+                        <div className="w-8 h-8 rounded-lg bg-pink-100 border border-pink-300 text-pink-700 flex items-center justify-center mb-4 font-mono font-bold text-sm">
+                          0{idx + 1}
+                        </div>
+                        <h2 className="text-base font-bold text-pink-950 mb-2">{f.title}</h2>
+                        <p className="text-xs text-pink-800 leading-relaxed">{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+          </main>
+
+          {/* Footer Controls matching user screenshot */}
+          <footer className="border-t border-pink-400/30 bg-[#ffccd5]/90 backdrop-blur-md px-6 py-3 flex items-center justify-between font-mono text-xs text-pink-900">
+            <div className="flex items-center gap-4">
+              <span>SYS: ONLINE</span>
+              <span className="hidden sm:inline">DEPTH: 0.00m</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-pink-700">NAV:</span>
+              <div className="flex items-center gap-1">
+                {SLIDES.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setCurrentSlide(s.id)}
+                    className={`w-6 h-6 rounded text-[10px] flex items-center justify-center transition-all ${
+                      currentSlide === s.id
+                        ? 'bg-pink-700 text-white font-bold'
+                        : 'bg-white/60 text-pink-800 hover:bg-pink-200 border border-pink-300'
+                    }`}
+                  >
+                    {s.id}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span>SLIDE: {String(currentSlide).padStart(2, '0')}/{SLIDES.length}</span>
+              <div className="flex gap-1 ml-2">
+                <button
+                  onClick={() => currentSlide > 1 && setCurrentSlide(p => p - 1)}
+                  disabled={currentSlide === 1}
+                  className="px-2 py-1 bg-white/60 hover:bg-pink-200 disabled:opacity-30 border border-pink-300 rounded text-pink-900"
+                >
+                  &larr;
+                </button>
+                <button
+                  onClick={() => currentSlide < SLIDES.length && setCurrentSlide(p => p + 1)}
+                  disabled={currentSlide === SLIDES.length}
+                  className="px-2 py-1 bg-pink-700 hover:bg-pink-600 text-white disabled:opacity-30 rounded font-bold"
+                >
+                  &rarr;
+                </button>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
-
-```
