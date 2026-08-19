@@ -77,7 +77,7 @@
         #title-screen {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: 20; background: transparent;
+            z-index: 25; background: transparent;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             opacity: 0; pointer-events: none;
@@ -88,7 +88,7 @@
         #end-screen {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: 20; background: transparent;
+            z-index: 25; background: transparent;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             opacity: 0; pointer-events: none;
@@ -570,7 +570,6 @@
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
         camera.position.set(0, 0, CONFIG.cameraZStart);
 
-        // Mouse look-around interaction variables
         let mouseX = 0, mouseY = 0;
         let targetLookX = 0, targetLookY = 0;
 
@@ -780,14 +779,20 @@
                     { opacity: 0, y: -50, scale: 0.95, duration: 0.04, ease: "power2.in" },
                     fadeOutPoint
                 );
+            } else {
+                // Fade out Slide 10 cleanly before reaching the end screen
+                masterTl.to(section, 
+                    { opacity: 0, y: -50, scale: 0.95, duration: 0.03, ease: "power2.in" },
+                    0.90
+                );
             }
         });
 
-        // Fade in THANK YOU ending screen at the very end of the scroll track
+        // Fade in THANK YOU ending screen exclusively at the very tail-end of the scroll
         masterTl.fromTo(endScreen,
             { opacity: 0, y: 50 },
-            { opacity: 1, y: 0, duration: 0.08, ease: "power2.out" },
-            0.92
+            { opacity: 1, y: 0, duration: 0.06, ease: "power2.out" },
+            0.93
         );
 
         window.addEventListener('resize', () => {
