@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEGACORP // MAINFRAME DESCENT v3.0.0 - PASTEL</title>
+    <title>KNOCK KNOCK // MAINFRAME</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -11,18 +11,17 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            /* Light Theme Variables */
-            --bg: #fadadd; /* Baby Pink */
-            --bg-panel: rgba(255, 255, 255, 0.65);
-            --border: rgba(199, 21, 133, 0.3);
+            /* True Pink Theme - No White Cast */
+            --bg: #ffb6c1; /* Richer Baby Pink */
+            --bg-panel: rgba(255, 192, 203, 0.7); /* Pink frosted glass */
+            --border: rgba(199, 21, 133, 0.4);
             
             /* Text & Accents */
-            --text-main: #4a0e26;
-            --text-muted: #8a3a5a;
+            --text-main: #5a1836;
+            --text-muted: #9e476e;
             --primary: #c71585; /* Deep Magenta */
             --primary-dim: rgba(199, 21, 133, 0.6);
             --accent1: #ff1493;
-            --accent2: #ff69b4;
             --warn: #d32f2f;
         }
         html { scroll-behavior: auto; }
@@ -39,31 +38,47 @@
         }
         canvas { display: block; }
         
-        /* Lightened CRT Effects */
         .crt-scanlines {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 100; pointer-events: none;
-            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2) 1px, transparent 1px, transparent 3px);
-            opacity: 0.5;
+            background: repeating-linear-gradient(0deg, rgba(199, 21, 133, 0.05), rgba(199, 21, 133, 0.05) 1px, transparent 1px, transparent 3px);
+            opacity: 0.8;
         }
         .crt-vignette {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 101; pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 50%, rgba(250, 218, 221, 0.4) 80%, rgba(200, 100, 140, 0.15) 100%);
-        }
-        .crt-glow {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 103; pointer-events: none;
-            box-shadow: inset 0 0 80px rgba(255,255,255,0.4);
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 182, 193, 0.5) 80%, rgba(199, 21, 133, 0.2) 100%);
         }
 
         #scroll-track {
             position: relative; z-index: 2;
-            height: 600vh; pointer-events: none;
+            height: 1500vh; /* Extended for 10 slides */
+            pointer-events: none;
         }
+        
+        /* Title Screen Overlay */
+        #title-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 200; background: var(--bg);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .main-title {
+            font-size: clamp(5rem, 12vw, 9rem);
+            color: var(--primary); text-align: center;
+            line-height: 0.9; letter-spacing: -0.05em;
+            font-weight: 800; text-shadow: 0 10px 30px rgba(199, 21, 133, 0.15);
+        }
+        .author-credit {
+            position: absolute; bottom: 40px; right: 50px;
+            font-size: 14px; color: var(--text-muted);
+            font-weight: 600; letter-spacing: 0.05em;
+        }
+        
         .ui-layer {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100vh;
@@ -72,84 +87,56 @@
         }
         .ui-section {
             position: absolute; width: 100%;
-            max-width: 900px; padding: 0 5vw;
-            opacity: 0; transform: translateY(40px);
+            max-width: 850px; padding: 0 5vw;
+            opacity: 0; transform: translateY(60px);
             pointer-events: none;
         }
         .terminal-window {
             background: var(--bg-panel); border: 1px solid var(--border);
-            position: relative; backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(199, 21, 133, 0.08), inset 0 0 0 1px rgba(255,255,255,0.4);
-            border-radius: 4px;
+            position: relative; backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(199, 21, 133, 0.12), inset 0 0 0 1px rgba(255,255,255,0.2);
+            border-radius: 6px;
         }
         .terminal-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 16px; border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.4);
+            padding: 10px 18px; border-bottom: 1px solid var(--border);
+            background: rgba(255, 182, 193, 0.6);
             font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
-            border-radius: 4px 4px 0 0;
+            border-radius: 6px 6px 0 0;
         }
         .terminal-header .win-title { color: var(--primary); font-weight: 700; }
         .terminal-header .win-status { color: var(--text-muted); font-size: 10px; font-weight: 600; }
         .terminal-header .win-btns { display: flex; gap: 6px; }
         .win-btn {
-            width: 10px; height: 10px; border: 1px solid var(--border);
-            font-size: 7px; display: flex; align-items: center; justify-content: center;
-            color: var(--primary-dim); background: rgba(255,255,255,0.5);
+            width: 12px; height: 12px; border: 1px solid var(--border);
+            border-radius: 50%; background: var(--primary-dim);
         }
-        .terminal-body { padding: 24px 28px; }
+        .terminal-body { padding: 28px 32px; }
         .sys-id {
             color: var(--text-muted); font-size: 11px; font-weight: 600;
             letter-spacing: 0.1em; margin-bottom: 16px; display: block;
         }
         .sys-header {
-            font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 800;
+            font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;
             color: var(--primary); text-transform: uppercase;
-            letter-spacing: -0.02em; line-height: 1.1;
-            margin-bottom: 16px;
+            letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 16px;
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 14px; font-weight: 500;
-            line-height: 1.8; max-width: 600px; margin-bottom: 20px;
+            color: var(--text-main); font-size: 15px; font-weight: 500;
+            line-height: 1.8; max-width: 600px;
         }
-        .sys-tag {
-            display: inline-block; padding: 2px 10px;
-            border: 1px solid var(--border); background: rgba(255,255,255,0.5);
-            font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-            color: var(--primary); font-weight: 700; margin-bottom: 20px;
-            border-radius: 2px;
-        }
-        .sys-tag.critical { color: var(--warn); border-color: rgba(211, 47, 47, 0.3); }
-        
-        .spec-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px; border-top: 1px solid var(--border);
-            padding-top: 16px; margin-top: 16px;
-        }
-        .spec-item { display: flex; flex-direction: column; gap: 4px; }
-        .spec-label {
-            font-size: 10px; color: var(--text-muted); font-weight: 600;
-            letter-spacing: 0.15em; text-transform: uppercase;
-        }
-        .spec-value { font-size: 13px; color: var(--primary); font-weight: 700; }
-        .spec-value .blink { animation: blink 1s step-end infinite; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        
         .divider {
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--border), transparent);
-            margin: 16px 0;
+            margin: 20px 0;
         }
-        .log-entry { font-size: 12px; color: var(--text-main); font-weight: 500; margin-bottom: 4px; }
-        .log-entry .timestamp { color: var(--text-muted); font-weight: 700; }
         
         .status-bar {
             position: fixed; bottom: 0; left: 0;
             width: 100%; z-index: 50;
             background: var(--bg-panel); border-top: 1px solid var(--border);
-            padding: 6px 20px; backdrop-filter: blur(8px);
+            padding: 8px 24px; backdrop-filter: blur(12px);
             display: flex; align-items: center; justify-content: space-between;
             font-size: 11px; letter-spacing: 0.1em; font-weight: 600;
         }
@@ -157,13 +144,12 @@
         .status-item { display: flex; align-items: center; gap: 8px; }
         .status-label { color: var(--text-muted); }
         .status-value { color: var(--primary); font-weight: 700; }
-        .status-value.warn { color: var(--warn); }
         
         .progress-track {
-            width: 200px; height: 6px; border-radius: 3px;
-            background: rgba(199, 21, 133, 0.1);
+            width: 250px; height: 6px; border-radius: 3px;
+            background: rgba(199, 21, 133, 0.15);
             position: relative; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.5);
+            border: 1px solid rgba(199, 21, 133, 0.3);
         }
         .progress-fill {
             height: 100%; width: 0%;
@@ -171,158 +157,224 @@
             transition: width 0.1s linear;
         }
         
-        #boot-overlay {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 200; background: var(--bg);
-            display: flex; flex-direction: column;
-            justify-content: center; padding: 0 10vw;
-            font-size: 13px; line-height: 2; font-weight: 600;
-        }
-        #boot-overlay .boot-line { color: var(--text-muted); opacity: 0; }
-        #boot-overlay .boot-line.active { color: var(--primary); }
-        #boot-overlay .boot-line.error { color: var(--warn); }
-        #boot-overlay .boot-prompt { color: var(--primary); font-weight: 800; }
-        #boot-overlay.hidden { opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
-        
         .scroll-hint {
-            position: fixed; bottom: 50px; left: 50%;
+            position: absolute; bottom: 80px; left: 50%;
             transform: translateX(-50%); z-index: 20;
             display: flex; flex-direction: column;
-            align-items: center; gap: 8px;
-            opacity: 1; transition: opacity 0.8s ease;
+            align-items: center; gap: 12px;
         }
-        .scroll-hint.hidden { opacity: 0; pointer-events: none; }
         .scroll-hint span {
-            font-size: 11px; letter-spacing: 0.3em; font-weight: 700;
+            font-size: 12px; letter-spacing: 0.3em; font-weight: 700;
             text-transform: uppercase; color: var(--primary);
         }
         .scroll-line {
-            width: 2px; height: 30px;
+            width: 2px; height: 40px;
             background: linear-gradient(to bottom, var(--primary), transparent);
             animation: scrollPulse 2s ease-in-out infinite;
         }
         @keyframes scrollPulse {
             0%,100%{opacity:0.2;transform:scaleY(0.4)}
-            50%{opacity:0.8;transform:scaleY(1)}
+            50%{opacity:1;transform:scaleY(1)}
         }
         
-        .ui-section.left { justify-self: start; text-align: left; }
-        .ui-section.right { justify-self: end; text-align: right; margin-left: auto; margin-right: 0; }
+        .ui-section.left { justify-self: start; text-align: left; margin-left: 5vw; }
+        .ui-section.right { justify-self: end; text-align: right; margin-right: 5vw; margin-left: auto; }
         .ui-section.right .terminal-body { text-align: left; }
         .ui-section.center { justify-self: center; text-align: center; margin: 0 auto; }
         .ui-section.center .terminal-body { text-align: left; }
-        .ui-section.center .sys-desc { margin: 0 auto 20px; }
-        .ui-section.center .spec-grid { max-width: 600px; margin: 16px auto 0; }
         
         @media (max-width: 768px) {
-            .ui-section { padding: 0 4vw; }
-            .spec-grid { grid-template-columns: 1fr 1fr; }
+            .ui-section { padding: 0 5vw; margin: 0 !important; max-width: 100%; }
             .status-bar { font-size: 9px; padding: 6px 10px; }
             .status-left, .status-right { gap: 12px; }
             .progress-track { width: 100px; }
-            .terminal-body { padding: 16px 18px; }
+            .author-credit { bottom: 20px; right: 20px; font-size: 12px; }
         }
     </style>
 </head><body>
     <div id="canvas-container"></div>
     <div class="crt-scanlines"></div>
     <div class="crt-vignette"></div>
-    <div class="crt-glow"></div>
 
-    <div id="boot-overlay">
-        <div class="boot-line active"><span class="boot-prompt">></span> SYS_INIT: Booting pastel_kernel.x86_64...</div>
-        <div class="boot-line"><span class="boot-prompt">></span> NET_SYS: Daydream loopback initialized...</div>
-        <div class="boot-line"><span class="boot-prompt">></span> LOC_ID: SEC_01_CLOUD // VISUAL: HIGH_CONTRAST</div>
-        <div class="boot-line"><span class="boot-prompt">></span> SYNERGY_BOOT: v3.0.0-CLARITY</div>
-        <div class="boot-line active"><span class="boot-prompt">></span> Verifying analyst optics...</div>
-        <div class="boot-line"><span class="boot-prompt">></span> AMBIENT LIGHTING <span style="color:var(--primary)">[MAXIMIZED]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> FOG DENSITY <span style="color:var(--primary)">[REDUCED]</span></div>
-        <div class="boot-line"><span class="boot-prompt">></span> MATERIAL REFLECTIVITY <span style="color:var(--primary)">[ENHANCED]</span></div>
-        <div class="boot-line warn"><span class="boot-prompt">></span> SYS_ALIGNING_PARAMETERS...</div>
-        <div class="boot-line active"><span class="boot-prompt">></span> DESCENT PROTOCOL: ENGAGED // SCROLL TO NAVIGATE</div>
+    <!-- MAIN TITLE SCREEN -->
+    <div id="title-screen">
+        <h1 class="main-title">KNOCK<br>KNOCK</h1>
+        <div class="author-credit">Made by Asala Hassan Bait Mhaud</div>
+        <div class="scroll-hint">
+            <span>// SCROLL TO DESCEND //</span>
+            <div class="scroll-line"></div>
+        </div>
     </div>
 
     <div class="status-bar">
         <div class="status-left">
-            <div class="status-item"><span class="status-label">LOC_ID:</span><span class="status-value">SEC_01_CLOUD</span></div>
+            <div class="status-item"><span class="status-label">SYS:</span><span class="status-value">ONLINE</span></div>
             <div class="status-item"><span class="status-label">DEPTH:</span><span class="status-value" id="depth-readout">0.00m</span></div>
-            <div class="status-item"><span class="status-label">INTEGRITY:</span><span class="status-value" id="integrity-readout">100.00%</span></div>
         </div>
         <div class="status-right">
-            <div class="status-item"><span class="status-label">DESCENT:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
-            <div class="status-item"><span class="status-label">STATUS:</span><span class="status-value" id="status-readout">CLEAR</span></div>
+            <div class="status-item"><span class="status-label">NAV:</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
+            <div class="status-item"><span class="status-label">SLIDE:</span><span class="status-value" id="slide-readout">01/10</span></div>
         </div>
     </div>
 
-    <div class="scroll-hint" id="scroll-hint">
-        <span>// SCROLL TO DESCEND //</span>
-        <div class="scroll-line"></div>
-    </div>
-
+    <!-- 10 SLIDES -->
     <div class="ui-layer">
-        <div class="ui-section left" id="section-1">
+        <!-- Slide 1 -->
+        <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">[SYS_BRIEFING] // SECTOR_01</span>
-                    <span class="win-status">VISUAL_FEED_OPTIMIZED</span>
-                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                    <span class="win-title">01 // INITIALIZATION</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">SYS_REF: 0xPASTEL_INIT // TUNNEL_ID: 0xPINK</span>
-                    <div class="sys-tag">DIRECTIVE // CLARITY ONLINE</div>
-                    <h1 class="sys-header">MAINFRAME<br><span class="dim">DESCENT</span></h1>
-                    <p class="sys-desc">Welcome back, Analyst. The ambient lighting constraints have been lifted. You can now clearly observe the geometric architecture of the MegaCorp network. The geometry is fully illuminated.</p>
-                    <div class="divider"></div>
-                    <div class="spec-grid">
-                        <div class="spec-item"><span class="spec-label">Environment</span><span class="spec-value">BABY_PINK</span></div>
-                        <div class="spec-item"><span class="spec-label">Visibility</span><span class="spec-value">100%</span></div>
-                        <div class="spec-item"><span class="spec-label">Fog Density</span><span class="spec-value">LOW</span></div>
-                        <div class="spec-item"><span class="spec-label">Sector</span><span class="spec-value">01_CLOUD</span></div>
-                    </div>
+                    <span class="sys-id">SYSTEM ENTRY // STAGE_01</span>
+                    <h1 class="sys-header">THE<br><span class="dim">THRESHOLD</span></h1>
+                    <p class="sys-desc">Welcome to the descent. The structural void has been flooded with high-saturation pigment. No pure whites, no washed-out highlights—just pure geometric depth.</p>
                 </div>
             </div>
         </div>
 
-        <div class="ui-section right" id="section-2">
+        <!-- Slide 2 -->
+        <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">[MEMO: SYSTEM_UPDATE] // PHASE_ALPHA</span>
-                    <span class="win-status">ACTIVE_LOG</span>
-                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                    <span class="win-title">02 // ARCHITECTURE</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">INC-SEC02-042 // Created: 2026-08-19 // Status: CLEAR</span>
-                    <div class="sys-tag">UPDATE // HARDWARE_VISIBLE</div>
-                    <h1 class="sys-header">DATA<br><span class="dim">GEOMETRY</span></h1>
-                    <p class="sys-desc">Observe the pristine white and pastel server nodes passing by. With the darkness stripped away, the network is surprisingly serene. No shadows to hide in, just pure, uninterrupted data processing.</p>
-                    <div class="divider"></div>
-                    <div class="log-entry"><span class="timestamp">[08:14:22]</span> > Ambient light boosted by 400%.</div>
-                    <div class="log-entry"><span class="timestamp">[08:14:23]</span> > Materials updated to High-Reflectance Albedo.</div>
-                    <div class="log-entry"><span class="timestamp">[08:14:24]</span> > Server clusters are fully visible and operational.</div>
+                    <span class="sys-id">NETWORK TOPOLOGY // STAGE_02</span>
+                    <h1 class="sys-header">SERVER<br><span class="dim">SPINES</span></h1>
+                    <p class="sys-desc">Floating monolithic forms drift past. We have engineered the ambient environment to reflect soft magentas and deep rose tones, completely eliminating the synthetic glare.</p>
                 </div>
             </div>
         </div>
 
-        <div class="ui-section center" id="section-3">
+        <!-- Slide 3 -->
+        <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">[FINAL_VECTOR] // SECTOR_13</span>
-                    <span class="win-status">OVERSIGHT_APEX</span>
-                    <div class="win-btns"><span class="win-btn">_</span><span class="win-btn">[]</span><span class="win-btn">x</span></div>
+                    <span class="win-title">03 // PROTOCOLS</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">INC-SEC13-420 // Created: 2026-08-19 // Status: APPROVED</span>
-                    <div class="sys-tag">VERIFIED // OVERSIGHT_APEX</div>
+                    <span class="sys-id">DATA FLOW // STAGE_03</span>
+                    <h1 class="sys-header">SIGNAL<br><span class="dim">ROUTING</span></h1>
+                    <p class="sys-desc">Information traverses the network in elegant loops. The camera path mathematically calculates spline tension to ensure your journey through the clusters remains perfectly smooth.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">04 // RENDERING</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">GRAPHICS ENGINE // STAGE_04</span>
+                    <h1 class="sys-header">VERTEX<br><span class="dim">SHADERS</span></h1>
+                    <p class="sys-desc">Every polygon you see is illuminated by carefully positioned point lights. By casting warm, vivid hues, the geometry retains volume without losing its pastel aesthetic.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">05 // TELEMETRY</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">SYSTEM METRICS // STAGE_05</span>
+                    <h1 class="sys-header">CORE<br><span class="dim">STABILITY</span></h1>
+                    <p class="sys-desc">Halfway through the descent. The structural integrity of the UI elements remains locked. Frosted panels ensure perfect contrast against the dynamic background.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">06 // FREQUENCY</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">WAVEFORM SYNC // STAGE_06</span>
+                    <h1 class="sys-header">RESONANCE<br><span class="dim">TUNING</span></h1>
+                    <p class="sys-desc">Oscillating elements synchronize with the scroll velocity. The deeper you go, the more the visual density adapts to your pacing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">07 // LOGISTICS</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">ASSET MANAGEMENT // STAGE_07</span>
+                    <h1 class="sys-header">SPATIAL<br><span class="dim">LAYOUT</span></h1>
+                    <p class="sys-desc">The arrangement of servers follows procedural logic, scattering nodes across the z-axis to create a continuously evolving corridor of technology.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="ui-section center">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">08 // TRANSMISSION</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">UPLINK STATUS // STAGE_08</span>
+                    <h1 class="sys-header">DATA<br><span class="dim">BURST</span></h1>
+                    <p class="sys-desc">Packets of light pulse through the infrastructure. Each wireframe cube operates as a temporary cache, holding fragments of color before releasing them.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="ui-section left">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">09 // APEX</span>
+                    <span class="win-status">ACTIVE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">APPROACHING TERMINUS // STAGE_09</span>
                     <h1 class="sys-header">THE<br><span class="dim">HORIZON</span></h1>
-                    <p class="sys-desc">You have reached the end of the bright corridor. The structural clarity has improved workflow efficiency by 87%. The void is no longer dark—it is just pink.</p>
-                    <div class="divider"></div>
-                    <div class="spec-grid">
-                        <div class="spec-item"><span class="spec-label">Status</span><span class="spec-value">COMPLETE</span></div>
-                        <div class="spec-item"><span class="spec-label">Aesthetics</span><span class="spec-value">APPROVED</span></div>
-                        <div class="spec-item"><span class="spec-label">Shadows</span><span class="spec-value">REMOVED</span></div>
-                        <div class="spec-item"><span class="spec-label">Morale</span><span class="spec-value">IMPROVED</span></div>
-                    </div>
+                    <p class="sys-desc">You are nearing the end of the calculated spline path. The environment maintains its lush pink hue, undisturbed by artificial shadows.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="ui-section right">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="win-title">10 // CONCLUSION</span>
+                    <span class="win-status">COMPLETE</span>
+                    <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
+                </div>
+                <div class="terminal-body">
+                    <span class="sys-id">END OF LINE // STAGE_10</span>
+                    <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
+                    <p class="sys-desc">All ten data points have been successfully processed. The system will now idle in this state indefinitely. Thank you for viewing.</p>
                 </div>
             </div>
         </div>
@@ -333,43 +385,27 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
-        // Updated Configuration for Bright/Baby Pink Theme
+        // Updated Configuration for True Pink (No White)
         const CONFIG = {
             cameraZStart: 25,
-            cameraZEnd: -300,
-            fogDensity: 0.009, // Much lower density to see further
-            fogColor: 0xfadadd, // Baby pink
-            ambientIntensity: 2.5, // Massively increased so objects are bright
-            pointLightIntensity: 1.0,
-            pointLightDistance: 80,
-            objectCount: 200,
-            corridorWidth: 30,
-            corridorHeight: 24,
-            scrubValue: 1.5
+            cameraZEnd: -450, // Longer corridor for 10 slides
+            fogDensity: 0.007, 
+            fogColor: 0xffb6c1, // Pure baby pink
+            ambientIntensity: 2.2, // Pink ambient light intensity
+            pointLightIntensity: 1.5,
+            pointLightDistance: 100,
+            objectCount: 350,
+            corridorWidth: 35,
+            corridorHeight: 28,
+            scrubValue: 1.2
         };
-
-        const bootLines = document.querySelectorAll('#boot-overlay .boot-line');
-        bootLines.forEach((line, i) => {
-            gsap.to(line, {
-                opacity: 1,
-                duration: 0.05,
-                delay: i * 0.15,
-                onComplete: () => {
-                    if (i === bootLines.length - 1) {
-                        setTimeout(() => {
-                            document.getElementById('boot-overlay').classList.add('hidden');
-                        }, 800);
-                    }
-                }
-            });
-        });
 
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(CONFIG.fogColor);
         scene.fog = new THREE.FogExp2(CONFIG.fogColor, CONFIG.fogDensity);
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 400);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
         camera.position.set(0, 0, CONFIG.cameraZStart);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
@@ -378,53 +414,51 @@
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.2; // Brighter overall exposure
+        renderer.toneMappingExposure = 1.1; 
         container.appendChild(renderer.domElement);
 
-        // BRIGHT AMBIENT LIGHT
-        const ambientLight = new THREE.AmbientLight(0xffffff, CONFIG.ambientIntensity);
+        // PINK AMBIENT LIGHT (Replaces White)
+        const ambientLight = new THREE.AmbientLight(0xffa6c9, CONFIG.ambientIntensity);
         scene.add(ambientLight);
 
-        // Main bright white light attached to camera
-        const camLight = new THREE.PointLight(0xffffff, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
+        // Main camera light is Hot Pink/Magenta instead of White
+        const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
         camLight.position.set(0, 2, -6);
         camLight.castShadow = true;
         camLight.shadow.mapSize.width = 1024;
         camLight.shadow.mapSize.height = 1024;
-        camLight.shadow.bias = -0.001;
+        camLight.shadow.bias = -0.002;
         camera.add(camLight);
 
-        // Soft pink fill light
-        const camLight2 = new THREE.PointLight(0xffb6c1, 1.5, 50);
+        const camLight2 = new THREE.PointLight(0xff1493, 1.2, 50);
         camLight2.position.set(5, -2, -5);
         camera.add(camLight2);
 
         scene.add(camera);
 
         const corridorLights = [];
-        for (let i = 0; i < 20; i++) {
-            const z = -15 - i * 16;
-            // Lights are bright white or hot pink to contrast with the soft background
-            const color = Math.random() > 0.5 ? 0xffffff : 0xff1493;
-            const light = new THREE.PointLight(color, 0.8, 30);
+        for (let i = 0; i < 30; i++) {
+            const z = -15 - i * 15;
+            // Lights are purely pink tones
+            const color = Math.random() > 0.5 ? 0xffb6c1 : 0xff1493;
+            const light = new THREE.PointLight(color, 0.9, 35);
             light.position.set(
                 (Math.random() - 0.5) * CONFIG.corridorWidth * 0.85,
                 (Math.random() - 0.5) * CONFIG.corridorHeight * 0.4,
                 z
             );
             scene.add(light);
-            corridorLights.push({ light, baseIntensity: 0.8, flickerSpeed: 2 + Math.random() * 5 });
+            corridorLights.push({ light, baseIntensity: 0.9, flickerSpeed: 2 + Math.random() * 5 });
         }
 
-        // Lighter, highly visible materials
+        // Materials modified to have NO pure white, replacing with soft pink bases
         const materials = {
-            serverWhite: new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.1, roughness: 0.2 }),
-            serverPink: new THREE.MeshStandardMaterial({ color: 0xffe4e1, metalness: 0.2, roughness: 0.3 }),
-            serverMagenta: new THREE.MeshStandardMaterial({ color: 0xff69b4, metalness: 0.3, roughness: 0.4 }),
-            lightMetal: new THREE.MeshStandardMaterial({ color: 0xf0f0f0, metalness: 0.8, roughness: 0.2 }),
-            wireframe: new THREE.MeshBasicMaterial({ color: 0xc71585, wireframe: true, transparent: true, opacity: 0.3 }),
-            floor: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.8 }), // Pastel pink floor
-            grid: new THREE.MeshBasicMaterial({ color: 0xff69b4, transparent: true, opacity: 0.4, wireframe: true }),
+            serverSoftPink: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.3 }),
+            serverPink: new THREE.MeshStandardMaterial({ color: 0xffb6c1, metalness: 0.2, roughness: 0.4 }),
+            serverMagenta: new THREE.MeshStandardMaterial({ color: 0xff69b4, metalness: 0.3, roughness: 0.5 }),
+            wireframe: new THREE.MeshBasicMaterial({ color: 0xc71585, wireframe: true, transparent: true, opacity: 0.35 }),
+            floor: new THREE.MeshStandardMaterial({ color: 0xffc0cb, metalness: 0.1, roughness: 0.8 }),
+            grid: new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.25, wireframe: true }),
         };
 
         const objects = [];
@@ -433,16 +467,15 @@
 
         function createServerRack(z, x, y, scale) {
             const geo = new THREE.BoxGeometry(scale * 0.8, scale * 2.5, scale * 0.6);
-            const mat = Math.random() > 0.5 ? materials.serverWhite : materials.serverPink;
+            const mat = Math.random() > 0.5 ? materials.serverSoftPink : materials.serverPink;
             const mesh = new THREE.Mesh(geo, mat);
             mesh.position.set(x, y, z);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             objectGroup.add(mesh);
 
-            // Bright LED accents
             const ledGeo = new THREE.BoxGeometry(scale * 0.82, scale * 0.05, scale * 0.02);
-            const ledMat = new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.8 });
+            const ledMat = new THREE.MeshBasicMaterial({ color: 0xff1493, transparent: true, opacity: 0.9 });
             const led = new THREE.Mesh(ledGeo, ledMat);
             led.position.set(x, y + scale * 0.8, z + scale * 0.31);
             objectGroup.add(led);
@@ -497,8 +530,7 @@
                 createServerRack(z, x, y, scale);
             } else if (type < 0.7) {
                 const geo = new THREE.BoxGeometry(scale, scale, scale);
-                // Mix of bright white, pastel pink, and metal boxes
-                const mat = Math.random() > 0.6 ? materials.serverWhite : (Math.random() > 0.5 ? materials.serverMagenta : materials.lightMetal);
+                const mat = Math.random() > 0.6 ? materials.serverSoftPink : (Math.random() > 0.5 ? materials.serverMagenta : materials.serverPink);
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(x, y, z);
                 mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
@@ -507,7 +539,7 @@
                 objectGroup.add(mesh);
 
                 const wireGeo = new THREE.EdgesGeometry(geo);
-                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xc71585, transparent: true, opacity: 0.3 }));
+                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0xc71585, transparent: true, opacity: 0.4 }));
                 wireLine.position.copy(mesh.position);
                 wireLine.rotation.copy(mesh.rotation);
                 objectGroup.add(wireLine);
@@ -519,7 +551,7 @@
                 });
             } else {
                 const geo = new THREE.TorusKnotGeometry(scale * 0.5, scale * 0.15, 64, 8);
-                const mat = Math.random() > 0.5 ? materials.serverPink : materials.lightMetal;
+                const mat = Math.random() > 0.5 ? materials.serverPink : materials.serverMagenta;
                 const mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(x, y, z);
                 mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
@@ -542,8 +574,8 @@
         for (let i = 0; i < numSections; i++) {
             const progress = i / (numSections - 1);
             const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
-            const x = Math.sin(progress * Math.PI * 4) * (CONFIG.corridorWidth * 0.15);
-            const y = Math.cos(progress * Math.PI * 3) * (CONFIG.corridorHeight * 0.15);
+            const x = Math.sin(progress * Math.PI * 5) * (CONFIG.corridorWidth * 0.18);
+            const y = Math.cos(progress * Math.PI * 4) * (CONFIG.corridorHeight * 0.18);
             pathPoints.push(new THREE.Vector3(x, y, z));
         }
         
@@ -556,12 +588,25 @@
                 end: 'bottom bottom',
                 scrub: CONFIG.scrubValue,
                 onUpdate: (self) => {
+                    // Progress Bar
                     document.getElementById('progress-fill').style.width = `${self.progress * 100}%`;
+                    
+                    // Depth Readout
                     const depth = Math.abs(camera.position.z - CONFIG.cameraZStart).toFixed(2);
                     document.getElementById('depth-readout').textContent = `${depth}m`;
 
-                    if (self.progress > 0.05) {
-                        document.getElementById('scroll-hint').classList.add('hidden');
+                    // Slide Counter Logic
+                    const currentSlide = Math.min(10, Math.max(1, Math.ceil(self.progress * 10)));
+                    document.getElementById('slide-readout').textContent = `${currentSlide.toString().padStart(2, '0')}/10`;
+
+                    // Title Screen Fade Out
+                    const titleScreen = document.getElementById('title-screen');
+                    if (self.progress > 0.01) {
+                        titleScreen.style.opacity = '0';
+                        titleScreen.style.pointerEvents = 'none';
+                    } else {
+                        titleScreen.style.opacity = '1';
+                        titleScreen.style.pointerEvents = 'auto';
                     }
                 }
             }
@@ -575,20 +620,20 @@
                 const point = curve.getPointAt(time);
                 camera.position.copy(point);
 
-                const lookAheadTime = Math.min(1, time + 0.05);
+                const lookAheadTime = Math.min(1, time + 0.03);
                 const lookAheadPoint = curve.getPointAt(lookAheadTime);
                 const dx = lookAheadPoint.x - point.x;
                 camera.rotation.z = gsap.utils.interpolate(camera.rotation.z, dx * -0.1, 0.1);
                 
-                const targetPoint = curve.getPointAt(Math.min(1, time + 0.1));
+                const targetPoint = curve.getPointAt(Math.min(1, time + 0.06));
                 camera.rotation.x = gsap.utils.interpolate(camera.rotation.x, (targetPoint.y - point.y) * 0.02, 0.1);
                 camera.rotation.y = gsap.utils.interpolate(camera.rotation.y, (targetPoint.x - point.x) * 0.05, 0.1);
             }
         }, 0);
 
         sections.forEach((section, index) => {
-            const startProgress = Math.max(0, (index / (numSections - 1)) - 0.15);
-            const endProgress = Math.min(1, (index / (numSections - 1)) + 0.15);
+            const startProgress = Math.max(0, (index / (numSections - 1)) - 0.08);
+            const endProgress = Math.min(1, (index / (numSections - 1)) + 0.08);
             const startRatio = startProgress * 100;
             const endRatio = endProgress * 100;
 
@@ -607,12 +652,12 @@
             gsap.to(section, {
                 scrollTrigger: {
                     trigger: '#scroll-track',
-                    start: `${(index / (numSections - 1)) * 100 + 10}% top`,
-                    end: `${Math.min(100, (index / (numSections - 1)) * 100 + 25)}% top`,
+                    start: `${(index / (numSections - 1)) * 100 + 6}% top`,
+                    end: `${Math.min(100, (index / (numSections - 1)) * 100 + 15)}% top`,
                     scrub: 0.5,
                 },
                 opacity: 0,
-                y: -40,
+                y: -60,
                 ease: "power2.in",
             });
         });
@@ -661,7 +706,7 @@
                 if(obj.led) obj.led.position.y = obj.baseY + yOffset + (obj.mesh.geometry.parameters.height/2 || 0);
 
                 if (obj.isServer && obj.ledMat) {
-                    obj.ledMat.opacity = 0.4 + Math.sin(time * 5 + obj.ledPulse) * 0.6;
+                    obj.ledMat.opacity = 0.5 + Math.sin(time * 4 + obj.ledPulse) * 0.5;
                 }
             });
 
