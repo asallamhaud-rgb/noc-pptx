@@ -1,735 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Omantel NOC — Interactive 3D Presentation</title>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- React & ReactDOM CDNs -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-
-  <!-- Babel Compiler for JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- Three.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <!-- GSAP for Camera & UI Transitions -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #ffccd5;
-      color: #831843;
-      margin: 0;
-      overflow: hidden;
-    }
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-    #canvas-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omantel NOC - Mobile Network RAN & Core Architecture</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #030712;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.4);
+        }
+        .slide {
+            display: none;
+        }
+        .slide.active {
+            display: flex;
+        }
+    </style>
 </head>
-<body class="relative min-h-screen bg-[#ffccd5] text-pink-950">
+<body class="h-screen w-screen flex flex-col justify-between p-6 select-none">
 
-  <!-- Three.js Background Canvas -->
-  <div id="canvas-container"></div>
+    <!-- Three.js Canvas Container -->
+    <div id="webgl-container"></div>
 
-  <!-- React Root -->
-  <div id="root" class="relative z-10"></div>
-
-  <!-- Three.js + GSAP Pink Wireframe 3D Simulation -->
-  <script>
-    const container = document.getElementById('canvas-container');
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0xffccd5, 0.035);
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 15);
-
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    container.appendChild(renderer.domElement);
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffb6c1, 1.8);
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xdb2777, 2.5, 35);
-    pointLight.position.set(0, 2, 5);
-    scene.add(pointLight);
-
-    // Wireframe Racks & Floating Torus Knots
-    const rackGeo = new THREE.BoxGeometry(1.5, 6, 2);
-    const wireMat = new THREE.MeshBasicMaterial({
-      color: 0xdb2777,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.6
-    });
-
-    const torusGeo = new THREE.TorusKnotGeometry(0.6, 0.2, 64, 16);
-    const torusMat = new THREE.MeshBasicMaterial({
-      color: 0xf472b6,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.7
-    });
-
-    const corridorObjects = [];
-
-    for (let i = 0; i < 22; i++) {
-      const zPos = -i * 4 + 10;
-
-      // Left Rack
-      const leftRack = new THREE.Mesh(rackGeo, wireMat);
-      leftRack.position.set(-4.5, 0, zPos);
-      scene.add(leftRack);
-      corridorObjects.push(leftRack);
-
-      // Right Rack
-      const rightRack = new THREE.Mesh(rackGeo, wireMat);
-      rightRack.position.set(4.5, 0, zPos);
-      scene.add(rightRack);
-      corridorObjects.push(rightRack);
-
-      // Floating Torus Decors
-      if (i % 3 === 0) {
-        const torus = new THREE.Mesh(torusGeo, torusMat);
-        torus.position.set((i % 2 === 0 ? 6 : -6), (Math.random() - 0.5) * 4, zPos);
-        scene.add(torus);
-        corridorObjects.push(torus);
-      }
-    }
-
-    // Floor Grid Helper (Pink themed)
-    const gridHelper = new THREE.GridHelper(80, 40, 0xbe185d, 0xf472b6);
-    gridHelper.position.y = -3.2;
-    scene.add(gridHelper);
-
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-
-      camera.position.z -= 0.018;
-      if (camera.position.z < -30) {
-        camera.position.z = 10;
-      }
-
-      corridorObjects.forEach((obj, idx) => {
-        obj.rotation.x += 0.002;
-        obj.rotation.y += 0.003;
-      });
-
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.animateCameraOnSlideChange = function(slideIndex) {
-      if (typeof gsap !== 'undefined') {
-        gsap.to(camera.position, {
-          x: (slideIndex % 2 === 0 ? 0.6 : -0.6),
-          y: Math.sin(slideIndex) * 0.25,
-          duration: 1.2,
-          ease: "power2.out"
-        });
-      }
-    };
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
-
-  <!-- React Presentation Component -->
-  <script type="text/babel">
-    const { useState, useEffect } = React;
-
-    const SLIDES = [
-      { id: 1, name: "NOC Overview & Strategy" },
-      { id: 2, name: "Core Network Topology" },
-      { id: 3, name: "Transport & Transmission" },
-      { id: 4, name: "IP & Mobile Core Operations" },
-      { id: 5, name: "Incident & Outage Management" },
-      { id: 6, name: "Power & Infrastructure Monitoring" },
-      { id: 7, name: "Cybersecurity & Field Operations" },
-      { id: 8, name: "Subsea Cable Landing Stations" },
-      { id: 9, name: "Datacom & iNOC" },
-      { id: 10, name: "Future Network Automation" }
-    ];
-
-    const ALL_SLIDES_DATA = {
-      1: {
-        title: "NOC Overview & Strategy",
-        subtitle: "Mission-Critical Telecom Operations & High-Availability Governance",
-        icon: "shield-check",
-        metrics: [
-          { label: "SLA Target", val: "99.999%", sub: "Five-Nines Uptime" },
-          { label: "MTTR Target", val: "< 45m", sub: "Mean Time to Repair" },
-          { label: "Monitored Sites", val: "12,500+", sub: "National Footprint" },
-          { label: "Core Traffic", val: "> 10 Tbps", sub: "Peak Terrestrial/Subsea" }
-        ],
-        pillars: [
-          { title: "24/7/365 Command Center", desc: "Real-time fault isolation, telemetry analytics, and centralized multi-tier incident handling." },
-          { title: "Zero-Trust Operational Model", desc: "Rigorous access control, automated policy enforcement, and audit-compliant change controls." },
-          { title: "Proactive Service Assurance", desc: "Automated synthetic transaction monitoring detecting degradation before user impact." }
-        ]
-      },
-      2: {
-        title: "Core Network Topology",
-        subtitle: "High-Capacity Optical Backbone & Multi-Tier Routing Architecture",
-        icon: "network",
-        leftTitle: "DWDM Super-Core Rings",
-        leftDesc: "Mesh-connected optical rings spanning Muscat, Salalah, Sohar, and Nizwa with redundant optical paths.",
-        leftItems: [
-          { name: "Muscat Central Core", spec: "Mesh 800G Flex-Grid DWDM" },
-          { name: "Dhofar Regional Ring", spec: "Protection Optical Switching (<50ms)" },
-          { name: "Batinah Express Link", spec: "Ultra-Low Latency Fiber Trunk" }
-        ],
-        rightTitle: "IP/MPLS Routing Architecture",
-        rightDesc: "Multi-vendor Provider Edge (PE) and Core (P) routers delivering traffic engineering and QoS enforcement.",
-        rightItems: [
-          { label: "Core Backbone", val: "100G / 400G MPLS Interfaces" },
-          { label: "Route Reflectors", val: "Geographically Redundant Pairs" },
-          { label: "Peering Capacity", val: "Direct BGP Connections to Tier-1 Carriers" }
-        ]
-      },
-      3: {
-        title: "Transport & Transmission",
-        subtitle: "Dense Wavelength Division Multiplexing (DWDM) & Microwave Backhaul",
-        icon: "radio-tower",
-        cards: [
-          {
-            title: "Optical Layer (DWDM / OTN)",
-            items: ["Coherent 400G/800G per Wavelength", "Flex-Grid Reconfigurable Optical Add-Drop Multiplexers (ROADM)", "Automatic Optical Layer Protection (1+1 MSP / SNCP)"]
-          },
-          {
-            title: "Microwave & Backhaul",
-            items: ["High-Capacity E-Band (70/80GHz) Millimeter-Wave Links", "Adaptive Coding and Modulation (ACM) for Weather Resilience", "Hybrid Fiber-Microwave Redundancy for Remote Stations"]
-          },
-          {
-            title: "Network Synchronization",
-            items: ["PTP IEEE 1588v2 Primary Reference Time Clock (PRTC)", "SyncE (Synchronous Ethernet) for 5G Ultra-Low Latency", "Rubidium Atomic Clock Backup at Key Transmission Hubs"]
-          }
-        ]
-      },
-      4: {
-        title: "IP & Mobile Core Operations",
-        subtitle: "5G Standalone (SA), 4G LTE EPC & Multi-Cloud IP Infrastructure",
-        icon: "smartphone",
-        mobileCore: ["5G AMF / UPF Cloud Native Core", "4G MME / SGW / PGW Virtualized Functions", "IMS Subsystem for VoLTE & VoNR Services"],
-        ipServices: ["Carrier-Grade NAT (CGNAT) Pooling", "Anycast Public DNS Resolver Grid", "BGP Peering & Traffic Steering"],
-        kpis: [
-          { name: "5G Call Setup Success", status: "99.98%" },
-          { name: "VoLTE Drop Rate", status: "< 0.08%" },
-          { name: "User Plane Latency", status: "< 8.5ms" }
-        ]
-      },
-      5: {
-        title: "Incident & Outage Management",
-        subtitle: "Automated Alarm Correlation, Ticketing & Major Incident Response",
-        icon: "siren",
-        tiers: [
-          { tier: "Tier 1 — Triage", desc: "Automated ingestion, initial diagnostics, and ticket categorization within 5 minutes." },
-          { tier: "Tier 2 — Domain Specialists", desc: "In-depth protocol troubleshooting, log analysis, and targeted remediation." },
-          { tier: "Tier 3 — Principal & Vendor", desc: "Architectural escalations, vendor R&D bridge calls, and hot-fix deployment." }
-        ],
-        workflow: ["Alarm Ingestion", "AIOps Noise Reduction", "Auto-Ticket Dispatch", "War Room MIM Activation", "RCA & Post-Mortem"]
-      },
-      6: {
-        title: "Power & Infrastructure Monitoring",
-        subtitle: "Environmental Control, Auxiliary Power Systems & Facility Health",
-        icon: "battery-charging",
-        powerSpecs: [
-          { title: "DC Power & Rectifiers", detail: "-48V DC Systems with N+1 High-Efficiency Rectifier Modules and Smart Battery Health Management." },
-          { title: "Precision HVAC Cooling", detail: "N+2 In-Row Precision Air Conditioners with Hot/Cold Aisle Containment and Temperature Telemetry." },
-          { title: "Backup Generators & Fuel", detail: "Automated Mains Failure (AMF) diesel generators with 72-hour onsite fuel sensing and automatic transfer." }
-        ]
-      },
-      7: {
-        title: "Cybersecurity & Field Operations",
-        subtitle: "SOC Integration, DDoS Scrubbing & Emergency Field Response",
-        icon: "truck",
-        cyberItems: ["Tbps-Scale Automated DDoS Mitigation Scrubbing", "BGP Route Leak Protection & RPKI Validation", "Real-Time Intrusion Prevention (IPS/IDS) at IGW Nodes"],
-        fieldItems: ["4 Regional Emergency Dispatch Hubs (Muscat, Dhofar, Batinah, Interior)", "Mobile Optical Fiber Splicing & Emergency Repair Vans", "Drone Fleet for Aerial Tower & Cable Span Inspection"]
-      },
-      8: {
-        title: "Subsea Cable Landing Stations",
-        subtitle: "Oman as a Strategic Global Telecommunications Hub",
-        icon: "anchor",
-        stations: [
-          { name: "Muscat (Seeb)", cables: ["AAE-1", "EIG", "OAC"], status: "Operational" },
-          { name: "Salalah Hub", cables: ["2Africa", "SEA-ME-WE 5", "PEACE"], status: "Operational" },
-          { name: "Sohar Station", cables: ["Regional Gulf Express Links"], status: "Operational" },
-          { name: "Barka Terminal", cables: ["International Terrestrial & Subsea Crossings"], status: "Operational" }
-        ],
-        tech: ["Coherent Optical DSP Telemetry", "Wet-Plant OTDR Cable Monitoring", "Submarine Line Terminal Equipment (SLTE) Health"]
-      },
-      9: {
-        title: "Datacom & iNOC",
-        subtitle: "Enterprise Data Services & International Network Operations Center Infrastructure",
-        datacom: {
-          title: "Datacom",
-          subtitle: "Data connectivity between sites, customers & network services",
-          services: [
-            { code: "ILL", name: "Internet Leased Line", desc: "Dedicated internet connection for a customer/site." },
-            { code: "P2P", name: "Point-to-Point", desc: "Direct connection between two locations." },
-            { code: "SD-WAN", name: "Software-Defined WAN", desc: "Uses MPLS + Internet to connect sites through centrally managed, optimized paths.", benefits: ["Flexibility", "Better traffic management", "Link optimization"] }
-          ],
-          devices: ["Routers", "Switches"]
-        },
-        inoc: {
-          title: "iNOC",
-          subtitle: "Monitors and manages international connectivity and traffic",
-          monitoring: ["Network Weather Map", "iNOC Console", "IGW Network", "Zoi — GGC Monitoring"],
-          architecture: {
-            providersCustomers: ["Zain", "GGC"],
-            core: "MPLS Core",
-            peers: ["Content Providers", "STCs", "IX Peers", "CDNs"]
-          }
-        }
-      },
-      10: {
-        title: "Future Network Automation",
-        subtitle: "AI-Driven Predictive Operations (AIOps) & Autonomous Self-Healing",
-        icon: "cpu",
-        features: [
-          { title: "Predictive Anomaly Detection", desc: "ML models predicting fiber optic degradation and transponder failure up to 72 hours before loss of signal." },
-          { title: "Zero-Touch Provisioning (ZTP)", desc: "Fully automated end-to-end service instantiation for enterprise ILL, SD-WAN, and 5G network slices." },
-          { title: "Intent-Based Routing", desc: "Dynamic real-time traffic re-routing based on latency, jitter, and cost matrices using telemetry feedback." }
-        ]
-      }
-    };
-
-    function App() {
-      const [currentSlide, setCurrentSlide] = useState(1);
-
-      useEffect(() => {
-        if (window.lucide) {
-          window.lucide.createIcons();
-        }
-        if (window.animateCameraOnSlideChange) {
-          window.animateCameraOnSlideChange(currentSlide);
-        }
-      }, [currentSlide]);
-
-      useEffect(() => {
-        const handleKeyDown = (e) => {
-          if (e.key === 'ArrowRight' && currentSlide < SLIDES.length) setCurrentSlide(prev => prev + 1);
-          if (e.key === 'ArrowLeft' && currentSlide > 1) setCurrentSlide(prev => prev - 1);
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [currentSlide]);
-
-      const slideData = ALL_SLIDES_DATA[currentSlide];
-
-      return (
-        <div className="w-full h-screen flex flex-col justify-between selection:bg-pink-500 selection:text-white">
-          
-          {/* Header */}
-          <header className="border-b border-pink-400/30 bg-[#ffccd5]/80 backdrop-blur-md px-6 py-3.5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-pink-600 animate-pulse" />
-              <span className="font-extrabold tracking-wider text-pink-950 text-sm uppercase font-mono">
-                Omantel NOC <span className="text-pink-600">| Interactive Deck</span>
-              </span>
-            </div>
-
-            <div className="text-xs font-mono text-pink-800 hidden md:block">
-              Made by Asala Hassan Bait Mhaud
-            </div>
-          </header>
-
-          {/* Main Workspace */}
-          <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 flex flex-col justify-center">
-            
-            {currentSlide === 1 ? (
-              /* Title Slide special layout matching the image */
-              <div className="text-center flex flex-col items-center justify-center my-auto">
-                <div className="text-5xl md:text-7xl font-black text-pink-700 tracking-wider uppercase font-mono drop-shadow-sm mb-2">
-                  NOC<br />NOC
-                </div>
-                <div className="text-xs md:text-sm font-mono text-pink-600 tracking-widest uppercase mb-8">
-                  // Scroll to descend //
-                </div>
-                <p className="text-xs font-mono text-pink-800 max-w-md">
-                  Mission-Critical Telecom Operations & High-Availability Governance for Omantel National Backbone.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="border-b border-pink-400/30 pb-4 flex justify-between items-end mb-6">
-                  <div>
-                    <span className="text-xs font-mono tracking-widest text-pink-600 uppercase">
-                      Slide {String(currentSlide).padStart(2, '0')} — Network Operations
-                    </span>
-                    <h1 className="text-2xl md:text-3xl font-black text-pink-950 flex items-center gap-3 mt-1">
-                      <i data-lucide={slideData?.icon || "network"} className="w-7 h-7 text-pink-600"></i>
-                      {slideData?.title}
-                    </h1>
-                  </div>
-                  <p className="text-xs text-pink-800 max-w-md text-right hidden md:block font-mono">
-                    {slideData?.subtitle}
-                  </p>
-                </div>
-
-                {currentSlide === 2 && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
-                      <h2 className="text-lg font-bold text-pink-700 mb-2">{slideData.leftTitle}</h2>
-                      <p className="text-xs text-pink-800 mb-4">{slideData.leftDesc}</p>
-                      <div className="space-y-3">
-                        {slideData.leftItems.map((item, idx) => (
-                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded-lg flex justify-between items-center text-xs">
-                            <span className="font-semibold text-pink-950">{item.name}</span>
-                            <span className="font-mono text-pink-700 bg-pink-100 px-2 py-1 rounded border border-pink-200">{item.spec}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
-                      <h2 className="text-lg font-bold text-pink-700 mb-2">{slideData.rightTitle}</h2>
-                      <p className="text-xs text-pink-800 mb-4">{slideData.rightDesc}</p>
-                      <div className="space-y-3">
-                        {slideData.rightItems.map((item, idx) => (
-                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded-lg flex justify-between items-center text-xs">
-                            <span className="text-pink-800">{item.label}</span>
-                            <span className="font-mono font-bold text-pink-700">{item.val}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {currentSlide === 3 && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {slideData.cards.map((c, idx) => (
-                      <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md flex flex-col justify-between">
-                        <div>
-                          <h2 className="text-base font-bold text-pink-700 mb-4 pb-2 border-b border-pink-300/30">{c.title}</h2>
-                          <ul className="space-y-3">
-                            {c.items.map((item, iIdx) => (
-                              <li key={iIdx} className="text-xs text-pink-900 flex items-start gap-2">
-                                <i data-lucide="check-circle-2" className="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {currentSlide === 4 && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
-                      <h2 className="text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider font-mono">5G / 4G Mobile Core</h2>
-                      <div className="space-y-2">
-                        {slideData.mobileCore.map((item, idx) => (
-                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded text-xs text-pink-900">{item}</div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
-                      <h2 className="text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider font-mono">IP Backbone & Services</h2>
-                      <div className="space-y-2">
-                        {slideData.ipServices.map((item, idx) => (
-                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded text-xs text-pink-900">{item}</div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
-                      <h2 className="text-sm font-bold text-pink-700 mb-3 uppercase tracking-wider font-mono">Live KPIs</h2>
-                      <div className="space-y-3">
-                        {slideData.kpis.map((kpi, idx) => (
-                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded flex justify-between items-center text-xs">
-                            <span className="text-pink-800">{kpi.name}</span>
-                            <span className="font-mono font-bold text-pink-700">{kpi.status}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {currentSlide === 5 && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {slideData.tiers.map((t, idx) => (
-                        <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
-                          <span className="text-xs font-mono font-bold text-pink-700">{t.tier}</span>
-                          <p className="text-xs text-pink-900 mt-2 leading-relaxed">{t.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
-                      <h3 className="text-xs font-mono font-bold text-pink-800 uppercase mb-3">Incident Management Pipeline</h3>
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        {slideData.workflow.map((wf, idx) => (
-                          <React.Fragment key={idx}>
-                            <div className="bg-pink-100 border border-pink-300 text-pink-800 font-mono text-xs px-3 py-2 rounded">
-                              {wf}
-                            </div>
-                            {idx < slideData.workflow.length - 1 && (
-                              <i data-lucide="arrow-right" className="w-4 h-4 text-pink-500 hidden md:block"></i>
-                            )}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {currentSlide === 6 && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {slideData.powerSpecs.map((p, idx) => (
-                      <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
-                        <h2 className="text-base font-bold text-pink-700 mb-3">{p.title}</h2>
-                        <p className="text-xs text-pink-900 leading-relaxed">{p.detail}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {currentSlide === 7 && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
-                      <h2 className="text-base font-bold text-pink-700 mb-4 pb-2 border-b border-pink-300/30">Cybersecurity Defense</h2>
-                      <ul className="space-y-3">
-                        {slideData.cyberItems.map((item, idx) => (
-                          <li key={idx} className="text-xs text-pink-900 flex items-start gap-2">
-                            <i data-lucide="shield-alert" className="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
-                      <h2 className="text-base font-bold text-pink-700 mb-4 pb-2 border-b border-pink-300/30">Emergency Field Response</h2>
-                      <ul className="space-y-3">
-                        {slideData.fieldItems.map((item, idx) => (
-                          <li key={idx} className="text-xs text-pink-900 flex items-start gap-2">
-                            <i data-lucide="truck" className="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-
-                {currentSlide === 8 && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {slideData.stations.map((st, idx) => (
-                        <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-4 backdrop-blur-md">
-                          <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-sm font-bold text-pink-950">{st.name}</h3>
-                            <span className="w-2 h-2 rounded-full bg-pink-600 animate-pulse"></span>
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {st.cables.map((c, cIdx) => (
-                              <span key={cIdx} className="text-[10px] bg-pink-100 text-pink-800 border border-pink-300 px-2 py-0.5 rounded font-mono">
-                                {c}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="bg-white/40 border border-pink-400/30 rounded-xl p-5 backdrop-blur-md">
-                      <h3 className="text-xs font-mono font-bold text-pink-800 uppercase mb-3">Subsea Optical Diagnostic Suite</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        {slideData.tech.map((t, idx) => (
-                          <div key={idx} className="bg-white/60 border border-pink-300/40 p-3 rounded text-xs text-pink-900 flex items-center gap-2 font-mono">
-                            <i data-lucide="activity" className="w-4 h-4 text-pink-600 shrink-0"></i>
-                            <span>{t}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {currentSlide === 9 && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <section className="bg-white/40 backdrop-blur-xl border border-pink-400/30 rounded-xl p-6 flex flex-col justify-between shadow-lg">
-                      <div>
-                        <div className="flex items-center gap-3 mb-5">
-                          <div className="p-3 bg-pink-100 border border-pink-300 rounded-lg text-pink-700">
-                            <i data-lucide="server" className="w-6 h-6"></i>
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-pink-950 tracking-wide">{slideData.datacom.title}</h2>
-                            <p className="text-xs text-pink-800">{slideData.datacom.subtitle}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-3 my-4">
-                          {slideData.datacom.services.map((svc, idx) => (
-                            <div key={idx} className="bg-white/60 border border-pink-300/40 rounded-lg p-3.5">
-                              <div className="flex items-center gap-2.5 mb-1">
-                                <span className="px-2 py-0.5 text-xs font-mono font-bold bg-pink-100 text-pink-800 border border-pink-300 rounded">
-                                  {svc.code}
-                                </span>
-                                <span className="text-sm font-semibold text-pink-950">{svc.name}</span>
-                              </div>
-                              <p className="text-xs text-pink-800 pl-1">{svc.desc}</p>
-                              {svc.benefits && (
-                                <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-pink-200">
-                                  <span className="text-[10px] text-pink-700 font-mono font-bold uppercase mr-1">Benefits:</span>
-                                  {svc.benefits.map((b, bIdx) => (
-                                    <span key={bIdx} className="text-[10px] bg-pink-100 text-pink-800 border border-pink-200 px-2 py-0.5 rounded">
-                                      • {b}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="pt-4 border-t border-pink-300/30 flex items-center justify-between text-xs">
-                        <span className="text-pink-800 font-medium">Devices:</span>
-                        <div className="flex gap-2">
-                          {slideData.datacom.devices.map((device, dIdx) => (
-                            <span key={dIdx} className="px-3 py-1 bg-pink-100 text-pink-900 rounded font-mono text-xs font-bold border border-pink-300">
-                              {device}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="bg-white/40 backdrop-blur-xl border border-pink-400/30 rounded-xl p-6 flex flex-col justify-between shadow-lg">
-                      <div>
-                        <div className="flex items-center gap-3 mb-5">
-                          <div className="p-3 bg-pink-100 border border-pink-300 rounded-lg text-pink-700">
-                            <i data-lucide="globe" className="w-6 h-6"></i>
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-pink-950 tracking-wide">{slideData.inoc.title}</h2>
-                            <p className="text-xs text-pink-800">{slideData.inoc.subtitle}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-4 my-4">
-                          <div className="bg-white/60 border border-pink-300/40 rounded-lg p-3.5">
-                            <div className="flex items-center gap-2 mb-2 text-pink-700">
-                              <i data-lucide="activity" className="w-4 h-4"></i>
-                              <h3 className="text-xs font-mono font-bold uppercase tracking-wider">Monitoring</h3>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              {slideData.inoc.monitoring.map((mItem, idx) => (
-                                <div key={idx} className="bg-white/80 border border-pink-200 rounded p-2 text-xs text-pink-900 flex items-center gap-2 font-mono">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-pink-600 animate-ping" />
-                                  <span className="truncate">{mItem}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="pt-4 border-t border-pink-300/30 flex items-center justify-between text-xs">
-                        <span className="text-pink-800 font-medium">Operational Status:</span>
-                        <span className="px-3 py-1 bg-pink-100 text-pink-800 rounded font-mono text-xs font-bold border border-pink-300">
-                          Active Sync
-                        </span>
-                      </div>
-                    </section>
-                  </div>
-                )}
-
-                {currentSlide === 10 && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {slideData.features.map((f, idx) => (
-                      <div key={idx} className="bg-white/40 border border-pink-400/30 rounded-xl p-6 backdrop-blur-md">
-                        <div className="w-8 h-8 rounded-lg bg-pink-100 border border-pink-300 text-pink-700 flex items-center justify-center mb-4 font-mono font-bold text-sm">
-                          0{idx + 1}
-                        </div>
-                        <h2 className="text-base font-bold text-pink-950 mb-2">{f.title}</h2>
-                        <p className="text-xs text-pink-800 leading-relaxed">{f.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-
-          </main>
-
-          {/* Footer Controls matching user screenshot */}
-          <footer className="border-t border-pink-400/30 bg-[#ffccd5]/90 backdrop-blur-md px-6 py-3 flex items-center justify-between font-mono text-xs text-pink-900">
-            <div className="flex items-center gap-4">
-              <span>SYS: ONLINE</span>
-              <span className="hidden sm:inline">DEPTH: 0.00m</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-pink-700">NAV:</span>
-              <div className="flex items-center gap-1">
-                {SLIDES.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setCurrentSlide(s.id)}
-                    className={`w-6 h-6 rounded text-[10px] flex items-center justify-center transition-all ${
-                      currentSlide === s.id
-                        ? 'bg-pink-700 text-white font-bold'
-                        : 'bg-white/60 text-pink-800 hover:bg-pink-200 border border-pink-300'
-                    }`}
-                  >
-                    {s.id}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span>SLIDE: {String(currentSlide).padStart(2, '0')}/{SLIDES.length}</span>
-              <div className="flex gap-1 ml-2">
-                <button
-                  onClick={() => currentSlide > 1 && setCurrentSlide(p => p - 1)}
-                  disabled={currentSlide === 1}
-                  className="px-2 py-1 bg-white/60 hover:bg-pink-200 disabled:opacity-30 border border-pink-300 rounded text-pink-900"
-                >
-                  &larr;
-                </button>
-                <button
-                  onClick={() => currentSlide < SLIDES.length && setCurrentSlide(p => p + 1)}
-                  disabled={currentSlide === SLIDES.length}
-                  className="px-2 py-1 bg-pink-700 hover:bg-pink-600 text-white disabled:opacity-30 rounded font-bold"
-                >
-                  &rarr;
-                </button>
-              </div>
-            </div>
-          </footer>
+    <!-- Top Navigation Header -->
+    <header class="w-full max-w-7xl mx-auto flex justify-between items-center glass-panel px-6 py-4 rounded-xl shadow-2xl z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <span class="font-bold tracking-wider text-lg text-red-400">OMANTEL NOC // RAN ARCHITECTURE</span>
         </div>
-      );
-    }
+        <div class="text-sm font-mono text-gray-400">
+            SLIDE <span id="current-slide-num" class="text-white font-bold">1</span> / <span id="total-slides">14</span>
+        </div>
+    </header>
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+    <!-- Main Presentation Slide Area -->
+    <main class="w-full max-w-7xl mx-auto flex-grow flex items-center justify-center my-6 z-10">
+        
+        <!-- Slide 1: Executive Summary -->
+        <div class="slide active w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl animate-fade">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 01</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Executive Summary & Network Topology</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Comprehensive overview of the next-generation Radio Access Network (RAN) architecture deployment across regional distribution hubs.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-6 mt-6">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-2xl font-bold text-red-400">99.999%</div>
+                    <div class="text-sm text-gray-400 mt-1">Target Core Uptime</div>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-2xl font-bold text-red-400">&lt; 5ms</div>
+                    <div class="text-sm text-gray-400 mt-1">End-to-End Latency</div>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-2xl font-bold text-red-400">3.5 GHz</div>
+                    <div class="text-sm text-gray-400 mt-1">Active Mid-Band Spec</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Massively MIMO & Antenna Systems -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 02</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Massive MIMO & Active Antenna Units</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Deployment metrics for 64T64R AAS configurations optimized for beamforming and spatial multiplexing.</p>
+            </div>
+            <ul class="space-y-3 text-gray-300 text-base">
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Dynamic 3D beam steering capabilities targeting high-density urban clusters.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Integrated METAMATERIAL filtering elements for enhanced out-of-band rejection.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Real-time channel state information (CSI) feedback loop optimizations.</span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Cloud RAN (C-RAN) & Fronthaul -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 03</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Cloud RAN & Optical Fronthaul Links</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Centralizing baseband units (BBU) to reduce site footprint and optimize processing resource pooling.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-gray-900/60 p-6 rounded-xl border border-gray-800">
+                    <h3 class="font-bold text-lg text-white">eCPRI Compression</h3>
+                    <p class="text-gray-400 text-sm mt-2">Ethernet-based common public radio interface supporting scalable bandwidth efficiency up to 25Gbps per sector.</p>
+                </div>
+                <div class="bg-gray-900/60 p-6 rounded-xl border border-gray-800">
+                    <h3 class="font-bold text-lg text-white">Dark Fiber Ring</h3>
+                    <p class="text-gray-400 text-sm mt-2">Redundant ring topology connecting remote radio units (RRUs) directly to centralized regional data hubs.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Open RAN (O-RAN) Architecture -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 04</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Open RAN (O-RAN) Disaggregation</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Vendor-neutral hardware and software interface decoupling across RU, DU, and CU components.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-center">
+                    <div class="font-bold text-white text-lg">O-RU</div>
+                    <p class="text-xs text-gray-400 mt-1">Radio Unit</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-center">
+                    <div class="font-bold text-white text-lg">O-DU</div>
+                    <p class="text-xs text-gray-400 mt-1">Distributed Unit (Real-time L1/MAC)</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-center">
+                    <div class="font-bold text-white text-lg">O-CU</div>
+                    <p class="text-xs text-gray-400 mt-1">Centralized Unit (SDAP/PDCP/RRC)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Intelligent RAN Automation (RIC) -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 05</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">RAN Intelligent Controller (RIC)</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Real-time and non-real-time optimization loops powered by machine learning policy engines.</p>
+            </div>
+            <ul class="space-y-3 text-gray-300 text-base">
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span><strong>Non-RT RIC:</strong> Policy management and ML model training exceeding 1-second control loops.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span><strong>Near-RT RIC:</strong> Sub-second control loops handling traffic steering and handover optimization.</span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 6: Propagation & Spectrum Engineering -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 06</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Spectrum Engineering & Link Budgets</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Path loss modeling, fading margins, and interference mitigation across sub-6 GHz and mmWave bands.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-white font-bold">Sub-6 GHz Mid-Band</div>
+                    <div class="text-sm text-gray-400 mt-1">Balanced coverage and capacity layer providing deep indoor penetration.</div>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-white font-bold">mmWave Hotspots</div>
+                    <div class="text-sm text-gray-400 mt-1">High-frequency multi-gigabit throughput for stadiums and transport hubs.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Synchronization & Timing (PTP / SyncE) -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 07</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Phase & Frequency Synchronization</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Ensuring rigorous phase alignment required for Time Division Duplexing (TDD) and advanced carrier aggregation.</p>
+            </div>
+            <ul class="space-y-3 text-gray-300 text-base">
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>IEEE 1588v2 Precision Time Protocol (PTP) grandmaster clock distribution.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Synchronous Ethernet (SyncE) physical layer frequency traceability.</span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 8: Energy Efficiency & Green RAN -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 08</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Green RAN & Power Management</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">AI-driven power scaling strategies to reduce carbon footprint during low-traffic temporal windows.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-red-400 font-bold">Symbol Muting</div>
+                    <p class="text-xs text-gray-400 mt-1">Dynamic blanking of unused resource blocks.</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-red-400 font-bold">Deep Sleep States</div>
+                    <p class="text-xs text-gray-400 mt-1">Powering down PA chains during night hours.</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-red-400 font-bold">Solar Integration</div>
+                    <p class="text-xs text-gray-400 mt-1">Hybrid off-grid remote site power systems.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Network Security & Zero Trust RAN -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 09</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Zero Trust RAN Security Framework</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Securing fronthail interfaces, control plane signaling, and mutual authentication tokens.</p>
+            </div>
+            <ul class="space-y-3 text-gray-300 text-base">
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>IPsec encryption tunnels implemented across all open fronthail links.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Hardware Root of Trust (RoT) integrated into base station chipsets.</span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 10: NOC Telemetry & Assurance -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 10</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Automated NOC Telemetry & Assurance</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Streaming telemetry pipelines feeding predictive fault management and self-healing algorithms.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-white font-bold">KPI/KQI Dashboards</div>
+                    <p class="text-sm text-gray-400 mt-1">Real-time visualization of drop call rates, throughput bottlenecks, and RRC connection success.</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-white font-bold">Root Cause Analysis</div>
+                    <p class="text-sm text-gray-400 mt-1">Automated anomaly detection isolating hardware degradation from interference spikes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Edge Computing Integration (NEW) -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 11</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Multi-Access Edge Computing (MEC)</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Deploying cloud computing capabilities within the radio access network close to mobile subscribers.</p>
+            </div>
+            <ul class="space-y-3 text-gray-300 text-base">
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Ultra-low latency data processing for autonomous vehicles and industrial IoT.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Local traffic breakout minimizing backhaul congestion toward the core network.</span></li>
+                <li class="flex items-center space-x-3"><span class="w-2 h-2 bg-red-500 rounded-full"></span><span>Edge application orchestration via standard ETSI MEC APIs.</span></li>
+            </ul>
+        </div>
+
+        <!-- Slide 12: 5G Standalone Core (NEW) -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 12</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">5G Standalone (SA) Core Architecture</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Transitioning away from LTE anchor dependencies toward a cloud-native Service-Based Architecture (SBA).</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-center">
+                    <div class="font-bold text-white text-sm">AMF / SMF</div>
+                    <p class="text-xs text-gray-400 mt-1">Access & Session Management</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-center">
+                    <div class="font-bold text-white text-sm">UPF</div>
+                    <p class="text-xs text-gray-400 mt-1">User Plane Function</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 text-center">
+                    <div class="font-bold text-white text-sm">UDM / AUSF</div>
+                    <p class="text-xs text-gray-400 mt-1">Unified Data & Authentication</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Network Slicing & QoS (NEW) -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 13</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">End-to-End Network Slicing & QoS</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Partitioning physical infrastructure into isolated virtual networks tailored to specific service level agreements.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-red-400 font-bold text-sm">eMBB Slice</div>
+                    <p class="text-xs text-gray-400 mt-1">High-speed mobile broadband for consumer streaming.</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-red-400 font-bold text-sm">URLLC Slice</div>
+                    <p class="text-xs text-gray-400 mt-1">Mission-critical ultra-reliable low latency comms.</p>
+                </div>
+                <div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800">
+                    <div class="text-red-400 font-bold text-sm">mMTC Slice</div>
+                    <p class="text-xs text-gray-400 mt-1">Massive machine-type communications for smart cities.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Conclusion & Roadmap -->
+        <div class="slide w-full h-[65vh] glass-panel rounded-2xl p-10 flex-col justify-between shadow-2xl">
+            <div>
+                <span class="text-xs font-mono uppercase tracking-widest text-red-400 bg-red-950/50 px-3 py-1 rounded-full border border-red-800/50">Module 14</span>
+                <h1 class="text-4xl font-extrabold mt-4 text-white">Deployment Roadmap & Future Horizons</h1>
+                <p class="text-gray-300 mt-3 text-lg max-w-3xl">Final milestones for complete nationwide rollout, automated orchestration, and advanced spectrum refarming.</p>
+            </div>
+            <div class="bg-gray-900/60 p-6 rounded-xl border border-gray-800 flex justify-between items-center">
+                <div>
+                    <div class="text-white font-bold text-lg">Phase II Rollout Complete</div>
+                    <div class="text-sm text-gray-400 mt-1">All regional centers synchronized with centralized NOC operations.</div>
+                </div>
+                <div class="text-red-400 font-mono font-bold text-xl">READY FOR PRODUCTION</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation Controls -->
+    <footer class="w-full max-w-7xl mx-auto flex justify-between items-center glass-panel px-6 py-4 rounded-xl shadow-2xl z-10">
+        <button id="prev-btn" onclick="changeSlide(-1)" class="px-5 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium transition border border-gray-700 cursor-pointer">
+            &larr; Previous Module
+        </button>
+        <div class="text-xs text-gray-400 font-mono hidden md:block">Use Navigation Buttons or Arrow Keys</div>
+        <button id="next-btn" onclick="changeSlide(1)" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium transition cursor-pointer">
+            Next Module &rarr;
+        </button>
+    </footer>
+
+    <!-- Presentation Engine Script -->
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        document.getElementById('total-slides').innerText = totalSlides;
+
+        function updateSlides() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+            document.getElementById('current-slide-num').innerText = currentSlide + 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            updateSlides();
+            updateThreeJSAnimation();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') changeSlide(1);
+            if (e.key === 'ArrowLeft' || e.key === 'PageUp') changeSlide(-1);
+        });
+
+        // Three.js Background Animation
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        // Create particles representing network nodes
+        const particleCount = 1200;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 40;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.PointsMaterial({
+            size: 0.08,
+            color: 0xef4444,
+            transparent: true,
+            opacity: 0.7
+        });
+
+        const particleSystem = new THREE.Points(geometry, material);
+        scene.add(particleSystem);
+        camera.position.z = 15;
+
+        function updateThreeJSAnimation() {
+            // Shift camera slightly based on current slide to create depth
+            camera.position.x = (currentSlide / totalSlides) * 5;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particleSystem.rotation.y += 0.001;
+            particleSystem.rotation.x += 0.0005;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
