@@ -1,8 +1,3 @@
-My apologies! You are completely right—we were working with the **baby pink/magenta** aesthetic. Let's fix that immediately.
-
-Here is the complete code restored with the proper **baby pink palette**, smooth transitions, CRT grading, and Slide 6 included:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -366,22 +361,62 @@ Here is the complete code restored with the proper **baby pink palette**, smooth
             </div>
         </div>
 
-        <!-- Slide 6 (Added) -->
+        <!-- Slide 6 (Updated Content) -->
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">06 // MOBILE NETWORK & CORE</span>
+                    <span class="win-title">06 // MOBILE NETWORK: RAN</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">WIRELESS DOMAIN // STAGE_06</span>
-                    <h1 class="sys-header" style="font-size: clamp(1.4rem, 2.5vw, 2.2rem); margin-bottom: 15px;">MOBILE NETWORK:<br><span class="dim">RAN, CORE, & SOC</span></h1>
-                    <div class="sys-desc" style="font-size: 13.5px; line-height: 1.5;">
-                        <p style="margin-bottom: 6px;"><strong>> RAN (Radio Access Network):</strong> Manages base stations (NodeB, eNodeB, gNodeB) connecting users wirelessly.</p>
-                        <p style="margin-bottom: 6px;"><strong>> Mobile Core:</strong> Handles subscriber authentication, mobility, call routing, and data sessions (EPC / 5GC).</p>
-                        <p style="margin-bottom: 6px;"><strong>> SOC (Service Operations Center):</strong> Focuses on customer experience metrics, service quality, and app performance.</p>
-                        <p style="margin-bottom: 0;"><strong>> Key Metrics:</strong> Accessibility, Retainability, Traffic Volume, and Latency Monitoring.</p>
+                    <h1 class="sys-header" style="font-size: clamp(1.3rem, 2.2vw, 1.8rem); margin-bottom: 12px;">MOBILE NETWORK:<br><span class="dim">RADIO ACCESS NETWORK (RAN)</span></h1>
+                    <div class="sys-desc" style="font-size: 12.5px; line-height: 1.45;">
+                        <p style="margin-bottom: 8px;"><strong>> RAN:</strong> Connects user devices to the mobile core network through radio access infrastructure.</p>
+                        
+                        <p style="margin-bottom: 4px;"><strong>> NETWORK ARCHITECTURE FLOW:</strong></p>
+                        <div style="margin-bottom: 10px; background: rgba(255,182,193,0.05); padding: 8px 12px; border-left: 2px solid var(--primary); font-size: 11.5px; line-height: 1.5;">
+                            <strong>User Device</strong> (Smartphone / Mobile Device)<br>
+                            ↓<br>
+                            <strong>Radio Network</strong> (BTS / NodeB / eNodeB / gNodeB + Baseband)<br>
+                            ↓<br>
+                            <strong>Core Network</strong> (MSC • VLR • HLR • etc.)<br>
+                            ↓<br>
+                            <strong>External Networks</strong> (PSTN • PLMN • Internet • Other Networks)
+                        </div>
+
+                        <p style="margin-bottom: 4px;"><strong>> MOBILE NETWORK EVOLUTION:</strong></p>
+                        <table style="width:100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 6px; border: 1px solid var(--border);">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border); background: rgba(255,182,193,0.1); color: var(--primary);">
+                                    <th style="padding: 4px 8px; text-align: left;">GENERATION</th>
+                                    <th style="padding: 4px 8px; text-align: left;">TECHNOLOGY</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,182,193,0.15);">
+                                    <td style="padding: 3px 8px;"><strong>1G</strong></td>
+                                    <td style="padding: 3px 8px;">AMPS</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,182,193,0.15);">
+                                    <td style="padding: 3px 8px;"><strong>2G</strong></td>
+                                    <td style="padding: 3px 8px;">GSM</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,182,193,0.15);">
+                                    <td style="padding: 3px 8px;"><strong>3G</strong></td>
+                                    <td style="padding: 3px 8px;">UMTS / HSPA <em>(Phased out in many networks)</em></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,182,193,0.15);">
+                                    <td style="padding: 3px 8px;"><strong>4G</strong></td>
+                                    <td style="padding: 3px 8px;">LTE</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 3px 8px;"><strong>5G</strong></td>
+                                    <td style="padding: 3px 8px;">NR</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -772,5 +807,3 @@ Here is the complete code restored with the proper **baby pink palette**, smooth
     </script>
 </body>
 </html>
-
-```
