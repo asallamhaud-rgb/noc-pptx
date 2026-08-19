@@ -51,7 +51,7 @@
         #canvas-container {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
-            z-index: 1; pointer-events: auto; /* Enabled pointer events for interaction */
+            z-index: 1; pointer-events: auto;
         }
         canvas { display: block; }
         
@@ -362,82 +362,124 @@
             </div>
         </div>
 
-        <!-- Slide 6 -->
+        <!-- Slide 6: Mobile Network: RAN -->
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">06 // FREQUENCY</span>
+                    <span class="win-title">06 // MOBILE NETWORK: RAN</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">WAVEFORM SYNC // STAGE_06</span>
-                    <h1 class="sys-header">RESONANCE<br><span class="dim">TUNING</span></h1>
-                    <p class="sys-desc">Oscillating elements synchronize with the scroll velocity. The deeper you go, the more the visual density adapts to your pacing.</p>
+                    <span class="sys-id">RADIO ACCESS NETWORK // STAGE_06</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.4rem, 2.5vw, 2.2rem); margin-bottom: 15px;">RAN:<br><span class="dim">RADIO ACCESS NETWORK</span></h1>
+                    <div class="sys-desc" style="font-size: 13px; line-height: 1.45;">
+                        <p style="margin-bottom: 10px;"><strong>> Overview:</strong> Connects user devices to the mobile core network through the radio access network.</p>
+                        <p style="margin-bottom: 4px;"><strong>> Network Architecture:</strong></p>
+                        <p style="margin-bottom: 2px; padding-left: 10px;">• <strong>User Device:</strong> Smartphone / Mobile Device</p>
+                        <p style="margin-bottom: 2px; padding-left: 10px;">• <strong>Radio Network:</strong> BTS / NodeB / eNodeB / gNodeB + Baseband</p>
+                        <p style="margin-bottom: 2px; padding-left: 10px;">• <strong>Core Network:</strong> MSC • VLR • HLR • etc.</p>
+                        <p style="margin-bottom: 8px; padding-left: 10px;">• <strong>External Networks:</strong> PSTN • PLMN • Internet • Other Networks</p>
+                        <p style="margin-bottom: 4px;"><strong>> Mobile Network Evolution:</strong> 1G (AMPS) → 2G (GSM) → 3G (UMTS / HSPA) → 4G (LTE) → 5G (NR)</p>
+                        <p style="margin-bottom: 8px; color: var(--primary);">* Note: 3G has been phased out.</p>
+                        <p style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border);"><strong>Tools:</strong> Ericsson E&M • Huawei U2020</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7 -->
+        <!-- Slide 7: Mobile Core & SOC -->
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">07 // LOGISTICS</span>
+                    <span class="win-title">07 // MOBILE CORE & SOC</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">ASSET MANAGEMENT // STAGE_07</span>
-                    <h1 class="sys-header">SPATIAL<br><span class="dim">LAYOUT</span></h1>
-                    <p class="sys-desc">The arrangement of servers follows procedural logic, scattering nodes across the z-axis to create a continuously evolving corridor of technology.</p>
+                    <span class="sys-id">CORE & OPERATIONS // STAGE_07</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.3rem, 2.2vw, 2rem); margin-bottom: 12px;">MOBILE CORE & SOC</h1>
+                    <div class="sys-desc" style="font-size: 12.5px; line-height: 1.4;">
+                        <p style="margin-bottom: 2px;"><strong>SOC:</strong> Monitors network security, traffic, and performance.</p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• Security & Firewall Monitoring • Network Performance & KPIs • Alarm & Fault Management</p>
+                        <p style="margin-bottom: 2px;"><strong>Core:</strong> Monitors the mobile core and signaling to maintain service continuity.</p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• PS • CS • IMS • NFVi • Signaling & Node Monitoring • Traffic, KPIs & KQIs • Alarm & Fault Management</p>
+                        <p style="margin-bottom: 2px;"><strong>Operations (Analyze → Troubleshoot → Escalate → Follow Up → Resolve):</strong></p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• Calls & Email Handling • Tickets & Work Orders • Change Requests • Shift Handover</p>
+                        <p style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--border);"><strong>Key Systems:</strong> SmartCare • NetCool • U2020 • DRA • STP • Avaya • AgileOps</p>
+                        <p style="margin-bottom: 0; font-size: 11.5px; color: var(--text-muted);"><strong>Flow:</strong> RAN → Core → Services / External Networks</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 8 -->
+        <!-- Slide 8: Fixed Access: Fiber & Broadband -->
         <div class="ui-section center">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">08 // TRANSMISSION</span>
+                    <span class="win-title">08 // FIXED ACCESS: FIBER & BROADBAND</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">UPLINK STATUS // STAGE_08</span>
-                    <h1 class="sys-header">DATA<br><span class="dim">BURST</span></h1>
-                    <p class="sys-desc">Packets of light pulse through the infrastructure. Each wireframe cube operates as a temporary cache, holding fragments of color before releasing them.</p>
+                    <span class="sys-id">FIXED INFRASTRUCTURE // STAGE_08</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.4rem, 2.5vw, 2.2rem); margin-bottom: 15px;">FIXED ACCESS:<br><span class="dim">FIBER & BROADBAND</span></h1>
+                    <div class="sys-desc" style="font-size: 13px; line-height: 1.45;">
+                        <p style="margin-bottom: 6px;"><strong>> Overview:</strong> Connects customers to fixed broadband and voice services through the access network.</p>
+                        <p style="margin-bottom: 4px;"><strong>> Access Technologies & Devices:</strong></p>
+                        <p style="margin-bottom: 2px; padding-left: 10px;">• <strong>GPON:</strong> Fiber-based access technology | <strong>OLT:</strong> Network-side optical equipment</p>
+                        <p style="margin-bottom: 2px; padding-left: 10px;">• <strong>ONT:</strong> Customer-side optical equipment | <strong>MSAN:</strong> Provides multiple fixed access services</p>
+                        <p style="margin-bottom: 6px; padding-left: 10px;">• <strong>NGN:</strong> Next-gen voice/network | <strong>PRI:</strong> Digital voice | <strong>MPLS:</strong> Private data</p>
+                        <p style="margin-bottom: 4px;"><strong>> Network Flow:</strong> OLT → Fiber Distribution → ONT → Customer</p>
+                        <p style="margin-bottom: 4px;"><strong>> Monitoring:</strong> Fiber/GPON/OLT Alarms • NGN & IGW • Core U2020 • Critical Exchanges • ITOC • Public Wi-Fi • CCTV</p>
+                        <p style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border);"><strong>Key Systems:</strong> Fixed NCE • U2020 • AgileOps • Avaya</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 9 -->
+        <!-- Slide 9: Datacom & iNOC -->
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">09 // APEX</span>
+                    <span class="win-title">09 // DATACOM & iNOC</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">APPROACHING TERMINUS // STAGE_09</span>
-                    <h1 class="sys-header">THE<br><span class="dim">HORIZON</span></h1>
-                    <p class="sys-desc">You are nearing the end of the calculated spline path. The environment maintains its lush pink hue, undisturbed by artificial shadows.</p>
+                    <span class="sys-id">DATA & INTERNATIONAL CONNECTIVITY // STAGE_09</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.3rem, 2.2vw, 2rem); margin-bottom: 12px;">DATACOM & iNOC</h1>
+                    <div class="sys-desc" style="font-size: 12.5px; line-height: 1.4;">
+                        <p style="margin-bottom: 2px;"><strong>Datacom:</strong> Provides data connectivity between sites, customers, and network services.</p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• <strong>ILL:</strong> Internet Leased Line (Dedicated) • <strong>P2P:</strong> Point-to-Point • <strong>SD-WAN:</strong> Software-Defined WAN (MPLS + Internet, Flexible, Optimized)</p>
+                        <p style="margin-bottom: 2px;"><strong>iNOC:</strong> Monitors and manages international connectivity and traffic.</p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• <strong>Monitoring:</strong> Network Weather Map • iNOC Console • IGW Network • Zoi (GGC)</p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• <strong>International Network:</strong> IGW Providers & Customers • Zain • GGC • MPLS Core • IGW Peers • Content Providers • STCs • IX Peers • CDNs</p>
+                        <p style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--border); font-size: 12px;"><strong>Focus:</strong> Datacom → Data Connectivity | iNOC → International Connectivity</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 10 -->
+        <!-- Slide 10: Service Desk -->
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">10 // CONCLUSION</span>
+                    <span class="win-title">10 // SERVICE DESK</span>
                     <span class="win-status">COMPLETE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">END OF LINE // STAGE_10</span>
-                    <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
-                    <p class="sys-desc">All ten data points have been successfully processed. The system will now idle in this state indefinitely. Thank you for viewing.</p>
+                    <span class="sys-id">FOCAL POINT & CONCLUSION // STAGE_10</span>
+                    <h1 class="sys-header" style="font-size: clamp(1.4rem, 2.5vw, 2.2rem); margin-bottom: 12px;">SERVICE DESK</h1>
+                    <div class="sys-desc" style="font-size: 13px; line-height: 1.45;">
+                        <p style="margin-bottom: 4px;"><strong>> Role:</strong> The focal point of the NOC, coordinating activities across all NOC teams.</p>
+                        <p style="margin-bottom: 4px; padding-left: 10px;">• Monitors Work Orders & CRs • Manages Tickets & WOs • Assigns FM teams • Follows up on SLA & escalation • Handles customer & internal complaints</p>
+                        <p style="margin-bottom: 4px;"><strong>> CR Levels:</strong> Low (Not service affecting) • Medium (Service affecting) • High (Service affecting) • Emergency (Critical / urgent)</p>
+                        <p style="margin-bottom: 4px;"><strong>> Systems:</strong> AgileOps (Auto) • Excel • QMS</p>
+                        <p style="margin-bottom: 6px;"><strong>> Flow:</strong> Complaint/Alarm/CR → Ticket/WO → FM/Team → Follow-Up & Escalation → Resolution</p>
+                        <p style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); color: var(--primary); font-weight: 800;"><strong>Service Desk = The Focal Point Connecting NOC Teams, FM & Customers</strong></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -696,7 +738,6 @@
             duration: 1
         }, 0);
 
-        // Gradual fade out for the title screen as scrolling starts
         masterTl.to(titleScreen, {
             opacity: 0,
             y: -50,
@@ -736,11 +777,9 @@
             requestAnimationFrame(animate);
             const time = clock.getElapsedTime();
 
-            // Smoothly interpolate look directions based on mouse position
             targetLookX += (mouseX * 5 - targetLookX) * 0.05;
             targetLookY += (-mouseY * 4 - targetLookY) * 0.05;
 
-            // Update camera lookAt point to allow looking left and right smoothly
             const currentCamZ = camera.position.z;
             camera.lookAt(targetLookX, targetLookY, currentCamZ - 20);
 
