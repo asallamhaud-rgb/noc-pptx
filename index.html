@@ -71,7 +71,7 @@
 
         #scroll-track {
             position: relative; z-index: 2;
-            height: 1500vh; pointer-events: none;
+            height: 1650vh; pointer-events: none;
         }
         
         #title-screen {
@@ -83,6 +83,17 @@
             opacity: 0; pointer-events: none;
             transition: visibility 0.3s;
         }
+
+        /* Ending Screen Style Matched to Title Screen */
+        #end-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 20; background: transparent;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+        }
+
         .main-title {
             font-size: clamp(5rem, 12vw, 10rem);
             color: var(--primary); text-align: center;
@@ -226,6 +237,12 @@
             <span>// SCROLL TO DESCEND //</span>
             <div class="scroll-line"></div>
         </div>
+    </div>
+
+    <!-- THANK YOU ENDING SCREEN -->
+    <div id="end-screen">
+        <h1 class="main-title">THANK<br>YOU</h1>
+        <div class="author-credit">Made by Asala Hassan Bait Mhaud</div>
     </div>
 
     <div class="status-bar">
@@ -533,7 +550,7 @@
 
         const CONFIG = {
             cameraZStart: 25,
-            cameraZEnd: -450, 
+            cameraZEnd: -500, 
             fogDensity: 0.007, 
             fogColor: 0xffb6c1, 
             ambientIntensity: 2.2, 
@@ -709,6 +726,7 @@
         const depthReadout = document.getElementById('depth-readout');
         const slideReadout = document.getElementById('slide-readout');
         const progressFill = document.getElementById('progress-fill');
+        const endScreen = document.getElementById('end-screen');
 
         const masterTl = gsap.timeline({
             scrollTrigger: {
@@ -741,7 +759,7 @@
         masterTl.to(titleScreen, {
             opacity: 0,
             y: -50,
-            duration: 0.15,
+            duration: 0.1,
             ease: "power1.out"
         }, 0);
 
@@ -764,6 +782,13 @@
                 );
             }
         });
+
+        // Fade in THANK YOU ending screen at the very end of the scroll track
+        masterTl.fromTo(endScreen,
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 0.08, ease: "power2.out" },
+            0.92
+        );
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
