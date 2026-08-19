@@ -11,14 +11,18 @@
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #ffb6c1; 
-            --bg-panel: rgba(255, 192, 203, 0.75); 
+            /* True Pink Theme - No White Cast */
+            --bg: #ffb6c1; /* Richer Baby Pink */
+            --bg-panel: rgba(255, 192, 203, 0.75); /* Pink frosted glass */
             --border: rgba(199, 21, 133, 0.5);
+            
+            /* Text & Accents */
             --text-main: #5a1836;
             --text-muted: #9e476e;
-            --primary: #c71585; 
+            --primary: #c71585; /* Deep Magenta */
             --primary-dim: rgba(199, 21, 133, 0.6);
             --accent1: #ff1493;
+            --warn: #d32f2f;
         }
         html { scroll-behavior: auto; }
         body {
@@ -27,25 +31,6 @@
             overflow-x: hidden; cursor: crosshair;
             font-size: 16px; line-height: 1.6;
         }
-        
-        /* Boot Sequence Screen */
-        #boot-screen {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: var(--bg); z-index: 300;
-            display: flex; flex-direction: column;
-            padding: 50px; font-weight: 600;
-            color: var(--primary); font-size: 18px;
-            pointer-events: none;
-        }
-        .boot-line { margin-bottom: 8px; opacity: 0; }
-        .cursor {
-            display: inline-block; width: 12px; height: 20px;
-            background-color: var(--primary); margin-left: 5px;
-            vertical-align: middle; animation: blink 1s step-end infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
-
         #canvas-container {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -69,16 +54,36 @@
 
         #scroll-track {
             position: relative; z-index: 2;
-            height: 1500vh; pointer-events: none;
+            height: 1500vh; /* Extended for 10 slides */
+            pointer-events: none;
         }
         
+        /* Boot Sequence Screen */
+        #boot-screen {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--bg); z-index: 300;
+            display: flex; flex-direction: column;
+            padding: 50px; font-weight: 600;
+            color: var(--primary); font-size: 18px;
+            pointer-events: none;
+        }
+        .boot-line { margin-bottom: 8px; opacity: 0; }
+        .cursor {
+            display: inline-block; width: 12px; height: 20px;
+            background-color: var(--primary); margin-left: 5px;
+            vertical-align: middle; animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        /* Title Screen Overlay */
         #title-screen {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 200; background: transparent;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            transition: opacity 0.8s ease; opacity: 0; 
+            transition: opacity 0.8s ease; opacity: 0; /* Hidden initially until boot finishes */
         }
         .main-title {
             font-size: clamp(5rem, 12vw, 10rem);
@@ -100,7 +105,7 @@
         }
         .ui-section {
             position: absolute; width: 100%;
-            max-width: 1000px; 
+            max-width: 1000px; /* Slide Size as before */
             padding: 0 4vw;
             opacity: 0; transform: translateY(60px);
             pointer-events: none;
@@ -131,14 +136,14 @@
             letter-spacing: 0.15em; margin-bottom: 20px; display: block;
         }
         .sys-header {
-            font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
+            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800;
             color: var(--primary); text-transform: uppercase;
             letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 20px;
         }
         .sys-header .dim { color: var(--text-muted); font-weight: 300; }
         .sys-desc {
-            color: var(--text-main); font-size: 16px; font-weight: 500; 
-            line-height: 1.7; max-width: 850px;
+            color: var(--text-main); font-size: 18px; font-weight: 500; 
+            line-height: 1.8; max-width: 750px;
         }
         .sys-desc strong { color: var(--primary); font-weight: 800; }
         
@@ -267,20 +272,19 @@
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">MOVING THE NETWORK TRAFFIC</span>
-                    <h1 class="sys-header">THE<br><span class="dim">INFRASTRUCTURE</span></h1>
+                    <h1 class="sys-header">TRANSMISSION<br><span class="dim">&amp; CONNECTIVITY</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Transmission carries traffic between network locations and domains. Consists of topology, technologies, links, ports, cards, interfaces, and cross-site connectivity.</p>
-                        <p style="margin-bottom: 10px;"><strong>> VSAT (Very Small Aperture Terminal)</strong><br>Satellite-based communication useful for remote difficulty. Flow:<br>
-                        `Site` &#10142; `VSAT` &#10142; `Satellite` &#10142; `Hub/Gateway` &#10142; `Network`</p>
-                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS</strong><br>Alarm monitoring, calls, emails, ticket creation, escalations, first-level troubleshooting, Work Order (WO) dispatching, Change Request (CR) handling, Problem Management.</p>
-                        <p><strong>> DEVICES</strong><br>[TRANSPORT DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> INFRASTRUCTURE BACKBONE:</strong> Carries traffic between network locations using diverse topologies, links, ports, and interfaces.</p>
+                        <p style="margin-bottom: 15px;"><strong>> VSAT (Very Small Aperture Terminal):</strong> Satellite communication for remote areas where terrestrial connectivity is unavailable.<br>Flow: `Site → VSAT → Satellite → Hub/Gateway`</p>
+                        <p style="margin-bottom: 15px;"><strong>> OPERATIONS:</strong> 24/7 monitoring, alarm handling, troubleshooting, Work Orders, and Change Requests (CR).</p>
+                        <p><strong>> DEVICES:</strong><br>[TRANSPORT DEVICES — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 3 -->
-        <div class="ui-section center">
+        <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">03 // RAN</span>
@@ -291,17 +295,18 @@
                     <span class="sys-id">CONNECTING MOBILE USERS</span>
                     <h1 class="sys-header">RADIO ACCESS<br><span class="dim">NETWORK</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Provides the radio connection between users and the telecommunications network.<br>Flow: `Mobile User` &#10142; `Radio Site` &#10142; `RAN` &#10142; `Transport` &#10142; `Core Network`</p>
-                        <p style="margin-bottom: 10px;"><strong>> EVOLUTION</strong><br>Higher capacity, rates, lower latency from 2G &#10142; 3G &#10142; 4G &#10142; 5G. Roles of ERAN / HRAN.</p>
-                        <p style="margin-bottom: 10px;"><strong>> EQUIPMENT</strong><br>[RAN DEVICES — TO BE ADDED]</p>
-                        <p><strong>> OPERATIONS</strong><br>Monitoring, alarm/call/email triage, escalation, L1 troubleshooting, WO dispatch, closure, Problem Management.</p>
+                        <p style="margin-bottom: 15px;"><strong>> FUNCTION:</strong> The radio connection between user devices and the telecommunications network.</p>
+                        <p style="margin-bottom: 15px;"><strong>> EVOLUTION:</strong> 2G → 3G → 4G → 5G (Higher capacity, faster data, lower latency, better performance).</p>
+                        <p style="margin-bottom: 15px;"><strong>> TOPOLOGY:</strong><br>`Mobile User → Radio Site → RAN → Transport → Core`</p>
+                        <p style="margin-bottom: 15px;"><strong>> OPERATIONS:</strong> Alarm monitoring, call handling, L1 troubleshooting, field dispatch.</p>
+                        <p><strong>> EQUIPMENT:</strong><br>[RAN DEVICES — TO BE ADDED] // Inc. ERAN / HRAN</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 4 -->
-        <div class="ui-section left">
+        <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">04 // FIXED ACCESS</span>
@@ -310,40 +315,41 @@
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">CONNECTING FIXED CUSTOMERS</span>
-                    <h1 class="sys-header">WIRELINE<br><span class="dim">CONNECTIVITY</span></h1>
+                    <h1 class="sys-header">FIBER<br><span class="dim">&amp; COPPER ACCESS</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Providing fixed connectivity. Flow: `Customer` &#10142; `Access` &#10142; `Aggregation` &#10142; `Core` &#10142; `Service`</p>
-                        <p style="margin-bottom: 10px;"><strong>> GPON (Gigabit Passive Optical Network)</strong><br>Fiber-to-the-home. Flow: `OLT` &#10142; `Fiber` &#10142; `Splitter` &#10142; `ONT/ONU` &#10142; `Customer`</p>
-                        <p style="margin-bottom: 10px;"><strong>> MSAN & NGN / PRI</strong><br>MSAN aggregates customer access. NGN/PRI used for telecom/voice services.</p>
-                        <p style="margin-bottom: 10px;"><strong>> OPERATIONS & DEVICES</strong><br>Alarm tracking, customer tickets, troubleshooting, WO dispatch, Problem Management.<br>[FIXED ACCESS DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> FUNCTION:</strong> Wireline connectivity direct to customer premises.</p>
+                        <p style="margin-bottom: 15px;"><strong>> GPON (Gigabit Passive Optical Network):</strong> Uses fiber optics and splitters for high-speed delivery.<br>Flow: `OLT → Fiber → Splitter → ONT/ONU`</p>
+                        <p style="margin-bottom: 15px;"><strong>> MSAN & VOICE:</strong> MSAN aggregates access services. NGN/PRI protocols handle modern voice/telecom.</p>
+                        <p style="margin-bottom: 15px;"><strong>> TOPOLOGY:</strong> `Customer → Access → Aggregation → Core → Service`</p>
+                        <p><strong>> DEVICES:</strong><br>[FIXED ACCESS DEVICES — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 5 -->
-        <div class="ui-section right">
+        <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">05 // IP</span>
+                    <span class="win-title">05 // IP CORE</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">THE CORE OF CONNECTIVITY</span>
-                    <h1 class="sys-header">ROUTING AND<br><span class="dim">SWITCHING</span></h1>
+                    <h1 class="sys-header">IP ROUTING<br><span class="dim">&amp; SWITCHING</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Connects different network areas and services. Flow: `Access` &#10142; `Distribution` &#10142; `Core` &#10142; `Services / Internet`</p>
-                        <p style="margin-bottom: 10px;"><strong>> COMPONENTS</strong><br>Routers, switches across all layers, IP links.</p>
-                        <p style="margin-bottom: 10px;"><strong>> METRO / IP RINGS</strong><br>Ring topology provides alternative paths and network resilience.<br>`Site A` &#10142; `Site B` &#10142; `Site C` &#10142; `Site D` &#10142; `Site A`</p>
-                        <p><strong>> OPERATIONS & DEVICES</strong><br>Interface monitoring, connectivity checks, escalation, L1 troubleshooting, WO dispatch.<br>[IP DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> FUNCTION:</strong> Connects network areas and services using routers and switches across Access, Distribution, and Core layers.</p>
+                        <p style="margin-bottom: 15px;"><strong>> METRO / IP RINGS:</strong> Ring topology providing alternate paths for instant rerouting and network resilience.</p>
+                        <p style="margin-bottom: 15px;"><strong>> OPERATIONS:</strong> Interface monitoring, connectivity checks, L1 troubleshooting, Problem Management.</p>
+                        <p><strong>> DEVICES:</strong><br>[IP DEVICES — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 6 -->
-        <div class="ui-section left">
+        <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">06 // DATACOM</span>
@@ -352,21 +358,19 @@
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">DELIVERING DATA SERVICES</span>
-                    <h1 class="sys-header">ENTERPRISE<br><span class="dim">CONNECTIVITY</span></h1>
+                    <h1 class="sys-header">BUSINESS<br><span class="dim">CONNECTIVITY</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Responsible for data connectivity and related services.</p>
-                        <p style="margin-bottom: 10px;"><strong>> MPLS & ILL</strong><br>MPLS efficient forwarding for VPNs. ILL dedicated internet.</p>
-                        <p style="margin-bottom: 10px;"><strong>> P2P (Point-to-Point)</strong><br>Direct connectivity: `Site A` ───────── `Site B`</p>
-                        <p style="margin-bottom: 10px;"><strong>> SD-WAN</strong><br>Software control, dynamic path selection, multiple connections. Flow:<br>
-                        `Branch` &#10142; `SD-WAN` &#10142; `Multiple WAN Paths` &#10142; `HQ / Cloud`</p>
-                        <p><strong>> OPERATIONS & DEVICES</strong><br>Monitoring, ticketing, L1 troubleshooting, WO dispatch, CR/Problem Management.<br>[DATACOM DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> MPLS:</strong> Uses labels to efficiently forward traffic, supporting enterprise VPN services.</p>
+                        <p style="margin-bottom: 15px;"><strong>> ILL & P2P:</strong> Dedicated Internet Leased Lines and direct Point-to-Point connections (`A ── B`).</p>
+                        <p style="margin-bottom: 15px;"><strong>> SD-WAN:</strong> Software-defined control to manage WAN connectivity dynamically over multiple paths.<br>Flow: `Branch → SD-WAN → Optimal Path`</p>
+                        <p><strong>> DEVICES:</strong><br>[DATACOM DEVICES — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 7 -->
-        <div class="ui-section right">
+        <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">07 // INOC</span>
@@ -375,23 +379,19 @@
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">BRINGING NETWORK SERVICES TOGETHER</span>
-                    <h1 class="sys-header">INTEGRATED<br><span class="dim">OPERATIONS CENTER</span></h1>
+                    <h1 class="sys-header">SERVICE<br><span class="dim">INTEGRATION</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Interacts with different technical domains.</p>
-                        <p style="margin-bottom: 10px;"><strong>> INTERACTIONS</strong><br>
-                        `> Voice`: Service monitoring and control.<br>
-                        `> IP`: Connectivity and routing infrastructure.<br>
-                        `> Transmission`: Connectivity carrying services across the network.</p>
-                        <p style="margin-bottom: 10px;"><strong>> TOPOLOGY FLOW</strong><br>
-                        `Voice / Services` &#10142; `IP` &#10142; `Transport` &#10142; `Sites / Customers`</p>
-                        <p><strong>> DEVICES</strong><br>[INOC DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> FUNCTION:</strong> INOC interacts with all technical domains, monitoring coordination and overall topology connection.</p>
+                        <p style="margin-bottom: 15px;"><strong>> UNIFIED VIEW:</strong> Combines Voice infrastructure, underlying IP routing, and Transmission pipes into a single view.</p>
+                        <p style="margin-bottom: 15px;"><strong>> SERVICE RELATIONSHIP:</strong><br>`Voice / Services → IP → Transport`</p>
+                        <p><strong>> DEVICES:</strong><br>[INOC DEVICES — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Slide 8 -->
-        <div class="ui-section center">
+        <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <span class="win-title">08 // SOC</span>
@@ -400,12 +400,12 @@
                 </div>
                 <div class="terminal-body">
                     <span class="sys-id">PERFORMANCE & SERVICE MONITORING</span>
-                    <h1 class="sys-header">SERVICE<br><span class="dim">OPERATIONS CENTER</span></h1>
+                    <h1 class="sys-header">KPIs<br><span class="dim">&amp; SERVICE QUALITY</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">Focuses on service performance and operational visibility.</p>
-                        <p style="margin-bottom: 10px;"><strong>> PERFORMANCE KPIs</strong><br>availability, uptime, traffic utilization, latency, packet loss, incident resolution time. KPIs define the network/service health.</p>
-                        <p style="margin-bottom: 10px;"><strong>> SMART CARE TOOL</strong><br>Service monitoring, analysis, performance visibility, supporting investigation.</p>
-                        <p><strong>> TOOLS</strong><br>[SOC DEVICES / TOOLS — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> KPIs (Key Performance Indicators):</strong> Tell the team how healthy and efficient the network is (e.g., Availability, Latency, MTTR).</p>
+                        <p style="margin-bottom: 15px;"><strong>> SMART CARE TOOL:</strong> Service monitoring and analysis tool for end-to-end visibility and fault investigation.</p>
+                        <p style="margin-bottom: 15px;"><strong>> KEYWORDS:</strong> Packet loss, Traffic utilization, Uptime percentage.</p>
+                        <p><strong>> TOOLS:</strong><br>[SOC DEVICES / TOOLS — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
@@ -415,17 +415,18 @@
         <div class="ui-section left">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">09 // SERVICE DESK & SECURITY</span>
+                    <span class="win-title">09 // SERVICE DESK / SECURITY</span>
                     <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">STAGE_09</span>
-                    <h1 class="sys-header">FRONT OFFICE &<br><span class="dim">INFRASTRUCTURE PROTECTION</span></h1>
+                    <span class="sys-id">COMMUNICATION & INFRA PROTECTION</span>
+                    <h1 class="sys-header">SERVICE DESK<br><span class="dim">&amp; SECURITY</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;"><strong>> SERVICE DESK</strong><br>Communication point between users and technical operations. Ticket roles.<br>Flow: `Customer` &#10142; `Service Desk` &#10142; `NOC` &#10142; `Team` &#10142; `Resolution` &#10142; `Customer`</p>
-                        <p style="margin-bottom: 10px;"><strong>> PHYSICAL SECURITY</strong><br>Protects telecommunications infrastructure: site access control, restricted areas, hardware protection, environmental monitoring.</p>
-                        <p><strong>> SYSTEMS</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — TO BE ADDED]</p>
+                        <p style="margin-bottom: 15px;"><strong>> SERVICE DESK:</strong> Key interface between users and operations; receives reports, updates tickets, confirms resolution.</p>
+                        <p style="margin-bottom: 15px;"><strong>> COLLABORATION:</strong> `User → Service Desk → NOC → Resolution → User`</p>
+                        <p style="margin-bottom: 15px;"><strong>> PHYSICAL SECURITY:</strong> Protecting telecommunications infrastructure physically (Access control, equipment restriction).</p>
+                        <p><strong>> SYSTEMS:</strong><br>[SERVICE DESK / PHYSICAL SECURITY DEVICES — TO BE ADDED]</p>
                     </div>
                 </div>
             </div>
@@ -435,17 +436,17 @@
         <div class="ui-section right">
             <div class="terminal-window">
                 <div class="terminal-header">
-                    <span class="win-title">10 // CONCLUSION</span>
-                    <span class="win-status">COMPLETE</span>
+                    <span class="win-title">10 // WORKFLOW</span>
+                    <span class="win-status">ACTIVE</span>
                     <div class="win-btns"><span class="win-btn"></span><span class="win-btn"></span><span class="win-btn"></span></div>
                 </div>
                 <div class="terminal-body">
-                    <span class="sys-id">END OF LINE // STAGE_10</span>
-                    <h1 class="sys-header">DESCENT<br><span class="dim">FINISHED</span></h1>
+                    <span class="sys-id">HOW THE ENTIRE NOC WORKS TOGETHER</span>
+                    <h1 class="sys-header">END-TO-END<br><span class="dim">OPERATIONS</span></h1>
                     <div class="sys-desc">
-                        <p style="margin-bottom: 10px;">`Customer` &#10142; `SD` &#10142; `NOC` &#10142; `Alarm/Monitoring` &#10142; `Identify Domain` &#10142; `L1 Troublshoot` &#10142; `Escalate` &#10142; `Resolv` &#10142; `Close` &#10142; `Problem Mgt`</p>
-                        <p style="margin-bottom: 10px;"><strong>> CORE TAKEAWAY</strong><br>Every domain has a different role, but they work together to keep the network and services running.</p>
-                        <p style="color: var(--text-muted); font-size: 14px;">Transport Devices | RAN Devices | Fixed Access Devices | IP Devices | Datacom Devices | INOC Devices | SOC Tools</p>
+                        <p style="margin-bottom: 15px;"><strong>> UNIFIED FLOW:</strong> Monitoring ➔ Identify affected domain (RAN, IP, etc.) ➔ Troubleshoot ➔ Escalate (if needed) ➔ Resolve ➔ Closure.</p>
+                        <p style="margin-bottom: 15px;"><strong>> CORE MESSAGE:</strong> Every domain has a different role, but they work together to keep services running.</p>
+                        <p style="font-size: 13px; color: var(--text-muted);"><strong>> HARDWARE LAYER:</strong> Trans Devices | RAN Devices | Access Devices | IP Devices | Datacom Devices | INOC Devices | SOC Tools</p>
                     </div>
                 </div>
             </div>
@@ -486,7 +487,7 @@
                             ease: "power2.inOut",
                             onComplete: () => {
                                 bootScreen.style.display = 'none';
-                                titleScreen.style.opacity = '1'; 
+                                titleScreen.style.opacity = '1'; // Reveal title screen
                             }
                         });
                     }, 1200);
@@ -499,12 +500,13 @@
         // --- THREE.JS & GSAP LOGIC ---
         gsap.registerPlugin(ScrollTrigger);
 
+        // Configuration
         const CONFIG = {
             cameraZStart: 25,
-            cameraZEnd: -450, 
+            cameraZEnd: -450, // Longer corridor for 10 slides
             fogDensity: 0.007, 
-            fogColor: 0xffb6c1, 
-            ambientIntensity: 2.2, 
+            fogColor: 0xffb6c1, // Pure baby pink
+            ambientIntensity: 2.2, // Pink ambient light intensity
             pointLightIntensity: 1.5,
             pointLightDistance: 100,
             objectCount: 350,
@@ -530,9 +532,11 @@
         renderer.toneMappingExposure = 1.1; 
         container.appendChild(renderer.domElement);
 
+        // PINK AMBIENT LIGHT (Replaces White)
         const ambientLight = new THREE.AmbientLight(0xffa6c9, CONFIG.ambientIntensity);
         scene.add(ambientLight);
 
+        // Main camera light is Hot Pink/Magenta instead of White
         const camLight = new THREE.PointLight(0xff69b4, CONFIG.pointLightIntensity, CONFIG.pointLightDistance);
         camLight.position.set(0, 2, -6);
         camLight.castShadow = true;
@@ -544,11 +548,13 @@
         const camLight2 = new THREE.PointLight(0xff1493, 1.2, 50);
         camLight2.position.set(5, -2, -5);
         camera.add(camLight2);
+
         scene.add(camera);
 
         const corridorLights = [];
         for (let i = 0; i < 30; i++) {
             const z = -15 - i * 15;
+            // Lights are purely pink tones
             const color = Math.random() > 0.5 ? 0xffb6c1 : 0xff1493;
             const light = new THREE.PointLight(color, 0.9, 35);
             light.position.set(
@@ -560,6 +566,7 @@
             corridorLights.push({ light, baseIntensity: 0.9, flickerSpeed: 2 + Math.random() * 5 });
         }
 
+        // Materials modified to have NO pure white, replacing with soft pink bases
         const materials = {
             serverSoftPink: new THREE.MeshStandardMaterial({ color: 0xffd1dc, metalness: 0.1, roughness: 0.3 }),
             serverPink: new THREE.MeshStandardMaterial({ color: 0xffb6c1, metalness: 0.2, roughness: 0.4 }),
@@ -683,6 +690,7 @@
             const progress = i / (numSections - 1);
             const z = CONFIG.cameraZStart - progress * Math.abs(CONFIG.cameraZStart - CONFIG.cameraZEnd);
             
+            // Reduced Multiplier for Straighter Path
             const x = Math.sin(progress * Math.PI * 2) * (CONFIG.corridorWidth * 0.02);
             const y = Math.cos(progress * Math.PI * 2) * (CONFIG.corridorHeight * 0.02);
             
@@ -736,6 +744,8 @@
             }
         }, 0);
 
+
+        // --- NO-OVERLAP SCROLL LOGIC ---
         sections.forEach((section, index) => {
             const start = index * 10;
             const end = start + 10;
